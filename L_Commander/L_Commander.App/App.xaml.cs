@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using L_Commander.App.FileSystem;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.ViewModels;
 using L_Commander.App.Views;
@@ -73,7 +74,7 @@ namespace L_Commander.App
 
                 .AddSingleton<IConfiguration>(_configuration)
 
-                // infrastructure
+                // Infrastructure
                 .AddSingleton<IDispatcher>(dispatcherAdapter)
                 .AddSingleton<IShowDialogAgent, ShowDialogAgent>()
                 .AddLogging(x =>
@@ -82,9 +83,13 @@ namespace L_Commander.App
                     x.AddSerilog(logger: serilogLogger, dispose: true);
                 })
 
-                // viewModels
+                // File System
+                .AddSingleton<IDriveInfoProvider, DriveInfoProvider>()
 
-                .AddSingleton<IMainViewModel, MainViewModel>();
+                // ViewModels
+
+                .AddSingleton<IMainViewModel, MainViewModel>()
+                .AddTransient<IFileManagerViewModel, FileManagerViewModel>();
 
             return serviceCollection.BuildServiceProvider();
         }
