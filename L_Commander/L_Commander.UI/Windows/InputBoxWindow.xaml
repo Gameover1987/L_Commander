@@ -1,0 +1,42 @@
+﻿<Window x:Class="L_Commander.UI.Windows.InputBoxWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:designTime="clr-namespace:L_Commander.UI.ViewModels.DesignTime"
+        xmlns:helpers="clr-namespace:L_Commander.UI.Helpers"
+        mc:Ignorable="d"
+        Title="{Binding Title}"
+        Width="500"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="{x:Static SystemColors.ControlBrush}"
+        d:DataContext="{d:DesignInstance Type={x:Type designTime:DesignMockInputBoxViewModel}, IsDesignTimeCreatable=False}"
+        ResizeMode="NoResize"
+        FocusManager.FocusedElement="{Binding ElementName=TextBox}">
+    <Grid Margin="12">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding ParameterName}" VerticalAlignment="Center"/>
+        <TextBox x:Name="TextBox" Grid.Row="0" Grid.Column="1" Text="{Binding InputString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="6,0,0,0"                 />
+
+        <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="-12,12,-12,12"/>
+
+        <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Width="100" Height="23" Content="OK" IsDefault="True"
+                    Command="{Binding OKCommand}"
+                    helpers:WindowCloseHelper.DialogResult="True"/>
+            <Button Width="100" Height="23" Content="Отмена" Margin="6,0,0,0" IsCancel="True"
+                    helpers:WindowCloseHelper.DialogResult="False"/>
+        </StackPanel>
+    </Grid>
+</Window>

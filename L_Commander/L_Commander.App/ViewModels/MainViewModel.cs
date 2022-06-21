@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace L_Commander.App.ViewModels
 {
-    class MainViewModel
+    public interface IMainViewModel
+    {
+
+    }
+
+    public class MainViewModel : IMainViewModel
     {
     }
 }
