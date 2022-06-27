@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Enumeration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace L_Commander.App.FileSystem
 {
@@ -13,55 +9,61 @@ namespace L_Commander.App.FileSystem
         File, Folder
     }
 
-    public class FileSystemEntry
+    public class FileSystemEntryDescriptor
     {
-        private readonly string _path;
-
-        public FileSystemEntry(string path)
-        {
-            _path = path;
-
-            var attributes = File.GetAttributes(_path);
-            if (attributes.HasFlag(FileAttributes.Directory))
-            {
-                FileOrFolder = FileOrFolder.Folder;
-                TotalSize = "<DIR>";
-                Created = Directory.GetCreationTime(_path);
-            }
-            else
-            {
-                FileOrFolder = FileOrFolder.File;
-                Extension = System.IO.Path.GetExtension(_path);
-                Created = File.GetCreationTime(_path);
-            }
-        }
-
         public FileOrFolder FileOrFolder { get; set; }
 
-        public string Path => _path;
+        public string Path { get; set; }
 
-        public string Extension { get; private set; }
+        public string Extension { get; set; }
 
-        public string TotalSize { get; private set; }
+        public long TotalSize { get; set; }
 
-        public DateTime Created { get; private set; }
+        public DateTime Created { get; set; }
+
+        public bool IsFile
+        {
+            get { return FileOrFolder == FileOrFolder.File; }
+        }
     }
 
     public interface IFileSystemProvider
     {
-       IEnumerable<FileSystemEntry> GetFileSystemEntries(string path);
+       IEnumerable<string> GetFileSystemEntries(string path);
+
+       FileSystemEntryDescriptor GetEntryDetails(string path);
     }
 
     public sealed class FileSystemProvider : IFileSystemProvider
     {
-        public IEnumerable<FileSystemEntry> GetFileSystemEntries(string path)
+        public IEnumerable<string> GetFileSystemEntries(string path)
         {
             var entries = Directory.EnumerateFileSystemEntries(path, "*.*", SearchOption.TopDirectoryOnly);
+            return entries;
+        }
 
-            foreach (var entry in entries)
+        public FileSystemEntryDescriptor GetEntryDetails(string path)
+        {
+            var descriptor = new FileSystemEntryDescriptor();
+
+            var attributes = File.GetAttributes(path);
+            if (attributes.HasFlag(FileAttributes.Directory))
             {
-                yield return new FileSystemEntry(entry);
+                descriptor.FileOrFolder = FileOrFolder.Folder;
+                descriptor.Created = Directory.GetCreationTime(path);
             }
+            else
+            {
+                descriptor.FileOrFolder = FileOrFolder.File;
+
+                var fileInfo = new FileInfo(path);
+                
+                descriptor.TotalSize = fileInfo.Length;
+                descriptor.Extension = fileInfo.Extension;
+                descriptor.Created = fileInfo.CreationTime;
+            }
+
+            return descriptor;
         }
     }
 }

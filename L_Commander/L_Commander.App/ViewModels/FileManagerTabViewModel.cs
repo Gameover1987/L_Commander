@@ -8,31 +8,46 @@ namespace L_Commander.App.ViewModels;
 public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 {
     private readonly IFileSystemProvider _fileSystemProvider;
-    private string _path;
+    private string _rootPath;
+    private IFileSystemEntryViewModel _selectedFileSystemEntry;
 
     public FileManagerTabViewModel(IFileSystemProvider fileSystemProvider)
     {
         _fileSystemProvider = fileSystemProvider;
     }
 
-    public string Path
+    public string RootPath => _rootPath;
+
+    public ObservableCollection<IFileSystemEntryViewModel> FileSystemEntries { get; } = new ObservableCollection<IFileSystemEntryViewModel>();
+
+    public IFileSystemEntryViewModel SelectedFileSystemEntry
     {
-        get { return _path; }
+        get { return _selectedFileSystemEntry; }
+        set
+        {
+            if (_selectedFileSystemEntry == value)
+                return;
+            _selectedFileSystemEntry = value;
+            OnPropertyChanged();
+        }
     }
 
-    public ObservableCollection<FileSystemEntry> FileSystemEntries { get; } = new ObservableCollection<FileSystemEntry>();
-
-    public void SetPath(string path)
+    public void SetPath(string rootPath)
     {
-        _path = path;
+        _rootPath = rootPath;
 
-        var entries = _fileSystemProvider.GetFileSystemEntries(path);
+        var entries = _fileSystemProvider.GetFileSystemEntries(rootPath);
         FileSystemEntries.Clear();
-        foreach (var fileSystemEntry in entries)
+        foreach (var path in entries)
         {
-            FileSystemEntries.Add(fileSystemEntry);
+            FileSystemEntries.Add(CreateFileSystemEntryViewModel(path));
         }
 
         OnPropertyChanged();
+    }
+
+    protected virtual IFileSystemEntryViewModel CreateFileSystemEntryViewModel(string path)
+    {
+       return new FileSystemEntryViewModel(path, _fileSystemProvider);
     }
 }

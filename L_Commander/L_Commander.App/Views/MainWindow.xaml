@@ -37,9 +37,9 @@
                                          DataContext="{Binding LeftFileManagerViewModel}"/>
 
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch"
-                          Background="Transparent" ShowsPreview="True" Width="3" />
+                          Background="LightGray" ShowsPreview="True" Width="3" />
 
-            <controls:FileManagerControl Grid.Column="2" Margin="0,12,0,0"
+            <controls:FileManagerControl Grid.Column="2" Margin="6,12,0,0"
                                          DataContext="{Binding RightFileManagerViewModel}"/>
         </Grid>
 

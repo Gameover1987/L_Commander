@@ -2,5 +2,5 @@
 
 public interface IFileManagerTabViewModel
 {
-    void SetPath(string path);
+    void SetPath(string rootPath);
 }

@@ -61,6 +61,42 @@ namespace L_Commander.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Date.
+        /// </summary>
+        public static string DataGridColumnName_CreationDate {
+            get {
+                return ResourceManager.GetString("DataGridColumnName_CreationDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        public static string DataGridColumnName_Path {
+            get {
+                return ResourceManager.GetString("DataGridColumnName_Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Size.
+        /// </summary>
+        public static string DataGridColumnName_Size {
+            get {
+                return ResourceManager.GetString("DataGridColumnName_Size", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type.
+        /// </summary>
+        public static string DataGridColumnName_Type {
+            get {
+                return ResourceManager.GetString("DataGridColumnName_Type", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MainWindow.
         /// </summary>
         public static string MainWindowTitle {

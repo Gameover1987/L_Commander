@@ -1,12 +1,14 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
 using L_Commander.App.FileSystem;
+using L_Commander.UI.ViewModels;
 
 namespace L_Commander.App.ViewModels;
 
-public class FileManagerViewModel : IFileManagerViewModel
+public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
 {
     private readonly IDriveInfoProvider _driveInfoProvider;
+    private IFileManagerTabViewModel _selectedTab;
 
     public FileManagerViewModel(IDriveInfoProvider driveInfoProvider)
     {
@@ -16,6 +18,18 @@ public class FileManagerViewModel : IFileManagerViewModel
     public ObservableCollection<DriveViewModel> Drives { get; } = new ObservableCollection<DriveViewModel>();
 
     public ObservableCollection<IFileManagerTabViewModel> Tabs { get; } = new ObservableCollection<IFileManagerTabViewModel>();
+
+    public IFileManagerTabViewModel SelectedTab
+    {
+        get { return _selectedTab; }
+        set
+        {
+            if (_selectedTab == value)
+                return;
+            _selectedTab = value;
+            OnPropertyChanged(() => SelectedTab);
+        }
+    }
 
     public void Initialize()
     {
@@ -31,5 +45,7 @@ public class FileManagerViewModel : IFileManagerViewModel
         var fileManagerTabViewModel = new FileManagerTabViewModel(new FileSystemProvider());
         fileManagerTabViewModel.SetPath(Drives.First().RootPath);
         Tabs.Add(fileManagerTabViewModel);
+
+        SelectedTab = Tabs.First();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using L_Commander.App.FileSystem;
 using L_Commander.App.ViewModels;
 
@@ -10,6 +11,22 @@ internal sealed class DesignMockDriveInfoProvider : IDriveInfoProvider
     public DriveInfo[] GetDrives()
     {
         return DriveInfo.GetDrives();
+    }
+}
+
+internal sealed class DesignMockFileManagerTabViewModel : FileManagerTabViewModel
+{
+    public DesignMockFileManagerTabViewModel() 
+        : base(new FileSystemProvider())
+    {
+        SetPath("C:\\");
+
+        foreach (var fileSystemEntryViewModel in FileSystemEntries)
+        {
+            fileSystemEntryViewModel.Initialize();
+        }
+
+        SelectedFileSystemEntry = FileSystemEntries.FirstOrDefault();
     }
 }
 
