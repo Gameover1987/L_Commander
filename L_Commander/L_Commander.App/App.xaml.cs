@@ -24,7 +24,7 @@ namespace L_Commander.App
     /// </summary>
     public partial class App : Application
     {
-        private IServiceProvider _serviceProvider;
+        private ServiceProvider _serviceProvider;
         private IConfiguration _configuration;
 
         private void App_OnStartup(object sender, StartupEventArgs e)
@@ -47,6 +47,8 @@ namespace L_Commander.App
 
         private void MainWindowOnClosed(object sender, EventArgs e)
         {
+            _serviceProvider.Dispose();
+
             App.Current.Shutdown(0);
         }
 
@@ -59,7 +61,7 @@ namespace L_Commander.App
             return builder.Build();
         }
 
-        private IServiceProvider RegisterDependencies(IConfiguration configuration)
+        private ServiceProvider RegisterDependencies(IConfiguration configuration)
         {
             IServiceCollection serviceCollection = new ServiceCollection();
 
@@ -77,6 +79,8 @@ namespace L_Commander.App
                 // Infrastructure
                 .AddSingleton<IDispatcher>(dispatcherAdapter)
                 .AddSingleton<IShowDialogAgent, ShowDialogAgent>()
+                .AddSingleton<IExceptionHandler, ExceptionHandler>()
+                .AddSingleton<ISettingsProvider, ClientSettingsProvider>()
                 .AddLogging(x =>
                 {
                     x.SetMinimumLevel(LogLevel.Information);

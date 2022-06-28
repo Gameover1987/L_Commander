@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,7 +20,7 @@ namespace L_Commander.App.Views
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : MetroWindow
+    public partial class MainWindow : MetroWindow, IWindow
     {
         private IMainViewModel _mainViewModel;
 
@@ -28,12 +29,31 @@ namespace L_Commander.App.Views
             InitializeComponent();
 
             DataContextChanged += OnDataContextChanged;
+            Loaded+= OnLoaded;
+            Closing += OnClosing;
         }
 
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             _mainViewModel = (IMainViewModel)DataContext;
-            _mainViewModel?.Initialize();
+            _mainViewModel?.Initialize(this);
+        }
+
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            var mainWindowSettings = _mainViewModel.GetMainWindowSettings();
+            if (mainWindowSettings == null)
+                return;
+
+            Left = mainWindowSettings.Left;
+            Top = mainWindowSettings.Top;
+            Width = mainWindowSettings.Width;
+            Height = mainWindowSettings.Height;
+        }
+
+        private void OnClosing(object sender, CancelEventArgs e)
+        {
+            _mainViewModel.SaveSettings();
         }
     }
 }

@@ -24,9 +24,5 @@
                 <iconPacks:PackIconMaterial Margin="6" Kind="ArrowRight"/>
             </Button>
         </StackPanel>
-
-        <Button Style="{StaticResource MahApps.Styles.Button.Circle}" HorizontalAlignment="Right">
-            <iconPacks:PackIconMaterial Kind="ApplicationSettings" Margin="6"/>
-        </Button>
     </Grid>
 </UserControl>

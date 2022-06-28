@@ -5,11 +5,35 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:designMock="clr-namespace:L_Commander.App.Views.DesignMock"
              xmlns:app="clr-namespace:L_Commander.App"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=designMock:DesignMockFileManagerTabViewModel, IsDesignTimeCreatable=True}">
     <Grid>
-        <DataGrid AutoGenerateColumns="False" EnableRowVirtualization="True" 
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Button Style="{StaticResource MahApps.Styles.Button.Circle}">
+                <iconPacks:PackIconMaterial Kind="Refresh" Margin="6"/>
+            </Button>
+            <Button Style="{StaticResource MahApps.Styles.Button.Circle}" Margin="18,0,0,0">
+                <iconPacks:PackIconMaterial Kind="ArrowLeft" Margin="6"/>
+            </Button>
+            <Button Style="{StaticResource MahApps.Styles.Button.Circle}" Margin="6,0,0,0">
+                <iconPacks:PackIconMaterial Kind="ArrowRight" Margin="6"/>
+            </Button>
+            <Button Style="{StaticResource MahApps.Styles.Button.Circle}" Margin="18,0,0,0">
+                <Button.LayoutTransform>
+                    <RotateTransform Angle="-90"></RotateTransform>
+                </Button.LayoutTransform>
+                <iconPacks:PackIconMaterial Margin="6" Kind="ArrowRight"/>
+            </Button>
+        </StackPanel>
+
+        <DataGrid Grid.Row="1" AutoGenerateColumns="False" EnableRowVirtualization="True" Margin="0,6,0,0"
                   ItemsSource="{Binding FileSystemEntries}"
                   SelectedItem="{Binding SelectedFileSystemEntry}"
                   IsReadOnly="True"

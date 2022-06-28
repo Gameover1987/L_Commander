@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
 using L_Commander.App.FileSystem;
+using L_Commander.App.Infrastructure;
 using L_Commander.UI.Commands;
 using L_Commander.UI.ViewModels;
 
@@ -35,7 +36,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
 
     public IDelegateCommand NewTabCommand { get; }
 
-    public void Initialize()
+    public void Initialize(FileManagerSettings settings)
     {
         Drives.Clear();
 
@@ -46,10 +47,28 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
         }
 
         Tabs.Clear();
-        var fileManagerTabViewModel = CreateFileManagerTabViewModel(Drives.First().RootPath);
-        Tabs.Add(fileManagerTabViewModel);
+        if (settings != null && settings.Paths.Any())
+        {
+            foreach (var path in settings.Paths)
+            {
+                Tabs.Add(CreateFileManagerTabViewModel(path));
+            }
+        }
+        else
+        {
+            var fileManagerTabViewModel = CreateFileManagerTabViewModel(Drives.First().RootPath);
+            Tabs.Add(fileManagerTabViewModel);
+        }
 
         SelectedTab = Tabs.First();
+    }
+
+    public FileManagerSettings CollectSettings()
+    {
+        return new FileManagerSettings
+        {
+            Paths = Tabs.Select(x => x.RootPath).ToArray()
+        };
     }
 
     protected virtual IFileManagerTabViewModel CreateFileManagerTabViewModel(string path)

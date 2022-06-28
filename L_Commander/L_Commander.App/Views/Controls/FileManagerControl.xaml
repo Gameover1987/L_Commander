@@ -41,7 +41,7 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <TabControl Grid.Row="1" Margin="0,12,0,0"
+        <TabControl Grid.Row="1" Margin="0,0,0,0"
                     ItemsSource="{Binding Tabs}"
                     SelectedItem="{Binding SelectedTab}"
                     DisplayMemberPath="RootPath">

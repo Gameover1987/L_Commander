@@ -26,6 +26,7 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
     }
 
     public string Path => _path;
+
     public bool IsFile => FileOrFolder == FileOrFolder.File;
 
     public bool IsInitialized { get; private set; }
