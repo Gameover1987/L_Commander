@@ -7,29 +7,6 @@ using L_Commander.UI.ViewModels;
 
 namespace L_Commander.App.ViewModels;
 
-public class NavigationHistoryItem
-{
-    public string Path { get; private set; }
-
-    public DateTime DateTime { get; private set; }
-
-    public static NavigationHistoryItem Create(string path)
-    {
-        return new NavigationHistoryItem
-        {
-            Path = path,
-            DateTime = DateTime.Now
-        };
-    }
-
-    public override bool Equals(object obj)
-    {
-        var other = (NavigationHistoryItem)obj;
-
-        return Path == other.Path;
-    }
-}
-
 public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 {
     private readonly IFileSystemProvider _fileSystemProvider;
@@ -141,7 +118,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     private void RefreshCommandHandler()
     {
-
+        SetPath(CurrentPath);
     }
 
     private bool CanBackCommandHandler()
@@ -184,5 +161,33 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         SetPath(topLevelPath);
         _navigationHistory.Add(NavigationHistoryItem.Create(topLevelPath));
         _navigationIndex++;
+    }
+
+    private class NavigationHistoryItem
+    {
+        public string Path { get; private set; }
+
+        public DateTime DateTime { get; private set; }
+
+        public static NavigationHistoryItem Create(string path)
+        {
+            return new NavigationHistoryItem
+            {
+                Path = path,
+                DateTime = DateTime.Now
+            };
+        }
+
+        public override bool Equals(object obj)
+        {
+            var other = (NavigationHistoryItem)obj;
+
+            return Path == other.Path;
+        }
+
+        public override string ToString()
+        {
+            return string.Format($"[{Path}] at [{DateTime}]");
+        }
     }
 }
