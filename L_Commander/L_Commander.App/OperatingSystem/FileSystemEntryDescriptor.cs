@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace L_Commander.App.FileSystem;
+namespace L_Commander.App.OperatingSystem;
 
 public enum FileOrFolder
 {

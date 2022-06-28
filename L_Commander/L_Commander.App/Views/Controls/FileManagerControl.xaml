@@ -7,11 +7,12 @@
              xmlns:designMock="clr-namespace:L_Commander.App.Views.DesignMock"
              xmlns:viewModels="clr-namespace:L_Commander.App.ViewModels"
              xmlns:helpers="clr-namespace:L_Commander.UI.Helpers;assembly=L_Commander.UI"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=designMock:DesignMockFileManagerViewModel, IsDesignTimeCreatable=True}">
     <UserControl.InputBindings>
-        <KeyBinding Key="N" Modifiers="Control"
+        <KeyBinding Key="T" Modifiers="Control"
                     Command="{Binding NewTabCommand}"/>
     </UserControl.InputBindings>
     <UserControl.Resources>
@@ -51,6 +52,37 @@
                     ItemsSource="{Binding Tabs}"
                     SelectedItem="{Binding SelectedTab}"
                     DisplayMemberPath="CurrentPath">
+            <TabControl.ItemContainerStyle>
+                <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource {x:Type TabItem}}">
+                    <Setter Property="ContextMenu">
+                        <Setter.Value>
+                            <ContextMenu>
+                                <MenuItem Header="New tab" InputGestureText="Ctrl+T"
+                                          Command="{Binding Source={StaticResource BindingProxy}, Path=Data.NewTabCommand}"/>
+                                <Separator/>
+                                <MenuItem Header="Copy path" 
+                                          Command="{Binding Source={StaticResource BindingProxy}, Path=Data.CopyPathCommand}"
+                                          CommandParameter="{Binding}"/>
+                                <MenuItem Header="Open in Explorer" 
+                                          Command="{Binding Source={StaticResource BindingProxy}, Path=Data.OpenInExplorerCommand}"
+                                          CommandParameter="{Binding}"/>
+                                <MenuItem Header="Open in Command Line" 
+                                          Command="{Binding Source={StaticResource BindingProxy}, Path=Data.OpenInTerminalCommand}"
+                                          CommandParameter="{Binding}"/>
+                                <Separator/>
+                                <MenuItem Header="Close tab" InputGestureText="Ctrl+W"
+                                          Command="{Binding Source={StaticResource BindingProxy}, Path=Data.CloseTabCommand}"
+                                          CommandParameter="{Binding}"/>
+                                <MenuItem Header="Close all but this" />
+                                <Separator/>
+                                <MenuItem Header="Lock tab" IsCheckable="True"/>
+                                <MenuItem Header="Add to favorites"/>
+                            </ContextMenu>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.ItemContainerStyle>
+           
         </TabControl>
     </Grid>
 </UserControl>

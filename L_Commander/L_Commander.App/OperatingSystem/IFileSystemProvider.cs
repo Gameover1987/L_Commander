@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace L_Commander.App.FileSystem
+namespace L_Commander.App.OperatingSystem
 {
     public interface IFileSystemProvider
     {
@@ -14,12 +14,14 @@ namespace L_Commander.App.FileSystem
         string GetTopLevelPath(string path);
 
         bool IsDriveRoot(string path);
+
+        string GetFileName(string path);
+
+        string GetDirectoryName(string path);
     }
 
     public sealed class FileSystemProvider : IFileSystemProvider
     {
-        private int _counter = 0;
-
         public DriveInfo[] GetDrives()
         {
             return DriveInfo.GetDrives();
@@ -66,6 +68,17 @@ namespace L_Commander.App.FileSystem
         public bool IsDriveRoot(string path)
         {
             return Path.GetPathRoot(path) == path;
+        }
+
+        public string GetFileName(string path)
+        {
+            return Path.GetFileName(path);
+        }
+
+        public string GetDirectoryName(string path)
+        {
+            var info = new DirectoryInfo(path);
+            return info.Name;
         }
     }
 }

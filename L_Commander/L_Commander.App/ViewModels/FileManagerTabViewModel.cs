@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
-using L_Commander.App.FileSystem;
+using L_Commander.App.OperatingSystem;
 using L_Commander.UI.Commands;
 using L_Commander.UI.ViewModels;
 
@@ -16,7 +17,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private readonly List<NavigationHistoryItem> _navigationHistory = new List<NavigationHistoryItem>();
     private int _navigationIndex;
 
-    private ListCollectionView _fileSystemView;
+    private ICollectionView _fileSystemView;
     private IEnumerable<IFileSystemEntryViewModel> _fileSystemEntries;
 
     public FileManagerTabViewModel(IFileSystemProvider fileSystemProvider)
@@ -47,6 +48,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     public string CurrentPath => _currentPath;
 
+    public string Name => _fileSystemProvider.GetDirectoryName(_currentPath);
+
     public IEnumerable<IFileSystemEntryViewModel> FileSystemEntries
     {
         get { return _fileSystemEntries; }
@@ -54,7 +57,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         {
             _fileSystemEntries = value;
 
-            _fileSystemView = (ListCollectionView) CollectionViewSource.GetDefaultView(FileSystemEntries);
+            _fileSystemView = CollectionViewSource.GetDefaultView(FileSystemEntries);
             _fileSystemView.Filter = FileSystemEntryFilter;
 
             OnPropertyChanged(() => FileSystemEntries);

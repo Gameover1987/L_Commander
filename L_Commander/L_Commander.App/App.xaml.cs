@@ -6,8 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using L_Commander.App.FileSystem;
 using L_Commander.App.Infrastructure;
+using L_Commander.App.OperatingSystem;
 using L_Commander.App.ViewModels;
 using L_Commander.App.Views;
 using L_Commander.UI.Commands;
@@ -81,6 +81,8 @@ namespace L_Commander.App
                 .AddSingleton<IShowDialogAgent, ShowDialogAgent>()
                 .AddSingleton<IExceptionHandler, ExceptionHandler>()
                 .AddSingleton<ISettingsProvider, ClientSettingsProvider>()
+                .AddSingleton<IClipBoardProvider, ClipBoardProvider>()
+                .AddSingleton<IOperatingSystemProvider, OperatingSystemProvider>()
                 .AddLogging(x =>
                 {
                     x.SetMinimumLevel(LogLevel.Information);

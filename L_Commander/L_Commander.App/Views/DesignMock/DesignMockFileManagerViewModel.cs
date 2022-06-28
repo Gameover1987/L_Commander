@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using L_Commander.App.FileSystem;
 using L_Commander.App.Infrastructure;
+using L_Commander.App.OperatingSystem;
 using L_Commander.App.ViewModels;
 
 namespace L_Commander.App.Views.DesignMock;
@@ -26,7 +26,7 @@ internal sealed class DesignMockFileManagerTabViewModel : FileManagerTabViewMode
 internal sealed class DesignMockFileManagerViewModel : FileManagerViewModel
 {
     public DesignMockFileManagerViewModel()
-        : base(new FileSystemProvider())
+        : base(new FileSystemProvider(), new ClipBoardProvider(), new OperatingSystemProvider())
     {
         Initialize(new FileManagerSettings{Paths = new []{"C:\\", "D:\\"}});
     }
