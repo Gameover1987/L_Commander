@@ -67,7 +67,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
     {
         return new FileManagerSettings
         {
-            Paths = Tabs.Select(x => x.RootPath).ToArray()
+            Paths = Tabs.Select(x => x.CurrentPath).ToArray()
         };
     }
 
@@ -86,7 +86,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
 
     private void NewTabCommandHandler()
     {
-        var newTab = CreateFileManagerTabViewModel(SelectedTab.RootPath);
+        var newTab = CreateFileManagerTabViewModel(SelectedTab.CurrentPath);
         Tabs.Add(newTab);
     }
 }

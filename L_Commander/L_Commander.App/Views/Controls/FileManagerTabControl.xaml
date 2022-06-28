@@ -16,16 +16,20 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <Button Style="{StaticResource MahApps.Styles.Button.Circle}">
+            <Button Style="{StaticResource MahApps.Styles.Button.Circle}"
+                    Command="{Binding RefreshCommand}">
                 <iconPacks:PackIconMaterial Kind="Refresh" Margin="6"/>
             </Button>
-            <Button Style="{StaticResource MahApps.Styles.Button.Circle}" Margin="18,0,0,0">
+            <Button Style="{StaticResource MahApps.Styles.Button.Circle}" Margin="18,0,0,0"
+                    Command="{Binding BackCommand}">
                 <iconPacks:PackIconMaterial Kind="ArrowLeft" Margin="6"/>
             </Button>
-            <Button Style="{StaticResource MahApps.Styles.Button.Circle}" Margin="6,0,0,0">
+            <Button Style="{StaticResource MahApps.Styles.Button.Circle}" Margin="6,0,0,0"
+                    Command="{Binding NextCommand}">
                 <iconPacks:PackIconMaterial Kind="ArrowRight" Margin="6"/>
             </Button>
-            <Button Style="{StaticResource MahApps.Styles.Button.Circle}" Margin="18,0,0,0">
+            <Button Style="{StaticResource MahApps.Styles.Button.Circle}" Margin="18,0,0,0"
+                    Command="{Binding TopCommand}">
                 <Button.LayoutTransform>
                     <RotateTransform Angle="-90"></RotateTransform>
                 </Button.LayoutTransform>

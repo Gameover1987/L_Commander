@@ -4,7 +4,7 @@ namespace L_Commander.App.ViewModels;
 
 public interface IFileManagerTabViewModel
 {
-    string RootPath { get; }
+    string CurrentPath { get; }
 
     void SetPath(string rootPath);
 

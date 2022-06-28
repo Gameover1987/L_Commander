@@ -44,7 +44,7 @@
         <TabControl Grid.Row="1" Margin="0,0,0,0"
                     ItemsSource="{Binding Tabs}"
                     SelectedItem="{Binding SelectedTab}"
-                    DisplayMemberPath="RootPath">
+                    DisplayMemberPath="CurrentPath">
         </TabControl>
     </Grid>
 </UserControl>

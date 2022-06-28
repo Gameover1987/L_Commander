@@ -1,37 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 
 namespace L_Commander.App.FileSystem
 {
-    public enum FileOrFolder
-    {
-        File, Folder
-    }
-
-    public class FileSystemEntryDescriptor
-    {
-        public FileOrFolder FileOrFolder { get; set; }
-
-        public string Path { get; set; }
-
-        public string Extension { get; set; }
-
-        public long TotalSize { get; set; }
-
-        public DateTime Created { get; set; }
-
-        public bool IsFile
-        {
-            get { return FileOrFolder == FileOrFolder.File; }
-        }
-    }
-
     public interface IFileSystemProvider
     {
        IEnumerable<string> GetFileSystemEntries(string path);
 
        FileSystemEntryDescriptor GetEntryDetails(string path);
+
+       string GetTopLevelPath(string path);
+
+       bool IsDriveRoot(string path);
     }
 
     public sealed class FileSystemProvider : IFileSystemProvider
@@ -64,6 +44,18 @@ namespace L_Commander.App.FileSystem
             }
 
             return descriptor;
+        }
+
+        public string GetTopLevelPath(string path)
+        {
+            var parent = Directory.GetParent(path);
+
+            return parent.FullName;
+        }
+
+        public bool IsDriveRoot(string path)
+        {
+            return Path.GetPathRoot(path) == path;
         }
     }
 }
