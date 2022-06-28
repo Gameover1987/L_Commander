@@ -74,7 +74,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
     protected virtual IFileManagerTabViewModel CreateFileManagerTabViewModel(string path)
     {
         var fileManagerTabViewModel = new FileManagerTabViewModel(new FileSystemProvider());
-        fileManagerTabViewModel.SetPath(path);
+        fileManagerTabViewModel.Initialize(path);
 
         return fileManagerTabViewModel;
     }

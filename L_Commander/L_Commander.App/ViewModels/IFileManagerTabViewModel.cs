@@ -6,7 +6,7 @@ public interface IFileManagerTabViewModel
 {
     string CurrentPath { get; }
 
-    void SetPath(string rootPath);
+    void Initialize(string rootPath);
 
     IDelegateCommand OpenCommand { get; }
 }

@@ -20,7 +20,7 @@ internal sealed class DesignMockFileManagerTabViewModel : FileManagerTabViewMode
     public DesignMockFileManagerTabViewModel() 
         : base(new FileSystemProvider())
     {
-        SetPath("C:\\");
+        Initialize("C:\\");
 
         foreach (var fileSystemEntryViewModel in FileSystemEntries)
         {
