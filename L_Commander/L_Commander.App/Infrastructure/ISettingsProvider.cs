@@ -17,7 +17,7 @@ namespace L_Commander.App.Infrastructure
 
     public sealed class ClientSettingsProvider : ISettingsProvider
     {
-        private const string ClientSettingsFileName = "clientSettings.json";
+        private const string ClientSettingsFileName = "ClientSettings.json";
 
         public void Save(ClientSettings settings)
         {
