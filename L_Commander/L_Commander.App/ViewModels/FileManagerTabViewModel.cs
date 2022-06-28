@@ -58,7 +58,10 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     public void Initialize(string rootPath)
     {
+        _navigationHistory.Clear();
+        _navigationIndex = 0;
         _navigationHistory.Add(NavigationHistoryItem.Create(rootPath));
+
         SetPath(rootPath);
     }
 

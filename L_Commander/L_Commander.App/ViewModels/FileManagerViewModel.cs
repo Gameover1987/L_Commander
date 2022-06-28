@@ -16,6 +16,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
     {
         _driveInfoProvider = driveInfoProvider;
         NewTabCommand = new DelegateCommand(NewTabCommandHandler, CanNewTabCommandHandler);
+        ChangeDriveCommand = new DelegateCommand(x => ChangeDriveCommandHandler(x), x => CanChangeDriveCommandHandler());
     }
 
     public ObservableCollection<DriveViewModel> Drives { get; } = new ObservableCollection<DriveViewModel>();
@@ -35,6 +36,8 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
     }
 
     public IDelegateCommand NewTabCommand { get; }
+
+    public IDelegateCommand ChangeDriveCommand { get; }
 
     public void Initialize(FileManagerSettings settings)
     {
@@ -88,5 +91,16 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
     {
         var newTab = CreateFileManagerTabViewModel(SelectedTab.CurrentPath);
         Tabs.Add(newTab);
+    }
+
+    private bool CanChangeDriveCommandHandler()
+    {
+        return true;
+    }
+
+    private void ChangeDriveCommandHandler(object obj)
+    {
+        var drive = (DriveViewModel)obj;
+        SelectedTab.Initialize(drive.RootPath);
     }
 }
