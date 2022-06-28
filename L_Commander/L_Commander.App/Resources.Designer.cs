@@ -97,7 +97,7 @@ namespace L_Commander.App {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to MainWindow.
+        ///   Looks up a localized string similar to L_Commander.
         /// </summary>
         public static string MainWindowTitle {
             get {

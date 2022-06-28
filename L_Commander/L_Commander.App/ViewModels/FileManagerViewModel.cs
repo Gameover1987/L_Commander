@@ -9,12 +9,13 @@ namespace L_Commander.App.ViewModels;
 
 public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
 {
-    private readonly IDriveInfoProvider _driveInfoProvider;
+    private readonly IFileSystemProvider _fileSystemProvider;
+
     private IFileManagerTabViewModel _selectedTab;
 
-    public FileManagerViewModel(IDriveInfoProvider driveInfoProvider)
+    public FileManagerViewModel(IFileSystemProvider fileSystemProvider)
     {
-        _driveInfoProvider = driveInfoProvider;
+        _fileSystemProvider = fileSystemProvider;
         NewTabCommand = new DelegateCommand(NewTabCommandHandler, CanNewTabCommandHandler);
         ChangeDriveCommand = new DelegateCommand(x => ChangeDriveCommandHandler(x), x => CanChangeDriveCommandHandler());
     }
@@ -43,7 +44,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
     {
         Drives.Clear();
 
-        var driveInfos = _driveInfoProvider.GetDrives();
+        var driveInfos = _fileSystemProvider.GetDrives();
         foreach (var driveInfo in driveInfos)
         {
             Drives.Add(new DriveViewModel(driveInfo));
@@ -76,7 +77,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
 
     protected virtual IFileManagerTabViewModel CreateFileManagerTabViewModel(string path)
     {
-        var fileManagerTabViewModel = new FileManagerTabViewModel(new FileSystemProvider());
+        var fileManagerTabViewModel = new FileManagerTabViewModel(_fileSystemProvider);
         fileManagerTabViewModel.Initialize(path);
 
         return fileManagerTabViewModel;

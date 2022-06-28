@@ -27,9 +27,9 @@ namespace L_Commander.App.Views.Controls
 
         private void DataGridRow_Loaded(object sender, RoutedEventArgs e)
         {
-            var dataGridRow = (DataGridRow) sender;
-            var fileSystemEntryViewModel = (IFileSystemEntryViewModel) dataGridRow.DataContext;
-            fileSystemEntryViewModel.Initialize();
+            //var dataGridRow = (DataGridRow) sender;
+            //var fileSystemEntryViewModel = (IFileSystemEntryViewModel) dataGridRow.DataContext;
+            //fileSystemEntryViewModel.Initialize();
         }
 
         private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)

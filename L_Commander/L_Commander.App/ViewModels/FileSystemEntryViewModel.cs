@@ -9,7 +9,13 @@ public interface IFileSystemEntryViewModel
 {
     string Path { get; }
 
+    bool IsInitialized { get; }
+
     bool IsFile { get; }
+
+    bool IsSystem { get; }
+
+    bool IsHidden { get; }
 
     void Initialize();
 }
@@ -25,9 +31,22 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
         _fileSystemProvider = fileSystemProvider;
     }
 
-    public string Path => _path;
+    public string Path
+    {
+        get
+        {
+            if (!IsInitialized)
+                InitializeImpl();
+
+            return _path;
+        }
+    }
 
     public bool IsFile => FileOrFolder == FileOrFolder.File;
+
+    public bool IsSystem { get; private set; }
+
+    public bool IsHidden { get; private set; }
 
     public bool IsInitialized { get; private set; }
 
@@ -40,6 +59,11 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
     public DateTime Created { get; private set; }
 
     public void Initialize()
+    {
+        InitializeImpl();
+    }
+
+    private void InitializeImpl()
     {
         if (IsInitialized)
             return;
@@ -59,6 +83,9 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
         {
             TotalSize = "<DIR>";
         }
+
+        IsHidden = descriptor.IsHidden;
+        IsSystem = descriptor.IsSystem;
             
         Created = descriptor.Created;
 

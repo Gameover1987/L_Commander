@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows.Data;
 using L_Commander.App.FileSystem;
 using L_Commander.UI.Commands;
 using L_Commander.UI.ViewModels;
@@ -15,6 +16,9 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private readonly List<NavigationHistoryItem> _navigationHistory = new List<NavigationHistoryItem>();
     private int _navigationIndex;
 
+    private ListCollectionView _fileSystemView;
+    private IEnumerable<IFileSystemEntryViewModel> _fileSystemEntries;
+
     public FileManagerTabViewModel(IFileSystemProvider fileSystemProvider)
     {
         _fileSystemProvider = fileSystemProvider;
@@ -28,9 +32,34 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         TopCommand = new DelegateCommand(TopCommandHandler, CanTopCommandHandler);
     }
 
+    private bool FileSystemEntryFilter(object obj)
+    {
+        var entry = (IFileSystemEntryViewModel)obj;
+        entry.Initialize();
+        if (entry.IsHidden)
+            return false;
+
+        if (entry.IsSystem)
+            return false;
+
+        return true;
+    }
+
     public string CurrentPath => _currentPath;
 
-    public ObservableCollection<IFileSystemEntryViewModel> FileSystemEntries { get; } = new ObservableCollection<IFileSystemEntryViewModel>();
+    public IEnumerable<IFileSystemEntryViewModel> FileSystemEntries
+    {
+        get { return _fileSystemEntries; }
+        set
+        {
+            _fileSystemEntries = value;
+
+            _fileSystemView = (ListCollectionView) CollectionViewSource.GetDefaultView(FileSystemEntries);
+            _fileSystemView.Filter = FileSystemEntryFilter;
+
+            OnPropertyChanged(() => FileSystemEntries);
+        }
+    }
 
     public IFileSystemEntryViewModel SelectedFileSystemEntry
     {
@@ -70,11 +99,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _currentPath = rootPath;
 
         var entries = _fileSystemProvider.GetFileSystemEntries(rootPath);
-        FileSystemEntries.Clear();
-        foreach (var path in entries)
-        {
-            FileSystemEntries.Add(CreateFileSystemEntryViewModel(path));
-        }
+        FileSystemEntries = entries.Select(x => new FileSystemEntryViewModel(x, _fileSystemProvider));
 
         OnPropertyChanged();
     }

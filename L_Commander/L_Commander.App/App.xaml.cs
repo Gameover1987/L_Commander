@@ -88,7 +88,7 @@ namespace L_Commander.App
                 })
 
                 // File System
-                .AddSingleton<IDriveInfoProvider, DriveInfoProvider>()
+                .AddSingleton<IFileSystemProvider, FileSystemProvider>()
 
                 // ViewModels
 

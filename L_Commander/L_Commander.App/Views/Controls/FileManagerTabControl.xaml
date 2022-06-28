@@ -15,29 +15,46 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <Button Style="{StaticResource MahApps.Styles.Button.Circle}"
-                    Command="{Binding RefreshCommand}">
-                <iconPacks:PackIconMaterial Kind="Refresh" Margin="6"/>
-            </Button>
-            <Button Style="{StaticResource MahApps.Styles.Button.Circle}" Margin="18,0,0,0"
-                    Command="{Binding BackCommand}">
-                <iconPacks:PackIconMaterial Kind="ArrowLeft" Margin="6"/>
-            </Button>
-            <Button Style="{StaticResource MahApps.Styles.Button.Circle}" Margin="6,0,0,0"
-                    Command="{Binding NextCommand}">
-                <iconPacks:PackIconMaterial Kind="ArrowRight" Margin="6"/>
-            </Button>
-            <Button Style="{StaticResource MahApps.Styles.Button.Circle}" Margin="18,0,0,0"
-                    Command="{Binding TopCommand}">
-                <Button.LayoutTransform>
-                    <RotateTransform Angle="-90"></RotateTransform>
-                </Button.LayoutTransform>
-                <iconPacks:PackIconMaterial Margin="6" Kind="ArrowRight"/>
-            </Button>
-        </StackPanel>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-        <DataGrid Grid.Row="1" AutoGenerateColumns="False" EnableRowVirtualization="True" Margin="0,6,0,0"
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <Button Style="{StaticResource MahApps.Styles.Button.Circle}"
+                        Command="{Binding RefreshCommand}">
+                    <iconPacks:PackIconMaterial Kind="Refresh" Margin="6"/>
+                </Button>
+                <Button Style="{StaticResource MahApps.Styles.Button.Circle}" Margin="18,0,0,0"
+                        Command="{Binding BackCommand}">
+                    <iconPacks:PackIconMaterial Kind="ArrowLeft" Margin="6"/>
+                </Button>
+                <Button Style="{StaticResource MahApps.Styles.Button.Circle}" Margin="6,0,0,0"
+                        Command="{Binding NextCommand}">
+                    <iconPacks:PackIconMaterial Kind="ArrowRight" Margin="6"/>
+                </Button>
+                <Button Style="{StaticResource MahApps.Styles.Button.Circle}" Margin="6,0,0,0"
+                        Command="{Binding TopCommand}">
+                    <Button.LayoutTransform>
+                        <RotateTransform Angle="-90"></RotateTransform>
+                    </Button.LayoutTransform>
+                    <iconPacks:PackIconMaterial Margin="6" Kind="ArrowRight"/>
+                </Button>
+            </StackPanel>
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Orientation="Horizontal" Margin="18,0,0,0">
+                <CheckBox IsChecked="True" Content="All files"/>
+                <CheckBox IsChecked="True" Content="*.mp3" Margin="6,0,0,0"/>
+                <CheckBox IsChecked="True" Content="*.wma" Margin="6,0,0,0"/>
+                <CheckBox IsChecked="True" Content="*.wav" Margin="6,0,0,0"/>
+                <CheckBox IsChecked="True" Content="*.jpg" Margin="6,0,0,0"/>
+                <CheckBox IsChecked="True" Content="*.cs" Margin="6,0,0,0"/>
+                <CheckBox IsChecked="True" Content="*.xaml" Margin="6,0,0,0"/>
+            </StackPanel>
+        </Grid>
+
+        <DataGrid Grid.Row="1" AutoGenerateColumns="False" Margin="0,6,0,0"
+                  EnableRowVirtualization="True" 
                   ItemsSource="{Binding FileSystemEntries}"
                   SelectedItem="{Binding SelectedFileSystemEntry}"
                   IsReadOnly="True"
@@ -74,6 +91,9 @@
                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True">
                             <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent}"/>
                             <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.SystemControlBackgroundChromeBlackHigh}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsHidden}" Value="True">
+                            <Setter Property="Opacity" Value="0.6"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>

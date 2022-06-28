@@ -7,14 +7,6 @@ using L_Commander.App.ViewModels;
 
 namespace L_Commander.App.Views.DesignMock;
 
-internal sealed class DesignMockDriveInfoProvider : IDriveInfoProvider
-{
-    public DriveInfo[] GetDrives()
-    {
-        return DriveInfo.GetDrives();
-    }
-}
-
 internal sealed class DesignMockFileManagerTabViewModel : FileManagerTabViewModel
 {
     public DesignMockFileManagerTabViewModel() 
@@ -34,7 +26,7 @@ internal sealed class DesignMockFileManagerTabViewModel : FileManagerTabViewMode
 internal sealed class DesignMockFileManagerViewModel : FileManagerViewModel
 {
     public DesignMockFileManagerViewModel()
-        : base(new DriveInfoProvider())
+        : base(new FileSystemProvider())
     {
         Initialize(new FileManagerSettings{Paths = new []{"C:\\", "D:\\"}});
     }

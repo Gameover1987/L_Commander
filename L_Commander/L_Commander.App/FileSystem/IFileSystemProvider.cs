@@ -5,17 +5,26 @@ namespace L_Commander.App.FileSystem
 {
     public interface IFileSystemProvider
     {
-       IEnumerable<string> GetFileSystemEntries(string path);
+        DriveInfo[] GetDrives();
 
-       FileSystemEntryDescriptor GetEntryDetails(string path);
+        IEnumerable<string> GetFileSystemEntries(string path);
 
-       string GetTopLevelPath(string path);
+        FileSystemEntryDescriptor GetEntryDetails(string path);
 
-       bool IsDriveRoot(string path);
+        string GetTopLevelPath(string path);
+
+        bool IsDriveRoot(string path);
     }
 
     public sealed class FileSystemProvider : IFileSystemProvider
     {
+        private int _counter = 0;
+
+        public DriveInfo[] GetDrives()
+        {
+            return DriveInfo.GetDrives();
+        }
+
         public IEnumerable<string> GetFileSystemEntries(string path)
         {
             var entries = Directory.EnumerateFileSystemEntries(path, "*.*", SearchOption.TopDirectoryOnly);
@@ -27,6 +36,7 @@ namespace L_Commander.App.FileSystem
             var descriptor = new FileSystemEntryDescriptor();
 
             var attributes = File.GetAttributes(path);
+            descriptor.Attributes = attributes;
             if (attributes.HasFlag(FileAttributes.Directory))
             {
                 descriptor.FileOrFolder = FileOrFolder.Folder;
@@ -37,7 +47,7 @@ namespace L_Commander.App.FileSystem
                 descriptor.FileOrFolder = FileOrFolder.File;
 
                 var fileInfo = new FileInfo(path);
-                
+
                 descriptor.TotalSize = fileInfo.Length;
                 descriptor.Extension = fileInfo.Extension;
                 descriptor.Created = fileInfo.CreationTime;

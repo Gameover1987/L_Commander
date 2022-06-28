@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace L_Commander.App.FileSystem;
 
@@ -20,4 +21,10 @@ public class FileSystemEntryDescriptor
     public DateTime Created { get; set; }
 
     public bool IsFile => FileOrFolder == FileOrFolder.File;
+
+    public FileAttributes Attributes { get; set; }
+
+    public bool IsSystem => Attributes.HasFlag(FileAttributes.System);
+
+    public bool IsHidden => Attributes.HasFlag(FileAttributes.Hidden);
 }
