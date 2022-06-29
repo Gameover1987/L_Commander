@@ -128,6 +128,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
                     FileSystemEntries.Add(fileSystemEntryViewModel);
                 }
             });
+
+            SelectedFileSystemEntry = FileSystemEntries.FirstOrDefault();
         }
         finally
         {
