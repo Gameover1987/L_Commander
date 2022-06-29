@@ -29,6 +29,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto">
@@ -82,7 +83,6 @@
                     </Setter>
                 </Style>
             </TabControl.ItemContainerStyle>
-           
         </TabControl>
     </Grid>
 </UserControl>

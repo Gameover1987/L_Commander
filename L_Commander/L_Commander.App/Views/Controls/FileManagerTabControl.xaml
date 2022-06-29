@@ -6,6 +6,7 @@
              xmlns:designMock="clr-namespace:L_Commander.App.Views.DesignMock"
              xmlns:app="clr-namespace:L_Commander.App"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=designMock:DesignMockFileManagerTabViewModel, IsDesignTimeCreatable=True}">
@@ -17,6 +18,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
@@ -113,5 +115,9 @@
                                     Binding="{Binding Created, Mode=OneWay, StringFormat='dd.MM.yyyy HH:mm:ss'}" Width="Auto"/>
             </DataGrid.Columns>
         </DataGrid>
+
+        <mah:MetroProgressBar Grid.Row="2"
+                              Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}"
+                              IsIndeterminate="{Binding IsBusy, Mode=OneWay}"/>
     </Grid>
 </UserControl>

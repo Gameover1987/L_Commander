@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Data;
 using L_Commander.App.OperatingSystem;
+using L_Commander.Common.Extensions;
 using L_Commander.UI.Commands;
 using L_Commander.UI.ViewModels;
+using Serilog;
 
 namespace L_Commander.App.ViewModels;
 
@@ -17,8 +19,11 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private readonly List<NavigationHistoryItem> _navigationHistory = new List<NavigationHistoryItem>();
     private int _navigationIndex;
 
-    private ICollectionView _fileSystemView;
-    private IEnumerable<IFileSystemEntryViewModel> _fileSystemEntries;
+    private ListCollectionView _fileSystemView;
+    private object _lock = new object();
+
+    private ObservableCollection<IFileSystemEntryViewModel> _fileSystemEntries = new ObservableCollection<IFileSystemEntryViewModel>();
+    private bool _isBusy;
 
     public FileManagerTabViewModel(IFileSystemProvider fileSystemProvider)
     {
@@ -31,12 +36,19 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         BackCommand = new DelegateCommand(BackCommandHandler, CanBackCommandHandler);
         NextCommand = new DelegateCommand(NextCommandHandler, CanNextCommandHandler);
         TopCommand = new DelegateCommand(TopCommandHandler, CanTopCommandHandler);
+
+        BindingOperations.EnableCollectionSynchronization(FileSystemEntries, _lock);
+
+        _fileSystemView = (ListCollectionView)CollectionViewSource.GetDefaultView(FileSystemEntries);
+        _fileSystemView.Filter = FileSystemEntryFilter;
     }
 
     private bool FileSystemEntryFilter(object obj)
     {
         var entry = (IFileSystemEntryViewModel)obj;
-        entry.Initialize();
+        if (entry == null) 
+            return false;
+
         if (entry.IsHidden)
             return false;
 
@@ -50,19 +62,19 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     public string Name => _fileSystemProvider.GetDirectoryName(_currentPath);
 
-    public IEnumerable<IFileSystemEntryViewModel> FileSystemEntries
+    public bool IsBusy
     {
-        get { return _fileSystemEntries; }
-        set
+        get { return _isBusy; }
+        private set
         {
-            _fileSystemEntries = value;
-
-            _fileSystemView = CollectionViewSource.GetDefaultView(FileSystemEntries);
-            _fileSystemView.Filter = FileSystemEntryFilter;
-
-            OnPropertyChanged(() => FileSystemEntries);
+            if (_isBusy == value)
+                return;
+            _isBusy = value;
+            OnPropertyChanged(() => IsBusy);
         }
     }
+
+    public ObservableCollection<IFileSystemEntryViewModel> FileSystemEntries { get { return _fileSystemEntries; } }
 
     public IFileSystemEntryViewModel SelectedFileSystemEntry
     {
@@ -97,12 +109,31 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         SetPath(rootPath);
     }
 
-    private void SetPath(string rootPath)
+    private async void SetPath(string rootPath)
     {
         _currentPath = rootPath;
 
-        var entries = _fileSystemProvider.GetFileSystemEntries(rootPath);
-        FileSystemEntries = entries.Select(x => new FileSystemEntryViewModel(x, _fileSystemProvider));
+        IsBusy = true;
+        FileSystemEntries.Clear();
+        try
+        {
+            await ThreadTaskExtensions.Run(() =>
+            {
+                var items = _fileSystemProvider
+                    .GetFileSystemEntries(rootPath)
+                    .Select(CreateFileSystemEntryViewModel);
+                foreach (var fileSystemEntryViewModel in items)
+                {
+                    fileSystemEntryViewModel.Initialize();
+                    FileSystemEntries.Add(fileSystemEntryViewModel);
+                }
+            });
+        }
+        finally
+        {
+            DelegateCommand.NotifyCanExecuteChangedForAll();
+            IsBusy = false;
+        }
 
         OnPropertyChanged();
     }
@@ -144,7 +175,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     private bool CanRefreshCommandHandler()
     {
-        return true;
+        return !IsBusy;
     }
 
     private void RefreshCommandHandler()
