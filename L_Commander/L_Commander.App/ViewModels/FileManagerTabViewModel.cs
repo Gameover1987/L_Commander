@@ -14,7 +14,7 @@ namespace L_Commander.App.ViewModels;
 public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 {
     private readonly IFileSystemProvider _fileSystemProvider;
-    private string _currentPath;
+    private string _fullPath;
     private IFileSystemEntryViewModel _selectedFileSystemEntry;
     private readonly List<NavigationHistoryItem> _navigationHistory = new List<NavigationHistoryItem>();
     private int _navigationIndex;
@@ -58,9 +58,10 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         return true;
     }
 
-    public string CurrentPath => _currentPath;
+    public string FullPath => _fullPath;
+    public string ShortPath => _fileSystemProvider.GetDirectoryName(_fullPath);
 
-    public string Name => _fileSystemProvider.GetDirectoryName(_currentPath);
+    public string Name => _fileSystemProvider.GetDirectoryName(_fullPath);
 
     public bool IsBusy
     {
@@ -111,7 +112,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     private async void SetPath(string rootPath)
     {
-        _currentPath = rootPath;
+        _fullPath = rootPath;
 
         IsBusy = true;
         FileSystemEntries.Clear();
@@ -182,7 +183,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     private void RefreshCommandHandler()
     {
-        SetPath(CurrentPath);
+        SetPath(FullPath);
     }
 
     private bool CanBackCommandHandler()
@@ -216,12 +217,12 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     private bool CanTopCommandHandler()
     {
-        return !_fileSystemProvider.IsDriveRoot(CurrentPath);
+        return !_fileSystemProvider.IsDriveRoot(FullPath);
     }
 
     private void TopCommandHandler()
     {
-        var topLevelPath = _fileSystemProvider.GetTopLevelPath(CurrentPath);
+        var topLevelPath = _fileSystemProvider.GetTopLevelPath(FullPath);
         SetPath(topLevelPath);
         _navigationHistory.Add(NavigationHistoryItem.Create(topLevelPath));
         _navigationIndex++;

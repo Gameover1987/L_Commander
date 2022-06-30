@@ -90,14 +90,14 @@
                     <EventSetter Event="Loaded" Handler="DataGridRow_Loaded"/>
                     <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsMouseOver}" Value="True">
+                        <!--<DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsMouseOver}" Value="True">
                             <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent4}"/>
                             <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.SystemControlBackgroundChromeBlackHigh}"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True">
                             <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent}"/>
                             <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.SystemControlBackgroundChromeBlackHigh}"/>
-                        </DataTrigger>
+                        </DataTrigger>-->
                         <DataTrigger Binding="{Binding IsHidden}" Value="True">
                             <Setter Property="Opacity" Value="0.6"/>
                         </DataTrigger>

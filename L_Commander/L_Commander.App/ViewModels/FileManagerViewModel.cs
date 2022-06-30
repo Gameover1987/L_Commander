@@ -67,21 +67,24 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
             {
                 Tabs.Add(CreateFileManagerTabViewModel(path));
             }
+
+            SelectedTab = Tabs.FirstOrDefault(x => x.FullPath == settings.SelectedPath);
         }
         else
         {
             var fileManagerTabViewModel = CreateFileManagerTabViewModel(Drives.First().RootPath);
             Tabs.Add(fileManagerTabViewModel);
-        }
 
-        SelectedTab = Tabs.First();
+            SelectedTab = Tabs.First();
+        }
     }
 
     public FileManagerSettings CollectSettings()
     {
         return new FileManagerSettings
         {
-            Paths = Tabs.Select(x => x.CurrentPath).ToArray()
+            Paths = Tabs.Select(x => x.FullPath).ToArray(),
+            SelectedPath = SelectedTab?.FullPath
         };
     }
 
@@ -111,7 +114,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
 
     private void NewTabCommandHandler()
     {
-        var newTab = CreateFileManagerTabViewModel(SelectedTab.CurrentPath);
+        var newTab = CreateFileManagerTabViewModel(SelectedTab.FullPath);
         Tabs.Add(newTab);
     }
 
@@ -130,18 +133,18 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
     private void CopyPathCommandHandler(object obj)
     {
         var tab = (IFileManagerTabViewModel)obj;
-        _clipBoardHelper.CopyToClipBoard(tab.CurrentPath);
+        _clipBoardHelper.CopyToClipBoard(tab.FullPath);
     }
 
     private void OpenInExplorerCommandHandler(object obj)
     {
         var tab = (IFileManagerTabViewModel)obj;
-        _operatingSystemProvider.OpenExplorer(tab.CurrentPath);
+        _operatingSystemProvider.OpenExplorer(tab.FullPath);
     }
 
     private void OpenInTerminalCommandHandler(object obj)
     {
         var tab = (IFileManagerTabViewModel)obj;
-        _operatingSystemProvider.OpenTerminal(tab.CurrentPath);
+        _operatingSystemProvider.OpenTerminal(tab.FullPath);
     }
 }

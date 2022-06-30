@@ -15,6 +15,8 @@ public class FileManagerSettings
 {
     public string[] Paths { get; set; }
 
+    public string SelectedPath { get; set; }
+
 }
 
 public class ClientSettings

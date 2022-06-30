@@ -51,10 +51,10 @@
 
         <TabControl Grid.Row="1" Margin="0,0,0,0"
                     ItemsSource="{Binding Tabs}"
-                    SelectedItem="{Binding SelectedTab}"
-                    DisplayMemberPath="CurrentPath">
+                    SelectedItem="{Binding SelectedTab}">
             <TabControl.ItemContainerStyle>
                 <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource {x:Type TabItem}}">
+                    <Setter Property="ToolTip" Value="{Binding FullPath}"/>
                     <Setter Property="ContextMenu">
                         <Setter.Value>
                             <ContextMenu>
@@ -83,6 +83,11 @@
                     </Setter>
                 </Style>
             </TabControl.ItemContainerStyle>
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding ShortPath}"/>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
         </TabControl>
     </Grid>
 </UserControl>
