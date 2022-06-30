@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Data;
+using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
 using L_Commander.Common.Extensions;
 using L_Commander.UI.Commands;
 using L_Commander.UI.ViewModels;
+using MahApps.Metro.Controls.Dialogs;
 using Serilog;
 
 namespace L_Commander.App.ViewModels;
@@ -14,6 +16,7 @@ namespace L_Commander.App.ViewModels;
 public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 {
     private readonly IFileSystemProvider _fileSystemProvider;
+    private readonly IWindowManager _windowManager;
     private string _fullPath;
     private IFileSystemEntryViewModel _selectedFileSystemEntry;
     private readonly List<NavigationHistoryItem> _navigationHistory = new List<NavigationHistoryItem>();
@@ -22,17 +25,19 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private ListCollectionView _fileSystemView;
     private object _lock = new object();
 
-    private ObservableCollection<IFileSystemEntryViewModel> _fileSystemEntries = new ObservableCollection<IFileSystemEntryViewModel>();
+    private readonly ObservableCollection<IFileSystemEntryViewModel> _fileSystemEntries = new ObservableCollection<IFileSystemEntryViewModel>();
     private bool _isBusy;
 
-    public FileManagerTabViewModel(IFileSystemProvider fileSystemProvider)
+    public FileManagerTabViewModel(IFileSystemProvider fileSystemProvider, IWindowManager windowManager)
     {
         _fileSystemProvider = fileSystemProvider;
+        _windowManager = windowManager;
 
         OpenCommand = new DelegateCommand(OpenCommandHandler, CanOpenCommandHandler);
         DeleteCommand = new DelegateCommand(DeleteCommandHandler, CanDeleteCommandHandler);
 
         RefreshCommand = new DelegateCommand(RefreshCommandHandler, CanRefreshCommandHandler);
+        RenameCommand = new DelegateCommand(RenameCommandHandler, CanRenameCommandHandler);
         BackCommand = new DelegateCommand(BackCommandHandler, CanBackCommandHandler);
         NextCommand = new DelegateCommand(NextCommandHandler, CanNextCommandHandler);
         TopCommand = new DelegateCommand(TopCommandHandler, CanTopCommandHandler);
@@ -46,14 +51,14 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private bool FileSystemEntryFilter(object obj)
     {
         var entry = (IFileSystemEntryViewModel)obj;
-        if (entry == null) 
+        if (entry == null)
             return false;
 
-        if (entry.IsHidden)
-            return false;
+        //if (entry.IsHidden)
+        //    return false;
 
-        if (entry.IsSystem)
-            return false;
+        //if (entry.IsSystem)
+        //    return false;
 
         return true;
     }
@@ -93,6 +98,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     public IDelegateCommand DeleteCommand { get; }
 
+    public IDelegateCommand RenameCommand { get; }
+
     public IDelegateCommand RefreshCommand { get; }
 
     public IDelegateCommand BackCommand { get; }
@@ -130,7 +137,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
                 }
             });
 
-            SelectedFileSystemEntry = FileSystemEntries.FirstOrDefault();
+            SelectedFileSystemEntry = FileSystemEntries.FirstOrDefault(x => FileSystemEntryFilter(x));
         }
         finally
         {
@@ -184,6 +191,23 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private void RefreshCommandHandler()
     {
         SetPath(FullPath);
+    }
+
+    private bool CanRenameCommandHandler()
+    {
+        if (SelectedFileSystemEntry == null)
+            return false;
+
+        return !IsBusy;
+    }
+
+    private async void RenameCommandHandler()
+    {
+        var settings = new MetroDialogSettings{DefaultText = SelectedFileSystemEntry.Name};
+        var newName = await _windowManager.ShowInputBox("Rename", SelectedFileSystemEntry.Path, settings);
+        if (newName.IsNullOrWhiteSpace())
+            return;
+
     }
 
     private bool CanBackCommandHandler()

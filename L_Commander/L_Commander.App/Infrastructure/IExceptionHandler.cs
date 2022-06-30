@@ -15,19 +15,19 @@ namespace L_Commander.App.Infrastructure
 
     public class ExceptionHandler : IExceptionHandler
     {
-        private readonly IShowDialogAgent _dialogAgent;
+        private readonly IWindowManager _windowManager;
         private readonly ILogger<ExceptionHandler> _logger;
 
-        public ExceptionHandler(IShowDialogAgent dialogAgent, ILogger<ExceptionHandler> logger)
+        public ExceptionHandler(IWindowManager windowManager, ILogger<ExceptionHandler> logger)
         {
-            _dialogAgent = dialogAgent;
+            _windowManager = windowManager;
             _logger = logger;
         }
 
         public void HandleCommandException(Exception exception)
         {
             _logger.LogError(new EventId(0, "ExceptionHandler"), exception, exception.StackTrace);
-            _dialogAgent.ShowErrorMessageDialog(exception.Message, exception.StackTrace);
+            //_windowManager.ShowErrorMessageDialog(exception.Message, exception.StackTrace);
         }
     }
 }

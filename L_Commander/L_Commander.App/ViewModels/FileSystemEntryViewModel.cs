@@ -9,6 +9,8 @@ public interface IFileSystemEntryViewModel
 {
     string Path { get; }
 
+    string Name { get; }
+
     bool IsInitialized { get; }
 
     bool IsFile { get; }
@@ -31,16 +33,9 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
         _fileSystemProvider = fileSystemProvider;
     }
 
-    public string Path
-    {
-        get
-        {
-            if (!IsInitialized)
-                InitializeImpl();
+    public string Path => _path;
 
-            return _path;
-        }
-    }
+    public string Name { get; private set; }
 
     public bool IsFile => FileOrFolder == FileOrFolder.File;
 
@@ -86,7 +81,7 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
 
         IsHidden = descriptor.IsHidden;
         IsSystem = descriptor.IsSystem;
-            
+        Name = descriptor.Name;
         Created = descriptor.Created;
 
         IsInitialized = true;

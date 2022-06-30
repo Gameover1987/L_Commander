@@ -41,8 +41,10 @@ namespace L_Commander.App.OperatingSystem
             descriptor.Attributes = attributes;
             if (attributes.HasFlag(FileAttributes.Directory))
             {
+                var directoryInfo = new DirectoryInfo(path);
                 descriptor.FileOrFolder = FileOrFolder.Folder;
-                descriptor.Created = Directory.GetCreationTime(path);
+                descriptor.Created = directoryInfo.CreationTime;
+                descriptor.Name = directoryInfo.Name;
             }
             else
             {
@@ -53,6 +55,7 @@ namespace L_Commander.App.OperatingSystem
                 descriptor.TotalSize = fileInfo.Length;
                 descriptor.Extension = fileInfo.Extension;
                 descriptor.Created = fileInfo.CreationTime;
+                descriptor.Name = fileInfo.Name;
             }
 
             return descriptor;

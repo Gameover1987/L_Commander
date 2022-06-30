@@ -13,6 +13,8 @@
     <UserControl.InputBindings>
         <KeyBinding Key="Back"
                     Command="{Binding TopCommand}"/>
+        <KeyBinding Key="F2"
+                    Command="{Binding RenameCommand}"/>
     </UserControl.InputBindings>
     <Grid>
         <Grid.RowDefinitions>

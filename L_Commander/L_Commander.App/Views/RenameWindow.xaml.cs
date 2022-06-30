@@ -10,17 +10,16 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace L_Commander.App.Views.Controls
+namespace L_Commander.App.Views
 {
     /// <summary>
-    /// Interaction logic for FileActionsControl.xaml
+    /// Interaction logic for RenameWindow.xaml
     /// </summary>
-    public partial class FileActionsControl : UserControl
+    public partial class RenameWindow : Window
     {
-        public FileActionsControl()
+        public RenameWindow()
         {
             InitializeComponent();
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using L_Commander.App.ViewModels;
 using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
 
 namespace L_Commander.App.Views
 {
@@ -54,6 +56,16 @@ namespace L_Commander.App.Views
         private void OnClosing(object sender, CancelEventArgs e)
         {
             _mainViewModel.SaveSettings();
+        }
+
+        private void LeftFileManager_OnPreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            _mainViewModel.ActiveFileManager = _mainViewModel.LeftFileManager;
+        }
+
+        private void RightFileManager_OnPreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            _mainViewModel.ActiveFileManager = _mainViewModel.RightFileManager;
         }
     }
 }

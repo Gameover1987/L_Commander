@@ -27,4 +27,5 @@ public class FileSystemEntryDescriptor
     public bool IsSystem => Attributes.HasFlag(FileAttributes.System);
 
     public bool IsHidden => Attributes.HasFlag(FileAttributes.Hidden);
+    public string Name { get; set; }
 }

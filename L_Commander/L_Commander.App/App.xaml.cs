@@ -78,7 +78,7 @@ namespace L_Commander.App
 
                 // Infrastructure
                 .AddSingleton<IDispatcher>(dispatcherAdapter)
-                .AddSingleton<IShowDialogAgent, ShowDialogAgent>()
+                .AddSingleton<IWindowManager, WindowManager>()
                 .AddSingleton<IExceptionHandler, ExceptionHandler>()
                 .AddSingleton<ISettingsProvider, ClientSettingsProvider>()
                 .AddSingleton<IClipBoardProvider, ClipBoardProvider>()

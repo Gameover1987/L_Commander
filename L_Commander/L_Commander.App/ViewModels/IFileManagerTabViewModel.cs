@@ -11,4 +11,6 @@ public interface IFileManagerTabViewModel
     void Initialize(string rootPath);
 
     IDelegateCommand OpenCommand { get; }
+    IDelegateCommand DeleteCommand { get; }
+    IDelegateCommand RenameCommand { get; }
 }
