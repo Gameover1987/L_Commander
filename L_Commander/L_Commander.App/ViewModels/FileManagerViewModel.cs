@@ -2,6 +2,7 @@
 using System.Linq;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
+using L_Commander.App.ViewModels.Filtering;
 using L_Commander.UI.Commands;
 using L_Commander.UI.ViewModels;
 
@@ -94,7 +95,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
 
     protected virtual IFileManagerTabViewModel CreateFileManagerTabViewModel(string path)
     {
-        var fileManagerTabViewModel = new FileManagerTabViewModel(_fileSystemProvider, _windowManager, _operatingSystemProvider);
+        var fileManagerTabViewModel = new FileManagerTabViewModel(new FolderFilterViewModel(), _fileSystemProvider, _windowManager, _operatingSystemProvider);
         fileManagerTabViewModel.Initialize(path);
 
         return fileManagerTabViewModel;

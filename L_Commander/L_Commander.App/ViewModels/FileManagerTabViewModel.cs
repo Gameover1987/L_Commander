@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows.Data;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
+using L_Commander.App.ViewModels.Filtering;
 using L_Commander.Common.Extensions;
 using L_Commander.UI.Commands;
 using L_Commander.UI.ViewModels;
@@ -15,22 +16,26 @@ namespace L_Commander.App.ViewModels;
 
 public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 {
+    private readonly IFolderFilterViewModel _folderFilter;
     private readonly IFileSystemProvider _fileSystemProvider;
     private readonly IWindowManager _windowManager;
     private readonly IOperatingSystemProvider _operatingSystemProvider;
     private string _fullPath;
+
+    private readonly ObservableCollection<IFileSystemEntryViewModel> _fileSystemEntries = new ObservableCollection<IFileSystemEntryViewModel>();
     private IFileSystemEntryViewModel _selectedFileSystemEntry;
     private readonly List<NavigationHistoryItem> _navigationHistory = new List<NavigationHistoryItem>();
     private int _navigationIndex;
 
-    private ListCollectionView _fileSystemView;
+    private readonly ListCollectionView _fileSystemView;
     private readonly object _lock = new object();
 
-    private readonly ObservableCollection<IFileSystemEntryViewModel> _fileSystemEntries = new ObservableCollection<IFileSystemEntryViewModel>();
     private bool _isBusy;
 
-    public FileManagerTabViewModel(IFileSystemProvider fileSystemProvider, IWindowManager windowManager, IOperatingSystemProvider operatingSystemProvider)
+    public FileManagerTabViewModel(IFolderFilterViewModel folderFilter, IFileSystemProvider fileSystemProvider, IWindowManager windowManager, IOperatingSystemProvider operatingSystemProvider)
     {
+        _folderFilter = folderFilter;
+        _folderFilter.Changed += FolderFilterOnChanged;
         _fileSystemProvider = fileSystemProvider;
         _windowManager = windowManager;
         _operatingSystemProvider = operatingSystemProvider;
@@ -52,22 +57,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _fileSystemView.SortDescriptions.Add(new SortDescription(nameof(IFileSystemEntryViewModel.Name), ListSortDirection.Ascending));
     }
 
-    private bool FileSystemEntryFilter(object obj)
-    {
-        var entry = (IFileSystemEntryViewModel)obj;
-        if (entry == null)
-            return false;
-
-        if (entry.IsHidden)
-            return false;
-
-        if (entry.IsSystem)
-            return false;
-
-        return true;
-    }
-
     public string FullPath => _fullPath;
+
     public string ShortPath => _fileSystemProvider.GetDirectoryName(_fullPath);
 
     public string Name => _fileSystemProvider.GetDirectoryName(_fullPath);
@@ -98,6 +89,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         }
     }
 
+    public IFolderFilterViewModel Filter => _folderFilter;
+
     public IDelegateCommand OpenCommand { get; }
 
     public IDelegateCommand DeleteCommand { get; }
@@ -127,6 +120,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
         IsBusy = true;
         FileSystemEntries.Clear();
+        _folderFilter.Clear();
         try
         {
             await ThreadTaskExtensions.Run(() =>
@@ -140,6 +134,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
                     FileSystemEntries.Add(fileSystemEntryViewModel);
                 }
             });
+
+            _folderFilter.Initialize(FileSystemEntries);
 
             SelectedFileSystemEntry = FileSystemEntries.FirstOrDefault(FileSystemEntryFilter);
         }
@@ -207,7 +203,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     private async void RenameCommandHandler()
     {
-        var settings = new MetroDialogSettings{DefaultText = SelectedFileSystemEntry.Name};
+        var settings = new MetroDialogSettings { DefaultText = SelectedFileSystemEntry.Name };
         var newName = await _windowManager.ShowInputBox("Rename", SelectedFileSystemEntry.Path, settings);
         if (newName.IsNullOrWhiteSpace())
             return;
@@ -254,6 +250,31 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         SetPath(topLevelPath);
         _navigationHistory.Add(NavigationHistoryItem.Create(topLevelPath));
         _navigationIndex++;
+    }
+
+    private void FolderFilterOnChanged(object sender, EventArgs e)
+    {
+        _fileSystemView.Refresh();
+    }
+
+    private bool FileSystemEntryFilter(object obj)
+    {
+        var entry = (IFileSystemEntryViewModel)obj;
+        if (entry == null)
+            return false;
+
+        if (entry.IsHidden)
+            return false;
+
+        if (entry.IsSystem)
+            return false;
+
+        if (!_folderFilter.IsCorrespondsByFilter(entry))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     private class NavigationHistoryItem

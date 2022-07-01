@@ -7,6 +7,7 @@
              xmlns:app="clr-namespace:L_Commander.App"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:filtering="clr-namespace:L_Commander.App.ViewModels.Filtering"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=designMock:DesignMockFileManagerTabViewModel, IsDesignTimeCreatable=True}">
@@ -50,15 +51,30 @@
                     <iconPacks:PackIconMaterial Margin="6" Kind="ArrowRight"/>
                 </Button>
             </StackPanel>
-            <StackPanel Grid.Column="1" VerticalAlignment="Center" Orientation="Horizontal" Margin="18,0,0,0">
-                <CheckBox IsChecked="True" Content="All files"/>
-                <CheckBox IsChecked="True" Content="*.mp3" Margin="6,0,0,0"/>
-                <CheckBox IsChecked="True" Content="*.wma" Margin="6,0,0,0"/>
-                <CheckBox IsChecked="True" Content="*.wav" Margin="6,0,0,0"/>
-                <CheckBox IsChecked="True" Content="*.jpg" Margin="6,0,0,0"/>
-                <CheckBox IsChecked="True" Content="*.cs" Margin="6,0,0,0"/>
-                <CheckBox IsChecked="True" Content="*.xaml" Margin="6,0,0,0"/>
-            </StackPanel>
+            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto"
+                          DataContext="{Binding Filter}"
+                          Background="Transparent"
+                          Margin="6,0,0,0">
+                <ScrollViewer.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Reset filters"
+                                  Command="{Binding ResetFiltersCommand}"/>
+                    </ContextMenu>
+                </ScrollViewer.ContextMenu>
+                <ItemsControl ItemsSource="{Binding Filters}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type filtering:FilterItemViewModel}">
+                            <CheckBox Content="{Binding Name}"
+                                      IsChecked="{Binding IsChecked}" Margin="0,0,6,0"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
         </Grid>
 
         <DataGrid Grid.Row="1" AutoGenerateColumns="False" Margin="0,6,0,0"

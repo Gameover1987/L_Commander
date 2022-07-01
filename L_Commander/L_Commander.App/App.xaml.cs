@@ -9,6 +9,7 @@ using System.Windows;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.ViewModels;
+using L_Commander.App.ViewModels.Filtering;
 using L_Commander.App.Views;
 using L_Commander.UI.Commands;
 using L_Commander.UI.Infrastructure;
@@ -82,19 +83,19 @@ namespace L_Commander.App
                 .AddSingleton<IExceptionHandler, ExceptionHandler>()
                 .AddSingleton<ISettingsProvider, ClientSettingsProvider>()
                 .AddSingleton<IClipBoardProvider, ClipBoardProvider>()
-                .AddSingleton<IOperatingSystemProvider, OperatingSystemProvider>()
-                .AddSingleton<IIconCache, IconCache>()
                 .AddLogging(x =>
                 {
                     x.SetMinimumLevel(LogLevel.Information);
                     x.AddSerilog(logger: serilogLogger, dispose: true);
                 })
 
-                // File System
+                // System
+                .AddSingleton<IOperatingSystemProvider, OperatingSystemProvider>()
+                .AddSingleton<IIconCache, IconCache>()
                 .AddSingleton<IFileSystemProvider, FileSystemProvider>()
 
                 // ViewModels
-
+                .AddTransient<IFolderFilterViewModel, FolderFilterViewModel>()
                 .AddSingleton<IMainViewModel, MainViewModel>()
                 .AddTransient<IFileManagerViewModel, FileManagerViewModel>();
 
