@@ -22,6 +22,13 @@ namespace L_Commander.App.OperatingSystem
 
     public sealed class FileSystemProvider : IFileSystemProvider
     {
+        private readonly IIconCache _iconCache;
+
+        public FileSystemProvider(IIconCache iconCache)
+        {
+            _iconCache = iconCache;
+        }
+
         public DriveInfo[] GetDrives()
         {
             return DriveInfo.GetDrives();
@@ -49,6 +56,7 @@ namespace L_Commander.App.OperatingSystem
             else
             {
                 descriptor.FileOrFolder = FileOrFolder.File;
+                descriptor.Icon = _iconCache.GetByPath(path);
 
                 var fileInfo = new FileInfo(path);
 

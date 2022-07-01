@@ -86,8 +86,20 @@
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <iconPacks:PackIconMaterial Kind="Folder" Margin="2,0,0,0"
+                                                            Visibility="{Binding IsFile, Converter={StaticResource BoolToInvisibilityConverter}}"/>
+                                <Image Width="16" Height="16" Source="{Binding Icon}"
+                                       Visibility="{Binding IsFile, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Header="{x:Static app:Resources.DataGridColumnName_Path}"
-                                    Binding="{Binding Path, Mode=OneWay}" Width="*"/>
+                                    Binding="{Binding Name, Mode=OneWay}" Width="*"/>
                 <DataGridTextColumn Header="{x:Static app:Resources.DataGridColumnName_Type}" 
                                     Binding="{Binding Extension, Mode=OneWay}" Width="Auto"/>
                 <DataGridTextColumn Header="{x:Static app:Resources.DataGridColumnName_Size}"

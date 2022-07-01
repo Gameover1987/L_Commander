@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
 using L_Commander.App.Infrastructure;
@@ -46,6 +48,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
         _fileSystemView = (ListCollectionView)CollectionViewSource.GetDefaultView(FileSystemEntries);
         _fileSystemView.Filter = FileSystemEntryFilter;
+        _fileSystemView.SortDescriptions.Add(new SortDescription(nameof(IFileSystemEntryViewModel.FileOrFolder), ListSortDirection.Ascending));
+        _fileSystemView.SortDescriptions.Add(new SortDescription(nameof(IFileSystemEntryViewModel.Name), ListSortDirection.Ascending));
     }
 
     private bool FileSystemEntryFilter(object obj)
@@ -54,11 +58,11 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         if (entry == null)
             return false;
 
-        //if (entry.IsHidden)
-        //    return false;
+        if (entry.IsHidden)
+            return false;
 
-        //if (entry.IsSystem)
-        //    return false;
+        if (entry.IsSystem)
+            return false;
 
         return true;
     }
@@ -137,7 +141,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
                 }
             });
 
-            SelectedFileSystemEntry = FileSystemEntries.FirstOrDefault(x => FileSystemEntryFilter(x));
+            SelectedFileSystemEntry = FileSystemEntries.FirstOrDefault(FileSystemEntryFilter);
         }
         finally
         {

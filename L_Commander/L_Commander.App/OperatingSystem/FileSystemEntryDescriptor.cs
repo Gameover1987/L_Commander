@@ -1,16 +1,20 @@
 ﻿using System;
 using System.IO;
+using System.Windows.Media;
 
 namespace L_Commander.App.OperatingSystem;
 
 public enum FileOrFolder
 {
-    File, Folder
+    Folder = 0,
+    File = 1
 }
 
 public class FileSystemEntryDescriptor
 {
     public FileOrFolder FileOrFolder { get; set; }
+
+    public ImageSource Icon { get; set; }
 
     public string Path { get; set; }
 

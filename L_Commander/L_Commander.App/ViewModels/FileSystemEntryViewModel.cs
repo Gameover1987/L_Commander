@@ -1,26 +1,12 @@
 ﻿using System;
 using System.Globalization;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using L_Commander.App.OperatingSystem;
+using L_Commander.Common.Extensions;
 using L_Commander.UI.ViewModels;
 
 namespace L_Commander.App.ViewModels;
-
-public interface IFileSystemEntryViewModel
-{
-    string Path { get; }
-
-    string Name { get; }
-
-    bool IsInitialized { get; }
-
-    bool IsFile { get; }
-
-    bool IsSystem { get; }
-
-    bool IsHidden { get; }
-
-    void Initialize();
-}
 
 public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
 {
@@ -32,6 +18,8 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
         _path = path;
         _fileSystemProvider = fileSystemProvider;
     }
+
+    public ImageSource Icon { get; private set; }
 
     public string Path => _path;
 
@@ -73,6 +61,8 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
 
             var numberFormatInfo = new NumberFormatInfo { NumberGroupSeparator = " " };
             TotalSize = String.Format(numberFormatInfo, "{0:#,#}", descriptor.TotalSize);
+
+            Icon = descriptor.Icon;
         }
         else
         {

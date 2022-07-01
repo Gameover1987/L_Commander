@@ -83,6 +83,7 @@ namespace L_Commander.App
                 .AddSingleton<ISettingsProvider, ClientSettingsProvider>()
                 .AddSingleton<IClipBoardProvider, ClipBoardProvider>()
                 .AddSingleton<IOperatingSystemProvider, OperatingSystemProvider>()
+                .AddSingleton<IIconCache, IconCache>()
                 .AddLogging(x =>
                 {
                     x.SetMinimumLevel(LogLevel.Information);
