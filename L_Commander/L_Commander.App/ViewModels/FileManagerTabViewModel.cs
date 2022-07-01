@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
@@ -11,7 +10,6 @@ using L_Commander.Common.Extensions;
 using L_Commander.UI.Commands;
 using L_Commander.UI.ViewModels;
 using MahApps.Metro.Controls.Dialogs;
-using Serilog;
 
 namespace L_Commander.App.ViewModels;
 
@@ -19,21 +17,23 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 {
     private readonly IFileSystemProvider _fileSystemProvider;
     private readonly IWindowManager _windowManager;
+    private readonly IOperatingSystemProvider _operatingSystemProvider;
     private string _fullPath;
     private IFileSystemEntryViewModel _selectedFileSystemEntry;
     private readonly List<NavigationHistoryItem> _navigationHistory = new List<NavigationHistoryItem>();
     private int _navigationIndex;
 
     private ListCollectionView _fileSystemView;
-    private object _lock = new object();
+    private readonly object _lock = new object();
 
     private readonly ObservableCollection<IFileSystemEntryViewModel> _fileSystemEntries = new ObservableCollection<IFileSystemEntryViewModel>();
     private bool _isBusy;
 
-    public FileManagerTabViewModel(IFileSystemProvider fileSystemProvider, IWindowManager windowManager)
+    public FileManagerTabViewModel(IFileSystemProvider fileSystemProvider, IWindowManager windowManager, IOperatingSystemProvider operatingSystemProvider)
     {
         _fileSystemProvider = fileSystemProvider;
         _windowManager = windowManager;
+        _operatingSystemProvider = operatingSystemProvider;
 
         OpenCommand = new DelegateCommand(OpenCommandHandler, CanOpenCommandHandler);
         DeleteCommand = new DelegateCommand(DeleteCommandHandler, CanDeleteCommandHandler);
@@ -166,7 +166,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     {
         if (SelectedFileSystemEntry.IsFile)
         {
-
+            _operatingSystemProvider.OpenFile(SelectedFileSystemEntry.Path);
         }
         else
         {

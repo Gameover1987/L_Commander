@@ -21,7 +21,7 @@ internal sealed class DesignMockWindowManager : IWindowManager
 internal sealed class DesignMockFileManagerTabViewModel : FileManagerTabViewModel
 {
     public DesignMockFileManagerTabViewModel()
-        : base(new FileSystemProvider(new IconCache()), new DesignMockWindowManager())
+        : base(new FileSystemProvider(new IconCache()), new DesignMockWindowManager(), new OperatingSystemProvider())
     {
         Initialize("C:\\");
 

@@ -18,17 +18,19 @@ namespace L_Commander.App.ViewModels.Factories
         private readonly IFileSystemProvider _fileSystemProvider;
         private readonly IWindowManager _windowManager;
         private readonly IIconCache _iconCache;
+        private readonly IOperatingSystemProvider _operatingSystemProvider;
 
-        public FileManagerTabViewModelFactory(IFileSystemProvider fileSystemProvider, IWindowManager windowManager, IIconCache iconCache)
+        public FileManagerTabViewModelFactory(IFileSystemProvider fileSystemProvider, IWindowManager windowManager, IIconCache iconCache, IOperatingSystemProvider operatingSystemProvider)
         {
             _fileSystemProvider = fileSystemProvider;
             _windowManager = windowManager;
             _iconCache = iconCache;
+            _operatingSystemProvider = operatingSystemProvider;
         }
 
         public IFileManagerTabViewModel CreateViewModel()
         {
-            return new FileManagerTabViewModel(_fileSystemProvider, _windowManager);
+            return new FileManagerTabViewModel(_fileSystemProvider, _windowManager, _operatingSystemProvider);
         }
     }
 }
