@@ -79,9 +79,9 @@
 
         <DataGrid Grid.Row="1" AutoGenerateColumns="False" Margin="0,6,0,0"
                   EnableRowVirtualization="True" 
-                  ItemsSource="{Binding FileSystemEntries}"
+                  ItemsSource="{Binding FolderView}"
                   SelectedItem="{Binding SelectedFileSystemEntry}"
-                  IsReadOnly="True"
+                  IsReadOnly="True"                  
                   SelectionUnit="FullRow">
             <DataGrid.InputBindings>
                 <KeyBinding Key="Enter"

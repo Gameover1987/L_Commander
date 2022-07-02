@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\Converters\**" />
+    <EmbeddedResource Remove="Views\Converters\**" />
+    <None Remove="Views\Converters\**" />
+    <Page Remove="Views\Converters\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="AppSettings.json" />
   </ItemGroup>
 
@@ -50,10 +57,6 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Views\Converters\" />
   </ItemGroup>
 
 </Project>

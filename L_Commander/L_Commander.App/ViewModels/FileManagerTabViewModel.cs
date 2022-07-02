@@ -105,6 +105,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     public IDelegateCommand TopCommand { get; }
 
+    public ListCollectionView FolderView => _fileSystemView;
+
     public void Initialize(string rootPath)
     {
         _navigationHistory.Clear();
