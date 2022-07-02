@@ -63,7 +63,7 @@ namespace L_Commander.App.OperatingSystem
                 descriptor.TotalSize = fileInfo.Length;
                 descriptor.Extension = fileInfo.Extension;
                 descriptor.Created = fileInfo.CreationTime;
-                descriptor.Name = fileInfo.Name;
+                descriptor.Name = Path.GetFileNameWithoutExtension(fileInfo.Name);
             }
 
             return descriptor;

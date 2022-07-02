@@ -22,14 +22,7 @@ namespace L_Commander.App.Views.Controls
 
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            _dataContext = (IFileManagerTabViewModel) e.NewValue;
-        }
-
-        private void DataGridRow_Loaded(object sender, RoutedEventArgs e)
-        {
-            //var dataGridRow = (DataGridRow) sender;
-            //var fileSystemEntryViewModel = (IFileSystemEntryViewModel) dataGridRow.DataContext;
-            //fileSystemEntryViewModel.Initialize();
+            _dataContext = (IFileManagerTabViewModel)e.NewValue;
         }
 
         private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
