@@ -12,13 +12,25 @@ namespace L_Commander.App.Infrastructure
     public interface IWindowManager
     {
         Task<string> ShowInputBox(string title, string message, MetroDialogSettings settings = null);
+
+        Task<MessageDialogResult> ShowMessage(string title, string message);
     }
 
     public sealed class WindowManager : IWindowManager
     {
+        public MetroWindow MainWindow
+        {
+            get { return (MetroWindow)Application.Current.MainWindow; }
+        }
+
         public Task<string> ShowInputBox(string title, string message, MetroDialogSettings settings = null)
         {
-            return DialogManager.ShowInputAsync((MetroWindow) Application.Current.MainWindow, title, message, settings);
+            return DialogManager.ShowInputAsync(MainWindow, title, message, settings);
+        }
+
+        public Task<MessageDialogResult> ShowMessage(string title, string message)
+        {
+            return DialogManager.ShowMessageAsync(MainWindow, title, message, MessageDialogStyle.Affirmative);
         }
     }
 }

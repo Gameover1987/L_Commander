@@ -10,18 +10,18 @@ namespace L_Commander.App.ViewModels;
 
 public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
 {
-    private readonly string _path;
+    private readonly string _fullPath;
     private readonly IFileSystemProvider _fileSystemProvider;
 
-    public FileSystemEntryViewModel(string path, IFileSystemProvider fileSystemProvider)
+    public FileSystemEntryViewModel(string fullPath, IFileSystemProvider fileSystemProvider)
     {
-        _path = path;
+        _fullPath = fullPath;
         _fileSystemProvider = fileSystemProvider;
     }
 
     public ImageSource Icon { get; private set; }
 
-    public string Path => _path;
+    public string FullPath => _fullPath;
 
     public string Name { get; private set; }
 
@@ -48,10 +48,7 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
 
     private void InitializeImpl()
     {
-        if (IsInitialized)
-            return;
-
-        var descriptor = _fileSystemProvider.GetEntryDetails(_path);
+        var descriptor = _fileSystemProvider.GetEntryDetails(_fullPath);
 
         FileOrFolder = descriptor.FileOrFolder;
 

@@ -11,7 +11,7 @@ namespace L_Commander.App.ViewModels.Filtering
     {
         void Clear();
 
-        void Initialize(IEnumerable<IFileSystemEntryViewModel> fileSystemEntries);
+        void Refresh(IEnumerable<IFileSystemEntryViewModel> fileSystemEntries);
 
         ObservableCollection<FilterItemViewModel> Filters { get; }
 

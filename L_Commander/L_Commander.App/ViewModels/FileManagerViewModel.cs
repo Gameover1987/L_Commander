@@ -15,19 +15,21 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
     private readonly IOperatingSystemProvider _operatingSystemProvider;
     private readonly IWindowManager _windowManager;
     private readonly IIconCache _iconCache;
+    private readonly IExceptionHandler _exceptionHandler;
 
     private IFileManagerTabViewModel _selectedTab;
 
-    public FileManagerViewModel(IFileSystemProvider fileSystemProvider, IClipBoardProvider clipBoardHelper, IOperatingSystemProvider operatingSystemProvider, IWindowManager windowManager, IIconCache iconCache)
+    public FileManagerViewModel(IFileSystemProvider fileSystemProvider, IClipBoardProvider clipBoardHelper, IOperatingSystemProvider operatingSystemProvider, IWindowManager windowManager, IIconCache iconCache, IExceptionHandler exceptionHandler)
     {
         _fileSystemProvider = fileSystemProvider;
         _clipBoardHelper = clipBoardHelper;
         _operatingSystemProvider = operatingSystemProvider;
         _windowManager = windowManager;
         _iconCache = iconCache;
-        ChangeDriveCommand = new DelegateCommand(x => ChangeDriveCommandHandler(x), x => CanChangeDriveCommandHandler());
+        _exceptionHandler = exceptionHandler;
+        ChangeDriveCommand = new DelegateCommand(ChangeDriveCommandHandler, x => CanChangeDriveCommandHandler());
         NewTabCommand = new DelegateCommand(NewTabCommandHandler, CanNewTabCommandHandler);
-        CloseTabCommand = new DelegateCommand(x => CloseTabCommandHandler(x), x => CanCloseTabCommandHandler());
+        CloseTabCommand = new DelegateCommand(CloseTabCommandHandler, x => CanCloseTabCommandHandler());
         CopyPathCommand = new DelegateCommand(CopyPathCommandHandler);
         OpenInExplorerCommand = new DelegateCommand(OpenInExplorerCommandHandler);
         OpenInTerminalCommand = new DelegateCommand(OpenInTerminalCommandHandler);
@@ -95,7 +97,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
 
     protected virtual IFileManagerTabViewModel CreateFileManagerTabViewModel(string path)
     {
-        var fileManagerTabViewModel = new FileManagerTabViewModel(new FolderFilterViewModel(), _fileSystemProvider, _windowManager, _operatingSystemProvider);
+        var fileManagerTabViewModel = new FileManagerTabViewModel(new FolderFilterViewModel(), _fileSystemProvider, _windowManager, _operatingSystemProvider, _exceptionHandler, new FolderWatcher());
         fileManagerTabViewModel.Initialize(path);
 
         return fileManagerTabViewModel;

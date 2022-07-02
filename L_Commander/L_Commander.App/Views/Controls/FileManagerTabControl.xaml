@@ -53,7 +53,7 @@
                 </Button>
             </StackPanel>
             <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto"
-                          DataContext="{Binding Filter}"
+                          DataContext="{Binding FolderFilter}"
                           Background="Transparent"
                           Margin="6,0,0,0">
                 <ScrollViewer.ContextMenu>

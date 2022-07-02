@@ -103,7 +103,7 @@ namespace L_Commander.App.ViewModels
 
         private void DeleteCommandHandler()
         {
-
+            ActiveFileManager?.SelectedTab?.DeleteCommand.TryExecute();
         }
     }
 }

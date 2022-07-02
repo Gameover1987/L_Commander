@@ -93,6 +93,7 @@ namespace L_Commander.App
                 .AddSingleton<IOperatingSystemProvider, OperatingSystemProvider>()
                 .AddSingleton<IIconCache, IconCache>()
                 .AddSingleton<IFileSystemProvider, FileSystemProvider>()
+                .AddTransient<IFolderWatcher, FolderWatcher>()
 
                 // ViewModels
                 .AddTransient<IFolderFilterViewModel, FolderFilterViewModel>()

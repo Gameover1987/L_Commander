@@ -92,7 +92,7 @@
                     Command="{Binding DeleteCommand}">
                 <StackPanel Orientation="Horizontal">
                     <iconPacks:PackIconMaterial Width="20" Height="20" Kind="Delete" />
-                    <TextBlock Text="F8 - Delete" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                    <TextBlock Text="Del - Delete" VerticalAlignment="Center" Margin="6,0,0,0"/>
                 </StackPanel>
             </Button>
         </Grid>

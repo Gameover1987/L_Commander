@@ -16,10 +16,12 @@ namespace L_Commander.App.ViewModels;
 
 public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 {
-    private readonly IFolderFilterViewModel _folderFilter;
+    private readonly IFolderFilterViewModel _folderFolderFilter;
     private readonly IFileSystemProvider _fileSystemProvider;
     private readonly IWindowManager _windowManager;
     private readonly IOperatingSystemProvider _operatingSystemProvider;
+    private readonly IExceptionHandler _exceptionHandler;
+    private readonly IFolderWatcher _folderWatcher;
     private string _fullPath;
 
     private IFileSystemEntryViewModel _selectedFileSystemEntry;
@@ -31,13 +33,21 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     private bool _isBusy;
 
-    public FileManagerTabViewModel(IFolderFilterViewModel folderFilter, IFileSystemProvider fileSystemProvider, IWindowManager windowManager, IOperatingSystemProvider operatingSystemProvider)
+    public FileManagerTabViewModel(IFolderFilterViewModel folderFolderFilter,
+        IFileSystemProvider fileSystemProvider,
+        IWindowManager windowManager,
+        IOperatingSystemProvider operatingSystemProvider,
+        IExceptionHandler exceptionHandler,
+        IFolderWatcher folderWatcher)
     {
-        _folderFilter = folderFilter;
-        _folderFilter.Changed += FolderFilterOnChanged;
+        _folderFolderFilter = folderFolderFilter;
+        _folderFolderFilter.Changed += FolderFolderFilterOnChanged;
         _fileSystemProvider = fileSystemProvider;
         _windowManager = windowManager;
         _operatingSystemProvider = operatingSystemProvider;
+        _exceptionHandler = exceptionHandler;
+        _folderWatcher = folderWatcher;
+        _folderWatcher.Changed+= FolderWatcherOnChanged;
 
         OpenCommand = new DelegateCommand(OpenCommandHandler, CanOpenCommandHandler);
         DeleteCommand = new DelegateCommand(DeleteCommandHandler, CanDeleteCommandHandler);
@@ -90,7 +100,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         }
     }
 
-    public IFolderFilterViewModel Filter => _folderFilter;
+    public IFolderFilterViewModel FolderFilter => _folderFolderFilter;
 
     public IDelegateCommand OpenCommand { get; }
 
@@ -117,11 +127,15 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     private async void SetPath(string rootPath)
     {
+        if (rootPath != null)
+            _folderWatcher.EndWatch(_fullPath);
+
         _fullPath = rootPath;
+        _folderWatcher.BeginWatch(_fullPath);
 
         IsBusy = true;
         FileSystemEntries.Clear();
-        _folderFilter.Clear();
+        _folderFolderFilter.Clear();
         try
         {
             await ThreadTaskExtensions.Run(() =>
@@ -136,7 +150,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
                 }
             });
 
-            _folderFilter.Initialize(FileSystemEntries);
+            _folderFolderFilter.Refresh(FileSystemEntries);
 
             SelectedFileSystemEntry = FileSystemEntries.FirstOrDefault(FileSystemEntryFilter);
         }
@@ -163,11 +177,11 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     {
         if (SelectedFileSystemEntry.IsFile)
         {
-            _operatingSystemProvider.OpenFile(SelectedFileSystemEntry.Path);
+            _operatingSystemProvider.OpenFile(SelectedFileSystemEntry.FullPath);
         }
         else
         {
-            var path = SelectedFileSystemEntry.Path;
+            var path = SelectedFileSystemEntry.FullPath;
             SetPath(path);
             _navigationHistory.Add(NavigationHistoryItem.Create(path));
             _navigationIndex++;
@@ -181,7 +195,14 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     private void DeleteCommandHandler()
     {
-
+        try
+        {
+            _fileSystemProvider.Delete(SelectedFileSystemEntry.FileOrFolder, SelectedFileSystemEntry.FullPath);
+        }
+        catch (Exception exception)
+        {
+            _exceptionHandler.HandleCommandException(exception);
+        }
     }
 
     private bool CanRefreshCommandHandler()
@@ -204,11 +225,19 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     private async void RenameCommandHandler()
     {
-        var settings = new MetroDialogSettings { DefaultText = SelectedFileSystemEntry.Name };
-        var newName = await _windowManager.ShowInputBox("Rename", SelectedFileSystemEntry.Path, settings);
-        if (newName.IsNullOrWhiteSpace())
-            return;
+        try
+        {
+            var settings = new MetroDialogSettings { DefaultText = SelectedFileSystemEntry.Name };
+            var newName = await _windowManager.ShowInputBox("Rename", SelectedFileSystemEntry.FullPath, settings);
+            if (newName.IsNullOrWhiteSpace())
+                return;
 
+            _fileSystemProvider.Rename(SelectedFileSystemEntry.FileOrFolder, SelectedFileSystemEntry.FullPath, newName);
+        }
+        catch (Exception exception)
+        {
+            _exceptionHandler.HandleCommandException(exception);
+        }
     }
 
     private bool CanBackCommandHandler()
@@ -253,9 +282,40 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _navigationIndex++;
     }
 
-    private void FolderFilterOnChanged(object sender, EventArgs e)
+    private void FolderFolderFilterOnChanged(object sender, EventArgs e)
     {
         _folderView.Refresh();
+    }
+
+    private void FolderWatcherOnChanged(object sender, FileChangedEventArgs e)
+    {
+        ExecuteInUIThread(() =>
+        {
+            switch (e.Change)
+            {
+                case FileChnageType.Create:
+                    var newEntry = CreateFileSystemEntryViewModel(e.CurrentPath);
+                    newEntry.Initialize();
+                    FileSystemEntries.Add(newEntry);
+                    break;
+
+                case FileChnageType.Delete:
+                    var deletedEntry = FileSystemEntries.FirstOrDefault(x => x.FullPath == e.CurrentPath);
+                    if (deletedEntry != null)
+                    {
+                        FileSystemEntries.Remove(deletedEntry);
+                    }
+                    break;
+
+                case FileChnageType.Rename:
+                    var renamedEntry = FileSystemEntries.FirstOrDefault(x => x.FullPath == e.OldPath);
+                    renamedEntry?.Initialize();
+                    break;
+            }
+
+            FolderFilter.Refresh(FileSystemEntries);
+            FolderView.Refresh();
+        });
     }
 
     private bool FileSystemEntryFilter(object obj)
@@ -270,7 +330,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         if (entry.IsSystem)
             return false;
 
-        if (!_folderFilter.IsCorrespondsByFilter(entry))
+        if (!_folderFolderFilter.IsCorrespondsByFilter(entry))
         {
             return false;
         }

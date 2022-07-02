@@ -32,7 +32,7 @@ public class FolderFilterViewModel : IFolderFilterViewModel
         IsInitialized = false;
     }
 
-    public void Initialize(IEnumerable<IFileSystemEntryViewModel> fileSystemEntries)
+    public void Refresh(IEnumerable<IFileSystemEntryViewModel> fileSystemEntries)
     {
         var groups = fileSystemEntries
             .Where(x => x.IsFile)

@@ -16,12 +16,17 @@ internal sealed class DesignMockWindowManager : IWindowManager
     {
         throw new NotImplementedException();
     }
+
+    public Task<MessageDialogResult> ShowMessage(string title, string message)
+    {
+        throw new NotImplementedException();
+    }
 }
 
 internal sealed class DesignMockFileManagerTabViewModel : FileManagerTabViewModel
 {
     public DesignMockFileManagerTabViewModel()
-        : base(new FolderFilterViewModel(), new FileSystemProvider(new IconCache()), new DesignMockWindowManager(), new OperatingSystemProvider())
+        : base(new FolderFilterViewModel(), new FileSystemProvider(new IconCache()), new DesignMockWindowManager(), new OperatingSystemProvider(), new DesignMockExceptionHandler(), new FolderWatcher())
     {
         Initialize("C:\\");
 
@@ -34,10 +39,18 @@ internal sealed class DesignMockFileManagerTabViewModel : FileManagerTabViewMode
     }
 }
 
+internal sealed class DesignMockExceptionHandler : IExceptionHandler
+{
+    public void HandleCommandException(Exception exception)
+    {
+        throw new NotImplementedException();
+    }
+}
+
 internal sealed class DesignMockFileManagerViewModel : FileManagerViewModel
 {
     public DesignMockFileManagerViewModel()
-        : base(new FileSystemProvider(new IconCache()), new ClipBoardProvider(), new OperatingSystemProvider(), new DesignMockWindowManager(), new DesignMockIconCache())
+        : base(new FileSystemProvider(new IconCache()), new ClipBoardProvider(), new OperatingSystemProvider(), new DesignMockWindowManager(), new DesignMockIconCache(), new DesignMockExceptionHandler())
     {
         Initialize(new FileManagerSettings { Paths = new[] { "C:\\", "D:\\" } });
     }

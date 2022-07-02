@@ -8,7 +8,7 @@ public interface IFileSystemEntryViewModel
 {
     ImageSource Icon { get; }
 
-    string Path { get; }
+    string FullPath { get; }
 
     string Name { get; }
 
