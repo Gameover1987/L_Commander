@@ -22,12 +22,11 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private readonly IOperatingSystemProvider _operatingSystemProvider;
     private string _fullPath;
 
-    private readonly ObservableCollection<IFileSystemEntryViewModel> _fileSystemEntries = new ObservableCollection<IFileSystemEntryViewModel>();
     private IFileSystemEntryViewModel _selectedFileSystemEntry;
     private readonly List<NavigationHistoryItem> _navigationHistory = new List<NavigationHistoryItem>();
     private int _navigationIndex;
 
-    private readonly ListCollectionView _fileSystemView;
+    private readonly ListCollectionView _folderView;
     private readonly object _lock = new object();
 
     private bool _isBusy;
@@ -51,10 +50,10 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
         BindingOperations.EnableCollectionSynchronization(FileSystemEntries, _lock);
 
-        _fileSystemView = (ListCollectionView)CollectionViewSource.GetDefaultView(FileSystemEntries);
-        _fileSystemView.Filter = FileSystemEntryFilter;
-        _fileSystemView.SortDescriptions.Add(new SortDescription(nameof(IFileSystemEntryViewModel.FileOrFolder), ListSortDirection.Ascending));
-        _fileSystemView.SortDescriptions.Add(new SortDescription(nameof(IFileSystemEntryViewModel.Name), ListSortDirection.Ascending));
+        _folderView = (ListCollectionView)CollectionViewSource.GetDefaultView(FileSystemEntries);
+        _folderView.Filter = FileSystemEntryFilter;
+        _folderView.SortDescriptions.Add(new SortDescription(nameof(IFileSystemEntryViewModel.FileOrFolder), ListSortDirection.Ascending));
+        _folderView.SortDescriptions.Add(new SortDescription(nameof(IFileSystemEntryViewModel.Name), ListSortDirection.Ascending));
     }
 
     public string FullPath => _fullPath;
@@ -75,7 +74,9 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         }
     }
 
-    public ObservableCollection<IFileSystemEntryViewModel> FileSystemEntries { get { return _fileSystemEntries; } }
+    public ObservableCollection<IFileSystemEntryViewModel> FileSystemEntries { get; } = new ObservableCollection<IFileSystemEntryViewModel>();
+
+    public ListCollectionView FolderView => _folderView;
 
     public IFileSystemEntryViewModel SelectedFileSystemEntry
     {
@@ -104,8 +105,6 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     public IDelegateCommand NextCommand { get; }
 
     public IDelegateCommand TopCommand { get; }
-
-    public ListCollectionView FolderView => _fileSystemView;
 
     public void Initialize(string rootPath)
     {
@@ -256,7 +255,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     private void FolderFilterOnChanged(object sender, EventArgs e)
     {
-        _fileSystemView.Refresh();
+        _folderView.Refresh();
     }
 
     private bool FileSystemEntryFilter(object obj)

@@ -85,7 +85,8 @@
             </TabControl.ItemContainerStyle>
             <TabControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding ShortPath}"/>
+                    <TextBlock Text="{Binding ShortPath}"
+                               MaxWidth="300" TextTrimming="CharacterEllipsis"/>
                 </DataTemplate>
             </TabControl.ItemTemplate>
         </TabControl>
