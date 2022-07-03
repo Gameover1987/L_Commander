@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Data;
 using L_Commander.App.Infrastructure;
@@ -9,6 +10,7 @@ using L_Commander.App.OperatingSystem;
 using L_Commander.App.ViewModels.Filtering;
 using L_Commander.Common.Extensions;
 using L_Commander.UI.Commands;
+using L_Commander.UI.Infrastructure;
 using L_Commander.UI.ViewModels;
 using MahApps.Metro.Controls.Dialogs;
 
@@ -16,12 +18,15 @@ namespace L_Commander.App.ViewModels;
 
 public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 {
+    private const int TimerInterval = 1000;
+
     private readonly IFolderFilterViewModel _folderFolderFilter;
     private readonly IFileSystemProvider _fileSystemProvider;
     private readonly IWindowManager _windowManager;
     private readonly IOperatingSystemProvider _operatingSystemProvider;
     private readonly IExceptionHandler _exceptionHandler;
     private readonly IFolderWatcher _folderWatcher;
+    private readonly IUiTimer _timer;
     private string _fullPath;
 
     private IFileSystemEntryViewModel _selectedFileSystemEntry;
@@ -38,7 +43,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         IWindowManager windowManager,
         IOperatingSystemProvider operatingSystemProvider,
         IExceptionHandler exceptionHandler,
-        IFolderWatcher folderWatcher)
+        IFolderWatcher folderWatcher, 
+        IUiTimer timer)
     {
         _folderFolderFilter = folderFolderFilter;
         _folderFolderFilter.Changed += FolderFolderFilterOnChanged;
@@ -47,6 +53,9 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _operatingSystemProvider = operatingSystemProvider;
         _exceptionHandler = exceptionHandler;
         _folderWatcher = folderWatcher;
+        _timer = timer;
+        _timer.Initialize(TimeSpan.FromMilliseconds(TimerInterval));
+        _timer.Tick += TimerOnTick;
         _folderWatcher.Changed+= FolderWatcherOnChanged;
 
         OpenCommand = new DelegateCommand(OpenCommandHandler, CanOpenCommandHandler);
@@ -201,7 +210,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         }
         catch (Exception exception)
         {
-            _exceptionHandler.HandleCommandException(exception);
+            _exceptionHandler.HandleExceptionWithMessageBox(exception);
         }
     }
 
@@ -236,7 +245,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         }
         catch (Exception exception)
         {
-            _exceptionHandler.HandleCommandException(exception);
+            _exceptionHandler.HandleExceptionWithMessageBox(exception);
         }
     }
 
@@ -291,31 +300,47 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     {
         ExecuteInUIThread(() =>
         {
-            switch (e.Change)
+            IsBusy = true;
+            _timer.Stop();
+            try
             {
-                case FileChnageType.Create:
-                    var newEntry = CreateFileSystemEntryViewModel(e.CurrentPath);
-                    newEntry.Initialize();
-                    FileSystemEntries.Add(newEntry);
-                    break;
+                switch (e.Change)
+                {
+                    case FileChnageType.Create:
+                        var newEntry = CreateFileSystemEntryViewModel(e.CurrentPath);
+                        newEntry.Initialize();
+                        FileSystemEntries.Add(newEntry);
+                        break;
 
-                case FileChnageType.Delete:
-                    var deletedEntry = FileSystemEntries.FirstOrDefault(x => x.FullPath == e.CurrentPath);
-                    if (deletedEntry != null)
-                    {
-                        FileSystemEntries.Remove(deletedEntry);
-                    }
-                    break;
+                    case FileChnageType.Delete:
+                        var deletedEntry = FileSystemEntries.FirstOrDefault(x => x.FullPath == e.CurrentPath);
+                        if (deletedEntry != null)
+                        {
+                            FileSystemEntries.Remove(deletedEntry);
+                        }
+                        break;
 
-                case FileChnageType.Rename:
-                    var renamedEntry = FileSystemEntries.FirstOrDefault(x => x.FullPath == e.OldPath);
-                    renamedEntry?.Initialize();
-                    break;
+                    case FileChnageType.Rename:
+                        var renamedEntry = FileSystemEntries.FirstOrDefault(x => x.FullPath == e.OldPath);
+                        renamedEntry?.Initialize();
+                        break;
+                }
+                _timer.Start();
             }
-
-            FolderFilter.Refresh(FileSystemEntries);
-            FolderView.Refresh();
+            catch (Exception exception)
+            {
+                _exceptionHandler.HandleException(exception);
+            }
         });
+    }
+
+    private void TimerOnTick(object sender, EventArgs e)
+    {
+        _timer.Stop();
+        FolderFilter.Refresh(FileSystemEntries);
+        FolderView.Refresh();
+
+        Debug.WriteLine($"TimerRefresh ({FileSystemEntries.Count}) - {FullPath}");
     }
 
     private bool FileSystemEntryFilter(object obj)
@@ -351,13 +376,6 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
                 Path = path,
                 DateTime = DateTime.Now
             };
-        }
-
-        public override bool Equals(object obj)
-        {
-            var other = (NavigationHistoryItem)obj;
-
-            return Path == other.Path;
         }
 
         public override string ToString()

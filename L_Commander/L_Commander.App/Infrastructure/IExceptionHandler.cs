@@ -11,7 +11,9 @@ namespace L_Commander.App.Infrastructure
 {
     public interface IExceptionHandler
     {
-        void HandleCommandException(Exception exception);
+        void HandleExceptionWithMessageBox(Exception exception);
+
+        void HandleException(Exception exception);
     }
 
     public class ExceptionHandler : IExceptionHandler
@@ -25,10 +27,15 @@ namespace L_Commander.App.Infrastructure
             _logger = logger;
         }
 
-        public void HandleCommandException(Exception exception)
+        public void HandleExceptionWithMessageBox(Exception exception)
         {
             _logger.LogError(new EventId(0, "ExceptionHandler"), exception, exception.StackTrace);
             _windowManager.ShowMessage(Resources.MainWindowTitle, exception.Message);
+        }
+
+        public void HandleException(Exception exception)
+        {
+            _logger.LogError(new EventId(0, "ExceptionHandler"), exception, exception.StackTrace);
         }
     }
 }

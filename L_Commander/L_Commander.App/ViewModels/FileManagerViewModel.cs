@@ -2,6 +2,7 @@
 using System.Linq;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
+using L_Commander.App.ViewModels.Factories;
 using L_Commander.App.ViewModels.Filtering;
 using L_Commander.UI.Commands;
 using L_Commander.UI.ViewModels;
@@ -12,21 +13,17 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
 {
     private readonly IFileSystemProvider _fileSystemProvider;
     private readonly IClipBoardProvider _clipBoardHelper;
+    private readonly IViewModelFactory _viewModelFactory;
     private readonly IOperatingSystemProvider _operatingSystemProvider;
-    private readonly IWindowManager _windowManager;
-    private readonly IIconCache _iconCache;
-    private readonly IExceptionHandler _exceptionHandler;
 
     private IFileManagerTabViewModel _selectedTab;
 
-    public FileManagerViewModel(IFileSystemProvider fileSystemProvider, IClipBoardProvider clipBoardHelper, IOperatingSystemProvider operatingSystemProvider, IWindowManager windowManager, IIconCache iconCache, IExceptionHandler exceptionHandler)
+    public FileManagerViewModel(IFileSystemProvider fileSystemProvider, IClipBoardProvider clipBoardHelper, IViewModelFactory viewModelFactory, IOperatingSystemProvider operatingSystemProvider)
     {
         _fileSystemProvider = fileSystemProvider;
         _clipBoardHelper = clipBoardHelper;
+        _viewModelFactory = viewModelFactory;
         _operatingSystemProvider = operatingSystemProvider;
-        _windowManager = windowManager;
-        _iconCache = iconCache;
-        _exceptionHandler = exceptionHandler;
         ChangeDriveCommand = new DelegateCommand(ChangeDriveCommandHandler, x => CanChangeDriveCommandHandler());
         NewTabCommand = new DelegateCommand(NewTabCommandHandler, CanNewTabCommandHandler);
         CloseTabCommand = new DelegateCommand(CloseTabCommandHandler, x => CanCloseTabCommandHandler());
@@ -97,7 +94,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
 
     protected virtual IFileManagerTabViewModel CreateFileManagerTabViewModel(string path)
     {
-        var fileManagerTabViewModel = new FileManagerTabViewModel(new FolderFilterViewModel(), _fileSystemProvider, _windowManager, _operatingSystemProvider, _exceptionHandler, new FolderWatcher());
+        var fileManagerTabViewModel = _viewModelFactory.CreateFileManagerTab();
         fileManagerTabViewModel.Initialize(path);
 
         return fileManagerTabViewModel;

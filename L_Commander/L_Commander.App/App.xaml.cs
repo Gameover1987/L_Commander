@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.ViewModels;
+using L_Commander.App.ViewModels.Factories;
 using L_Commander.App.ViewModels.Filtering;
 using L_Commander.App.Views;
 using L_Commander.UI.Commands;
@@ -43,7 +39,7 @@ namespace L_Commander.App
         private void CommandException(object? sender, ExceptionEventArgs e)
         {
             var exceptionHandler = _serviceProvider.GetService<IExceptionHandler>();
-            exceptionHandler?.HandleCommandException(e.Exception);
+            exceptionHandler?.HandleExceptionWithMessageBox(e.Exception);
         }
 
         private void MainWindowOnClosed(object sender, EventArgs e)
@@ -74,7 +70,6 @@ namespace L_Commander.App
 
             serviceCollection
                 .AddSingleton(_configuration)
-
                 .AddSingleton<IConfiguration>(_configuration)
 
                 // Infrastructure
@@ -96,6 +91,7 @@ namespace L_Commander.App
                 .AddTransient<IFolderWatcher, FolderWatcher>()
 
                 // ViewModels
+                .AddTransient<IViewModelFactory, ViewModelFactory>()
                 .AddTransient<IFolderFilterViewModel, FolderFilterViewModel>()
                 .AddSingleton<IMainViewModel, MainViewModel>()
                 .AddTransient<IFileManagerViewModel, FileManagerViewModel>();
