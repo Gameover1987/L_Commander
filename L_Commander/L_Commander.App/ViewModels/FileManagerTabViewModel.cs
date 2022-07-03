@@ -60,9 +60,10 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
         OpenCommand = new DelegateCommand(OpenCommandHandler, CanOpenCommandHandler);
         DeleteCommand = new DelegateCommand(DeleteCommandHandler, CanDeleteCommandHandler);
+        RenameCommand = new DelegateCommand(RenameCommandHandler, CanRenameCommandHandler);
+        MakeDirCommand = new DelegateCommand(MakeDirCommandHandler, CanMakeDirCommandHandler);
 
         RefreshCommand = new DelegateCommand(RefreshCommandHandler, CanRefreshCommandHandler);
-        RenameCommand = new DelegateCommand(RenameCommandHandler, CanRenameCommandHandler);
         BackCommand = new DelegateCommand(BackCommandHandler, CanBackCommandHandler);
         NextCommand = new DelegateCommand(NextCommandHandler, CanNextCommandHandler);
         TopCommand = new DelegateCommand(TopCommandHandler, CanTopCommandHandler);
@@ -116,6 +117,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     public IDelegateCommand DeleteCommand { get; }
 
     public IDelegateCommand RenameCommand { get; }
+
+    public IDelegateCommand MakeDirCommand { get; }
 
     public IDelegateCommand RefreshCommand { get; }
 
@@ -248,6 +251,28 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
                 return;
 
             _fileSystemProvider.Rename(SelectedFileSystemEntry.FileOrFolder, SelectedFileSystemEntry.FullPath, newName);
+        }
+        catch (Exception exception)
+        {
+            _exceptionHandler.HandleExceptionWithMessageBox(exception);
+        }
+    }
+
+    private bool CanMakeDirCommandHandler()
+    {
+        return !IsBusy;
+    }
+
+    private async void MakeDirCommandHandler()
+    {
+        try
+        {
+            var newName = await _windowManager.ShowInputBox($"Make directory in \r\n'{FullPath}'", "Name");
+            if (newName.IsNullOrWhiteSpace())
+                return;
+
+            _fileSystemProvider.MakeDirectory(FullPath, newName);
+
         }
         catch (Exception exception)
         {

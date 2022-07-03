@@ -3,7 +3,6 @@
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                 xmlns:local="clr-namespace:L_Commander.App.Views"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                  xmlns:app="clr-namespace:L_Commander.App"
                  xmlns:controls="clr-namespace:L_Commander.App.Views.Controls"
@@ -18,6 +17,16 @@
                  ShowIconOnTitleBar="True"
                  WindowStartupLocation="CenterScreen"
                  d:DataContext="{d:DesignInstance Type=designMock:DesignMockMainViewModel, IsDesignTimeCreatable=True}">
+    <mah:MetroWindow.InputBindings>
+        <KeyBinding Key="F2"
+                    Command="{Binding RenameCommand}"/>
+        <KeyBinding Key="F3"
+                    Command="{Binding OpenCommand}"/>
+        <KeyBinding Key="F7"
+                    Command="{Binding MakeDirCommand}"/>
+        <KeyBinding Key="Delete"
+                    Command="{Binding DeleteCommand}"/>
+    </mah:MetroWindow.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -35,7 +44,8 @@
             <controls:FileManagerControl Grid.Column="0" Margin="6,6,0,0" 
                                          Background="Transparent"
                                          DataContext="{Binding LeftFileManager}"
-                                         PreviewGotKeyboardFocus="LeftFileManager_OnPreviewGotKeyboardFocus"/>
+                                         PreviewGotKeyboardFocus="LeftFileManager_OnPreviewGotKeyboardFocus"
+                                         PreviewMouseDown="LeftFileManager_OnPreviewMouseDown"/>
 
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch"
                           Background="LightGray" ShowsPreview="True" Width="3" />
@@ -43,7 +53,8 @@
             <controls:FileManagerControl Grid.Column="2" Margin="6,6,0,0" 
                                          Background="Transparent"
                                          DataContext="{Binding RightFileManager}"
-                                         PreviewGotKeyboardFocus="RightFileManager_OnPreviewGotKeyboardFocus"/>
+                                         PreviewGotKeyboardFocus="RightFileManager_OnPreviewGotKeyboardFocus"
+                                         PreviewMouseDown="RightFileManager_OnPreviewMouseDown"/>
         </Grid>
 
         <Grid Grid.Row="2">
@@ -82,7 +93,8 @@
                     <TextBlock Text="F6 - Move" VerticalAlignment="Center" Margin="6,0,0,0"/>
                 </StackPanel>
             </Button>
-            <Button Grid.Column="4">
+            <Button Grid.Column="4"
+                    Command="{Binding MakeDirCommand}">
                 <StackPanel Orientation="Horizontal">
                     <iconPacks:PackIconMaterial Width="20" Height="20" Kind="FolderPlus" />
                     <TextBlock Text="F7 - Make dir" VerticalAlignment="Center" Margin="6,0,0,0"/>

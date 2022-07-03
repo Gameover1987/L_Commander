@@ -8,7 +8,6 @@
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:filtering="clr-namespace:L_Commander.App.ViewModels.Filtering"
-             xmlns:viewModels="clr-namespace:L_Commander.App.ViewModels"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=designMock:DesignMockFileManagerTabViewModel, IsDesignTimeCreatable=True}">
@@ -17,6 +16,8 @@
                     Command="{Binding TopCommand}"/>
         <KeyBinding Key="F2"
                     Command="{Binding RenameCommand}"/>
+        <KeyBinding Key="F7"
+                    Command="{Binding MakeDirCommand}"/>
     </UserControl.InputBindings>
     <Grid>
         <Grid.RowDefinitions>

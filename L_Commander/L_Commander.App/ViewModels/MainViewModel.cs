@@ -23,6 +23,7 @@ namespace L_Commander.App.ViewModels
 
             RenameCommand = new DelegateCommand(RenameCommandHandler, CanRenameCommandHandler);
             OpenCommand = new DelegateCommand(OpenCommandHandler, CanDeleteCommandHandler);
+            MakeDirCommand = new DelegateCommand(MakeDirCommandHandler, CanMakeDirCommandHandler);
             DeleteCommand = new DelegateCommand(DeleteCommandHandler, CanDeleteCommandHandler);
         }
 
@@ -44,6 +45,8 @@ namespace L_Commander.App.ViewModels
         public IDelegateCommand OpenCommand { get; }
 
         public IDelegateCommand DeleteCommand { get; }
+
+        public IDelegateCommand MakeDirCommand { get; set; }
 
         public void Initialize(IWindow window)
         {
@@ -94,6 +97,16 @@ namespace L_Commander.App.ViewModels
         private void OpenCommandHandler()
         {
             ActiveFileManager?.SelectedTab?.OpenCommand.TryExecute();
+        }
+
+        private bool CanMakeDirCommandHandler()
+        {
+            return ActiveFileManager?.SelectedTab?.MakeDirCommand.CanExecute() == true;
+        }
+
+        private void MakeDirCommandHandler()
+        {
+            ActiveFileManager?.SelectedTab?.MakeDirCommand.TryExecute();
         }
 
         private bool CanDeleteCommandHandler()

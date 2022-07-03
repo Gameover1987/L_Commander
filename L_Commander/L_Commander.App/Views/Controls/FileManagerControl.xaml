@@ -18,7 +18,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <DataTemplate DataType="{x:Type viewModels:FileManagerTabViewModel}">
-                <local:FileManagerTabControl/>
+                <local:FileManagerTabControl />
             </DataTemplate>
 
             <helpers:BindingProxy x:Key="BindingProxy"

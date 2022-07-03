@@ -63,7 +63,17 @@ namespace L_Commander.App.Views
             _mainViewModel.ActiveFileManager = _mainViewModel.LeftFileManager;
         }
 
+        private void LeftFileManager_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            _mainViewModel.ActiveFileManager = _mainViewModel.LeftFileManager;
+        }
+
         private void RightFileManager_OnPreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            _mainViewModel.ActiveFileManager = _mainViewModel.RightFileManager;
+        }
+
+        private void RightFileManager_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             _mainViewModel.ActiveFileManager = _mainViewModel.RightFileManager;
         }

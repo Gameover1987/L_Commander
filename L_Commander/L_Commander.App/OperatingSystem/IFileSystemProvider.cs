@@ -22,5 +22,7 @@ namespace L_Commander.App.OperatingSystem
         void Rename(FileOrFolder fileOrFolder, string oldName, string newName);
 
         void Delete(FileOrFolder fileOrFolder, string path);
+
+        void MakeDirectory(string path, string folderName);
     }
 }

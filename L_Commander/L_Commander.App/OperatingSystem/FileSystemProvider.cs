@@ -104,4 +104,10 @@ public sealed class FileSystemProvider : IFileSystemProvider
             directoryInfo.Delete(true);
         }
     }
+
+    public void MakeDirectory(string path, string folderName)
+    {
+        var directoryPath = Path.Combine(path, folderName);
+        Directory.CreateDirectory(directoryPath);
+    }
 }
