@@ -58,10 +58,11 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _timer.Tick += TimerOnTick;
         _folderWatcher.Changed += FolderWatcherOnChanged;
 
-        OpenCommand = new DelegateCommand(OpenCommandHandler, CanOpenCommandHandler);
-        DeleteCommand = new DelegateCommand(DeleteCommandHandler, CanDeleteCommandHandler);
         RenameCommand = new DelegateCommand(RenameCommandHandler, CanRenameCommandHandler);
+        OpenCommand = new DelegateCommand(OpenCommandHandler, CanOpenCommandHandler);
+        CopyCommand = new DelegateCommand(CopyCommandHandler, CanCopyCommandHandler);
         MakeDirCommand = new DelegateCommand(MakeDirCommandHandler, CanMakeDirCommandHandler);
+        DeleteCommand = new DelegateCommand(DeleteCommandHandler, CanDeleteCommandHandler);
 
         RefreshCommand = new DelegateCommand(RefreshCommandHandler, CanRefreshCommandHandler);
         BackCommand = new DelegateCommand(BackCommandHandler, CanBackCommandHandler);
@@ -119,6 +120,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     public IDelegateCommand RenameCommand { get; }
 
     public IDelegateCommand MakeDirCommand { get; }
+
+    public IDelegateCommand CopyCommand { get; }
 
     public IDelegateCommand RefreshCommand { get; }
 
@@ -180,6 +183,31 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         return new FileSystemEntryViewModel(path, _fileSystemProvider);
     }
 
+    private bool CanRenameCommandHandler()
+    {
+        if (SelectedFileSystemEntry == null)
+            return false;
+
+        return !IsBusy;
+    }
+
+    private async void RenameCommandHandler()
+    {
+        try
+        {
+            var settings = new MetroDialogSettings { DefaultText = SelectedFileSystemEntry.Name };
+            var newName = await _windowManager.ShowInputBox("Rename", SelectedFileSystemEntry.FullPath, settings);
+            if (newName.IsNullOrWhiteSpace())
+                return;
+
+            _fileSystemProvider.Rename(SelectedFileSystemEntry.FileOrFolder, SelectedFileSystemEntry.FullPath, newName);
+        }
+        catch (Exception exception)
+        {
+            _exceptionHandler.HandleExceptionWithMessageBox(exception);
+        }
+    }
+
     private bool CanOpenCommandHandler()
     {
         return SelectedFileSystemEntry != null;
@@ -197,6 +225,38 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
             SetPath(path);
             _navigationHistory.Add(NavigationHistoryItem.Create(path));
             _navigationIndex++;
+        }
+    }
+
+    private bool CanCopyCommandHandler()
+    {
+        return !IsBusy;
+    }
+
+    private void CopyCommandHandler()
+    {
+
+    }
+
+    private bool CanMakeDirCommandHandler()
+    {
+        return !IsBusy;
+    }
+
+    private async void MakeDirCommandHandler()
+    {
+        try
+        {
+            var newName = await _windowManager.ShowInputBox($"Make directory in \r\n'{FullPath}'", "Name");
+            if (newName.IsNullOrWhiteSpace())
+                return;
+
+            _fileSystemProvider.MakeDirectory(FullPath, newName);
+
+        }
+        catch (Exception exception)
+        {
+            _exceptionHandler.HandleExceptionWithMessageBox(exception);
         }
     }
 
@@ -231,53 +291,6 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private void RefreshCommandHandler()
     {
         SetPath(FullPath);
-    }
-
-    private bool CanRenameCommandHandler()
-    {
-        if (SelectedFileSystemEntry == null)
-            return false;
-
-        return !IsBusy;
-    }
-
-    private async void RenameCommandHandler()
-    {
-        try
-        {
-            var settings = new MetroDialogSettings { DefaultText = SelectedFileSystemEntry.Name };
-            var newName = await _windowManager.ShowInputBox("Rename", SelectedFileSystemEntry.FullPath, settings);
-            if (newName.IsNullOrWhiteSpace())
-                return;
-
-            _fileSystemProvider.Rename(SelectedFileSystemEntry.FileOrFolder, SelectedFileSystemEntry.FullPath, newName);
-        }
-        catch (Exception exception)
-        {
-            _exceptionHandler.HandleExceptionWithMessageBox(exception);
-        }
-    }
-
-    private bool CanMakeDirCommandHandler()
-    {
-        return !IsBusy;
-    }
-
-    private async void MakeDirCommandHandler()
-    {
-        try
-        {
-            var newName = await _windowManager.ShowInputBox($"Make directory in \r\n'{FullPath}'", "Name");
-            if (newName.IsNullOrWhiteSpace())
-                return;
-
-            _fileSystemProvider.MakeDirectory(FullPath, newName);
-
-        }
-        catch (Exception exception)
-        {
-            _exceptionHandler.HandleExceptionWithMessageBox(exception);
-        }
     }
 
     private bool CanBackCommandHandler()
