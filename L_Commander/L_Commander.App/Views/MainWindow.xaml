@@ -22,6 +22,8 @@
                     Command="{Binding RenameCommand}"/>
         <KeyBinding Key="F3"
                     Command="{Binding OpenCommand}"/>
+        <KeyBinding Key="F5"
+                    Command="{Binding CopyCommand}"/>
         <KeyBinding Key="F7"
                     Command="{Binding MakeDirCommand}"/>
         <KeyBinding Key="Delete"
@@ -81,7 +83,8 @@
                     <TextBlock Text="F3 - Open" VerticalAlignment="Center" Margin="6,0,0,0"/>
                 </StackPanel>
             </Button>
-            <Button Grid.Column="2">
+            <Button Grid.Column="2"
+                    Command="{Binding CopyCommand}">
                 <StackPanel Orientation="Horizontal">
                     <iconPacks:PackIconMaterial Width="20" Height="20" Kind="ContentCopy" />
                     <TextBlock Text="F5 - Copy" VerticalAlignment="Center" Margin="6,0,0,0"/>

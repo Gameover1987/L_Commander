@@ -11,10 +11,11 @@ public interface IFileManagerTabViewModel
 
     ListCollectionView FolderView { get; }
 
-    IDelegateCommand OpenCommand { get; }
-    IDelegateCommand DeleteCommand { get; }
     IDelegateCommand RenameCommand { get; }
+    IDelegateCommand OpenCommand { get; }
+    IDelegateCommand CopyCommand { get; }
     IDelegateCommand MakeDirCommand { get; }
+    IDelegateCommand DeleteCommand { get; }
 
     void Initialize(string rootPath);
 }

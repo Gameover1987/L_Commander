@@ -113,15 +113,15 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     public IFolderFilterViewModel FolderFilter => _folderFolderFilter;
 
+    public IDelegateCommand RenameCommand { get; }
+
     public IDelegateCommand OpenCommand { get; }
 
-    public IDelegateCommand DeleteCommand { get; }
-
-    public IDelegateCommand RenameCommand { get; }
+    public IDelegateCommand CopyCommand { get; }
 
     public IDelegateCommand MakeDirCommand { get; }
 
-    public IDelegateCommand CopyCommand { get; }
+    public IDelegateCommand DeleteCommand { get; }
 
     public IDelegateCommand RefreshCommand { get; }
 

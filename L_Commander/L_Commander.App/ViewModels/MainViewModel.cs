@@ -11,7 +11,6 @@ namespace L_Commander.App.ViewModels
         private readonly IFileManagerViewModel _rightFileManager;
 
         private IWindow _window;
-        private IFileManagerViewModel _activeFileManager;
 
         public MainViewModel(ISettingsProvider settingsProvider, IFileManagerViewModel leftFileManager, IFileManagerViewModel rightFileManager)
         {
@@ -22,7 +21,8 @@ namespace L_Commander.App.ViewModels
             ActiveFileManager = LeftFileManager;
 
             RenameCommand = new DelegateCommand(RenameCommandHandler, CanRenameCommandHandler);
-            OpenCommand = new DelegateCommand(OpenCommandHandler, CanDeleteCommandHandler);
+            OpenCommand = new DelegateCommand(OpenCommandHandler, CanOpenCommandHandler);
+            CopyCommand = new DelegateCommand(CopyCommandHandler, CanCopyCommandHandler);
             MakeDirCommand = new DelegateCommand(MakeDirCommandHandler, CanMakeDirCommandHandler);
             DeleteCommand = new DelegateCommand(DeleteCommandHandler, CanDeleteCommandHandler);
         }
@@ -31,22 +31,17 @@ namespace L_Commander.App.ViewModels
 
         public IFileManagerViewModel RightFileManager => _rightFileManager;
 
-        public IFileManagerViewModel ActiveFileManager
-        {
-            get { return _activeFileManager; }
-            set
-            {
-                _activeFileManager = value;
-            }
-        }
+        public IFileManagerViewModel ActiveFileManager { get; set; }
 
         public IDelegateCommand RenameCommand { get; }
 
         public IDelegateCommand OpenCommand { get; }
 
-        public IDelegateCommand DeleteCommand { get; }
+        public IDelegateCommand CopyCommand { get; }
 
         public IDelegateCommand MakeDirCommand { get; set; }
+
+        public IDelegateCommand DeleteCommand { get; }
 
         public void Initialize(IWindow window)
         {
@@ -97,6 +92,16 @@ namespace L_Commander.App.ViewModels
         private void OpenCommandHandler()
         {
             ActiveFileManager?.SelectedTab?.OpenCommand.TryExecute();
+        }
+
+        private bool CanCopyCommandHandler()
+        {
+            return ActiveFileManager?.SelectedTab?.CopyCommand.CanExecute() == true;
+        }
+
+        private void CopyCommandHandler()
+        {
+            ActiveFileManager?.SelectedTab?.CopyCommand.TryExecute();
         }
 
         private bool CanMakeDirCommandHandler()
