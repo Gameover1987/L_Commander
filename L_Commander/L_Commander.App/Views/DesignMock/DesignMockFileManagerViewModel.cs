@@ -23,6 +23,11 @@ internal sealed class DesignMockWindowManager : IWindowManager
     {
         throw new NotImplementedException();
     }
+
+    public Task<MessageDialogResult> ShowQuestion(string title, string message)
+    {
+        throw new NotImplementedException();
+    }
 }
 
 internal sealed class DesignMockFileManagerTabViewModel : FileManagerTabViewModel

@@ -43,7 +43,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         IWindowManager windowManager,
         IOperatingSystemProvider operatingSystemProvider,
         IExceptionHandler exceptionHandler,
-        IFolderWatcher folderWatcher, 
+        IFolderWatcher folderWatcher,
         IUiTimer timer)
     {
         _folderFolderFilter = folderFolderFilter;
@@ -56,7 +56,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _timer = timer;
         _timer.Initialize(TimeSpan.FromMilliseconds(TimerInterval));
         _timer.Tick += TimerOnTick;
-        _folderWatcher.Changed+= FolderWatcherOnChanged;
+        _folderWatcher.Changed += FolderWatcherOnChanged;
 
         OpenCommand = new DelegateCommand(OpenCommandHandler, CanOpenCommandHandler);
         DeleteCommand = new DelegateCommand(DeleteCommandHandler, CanDeleteCommandHandler);
@@ -202,10 +202,16 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         return SelectedFileSystemEntry != null;
     }
 
-    private void DeleteCommandHandler()
+    private async void DeleteCommandHandler()
     {
         try
         {
+            var titleMsg = SelectedFileSystemEntry.IsFile ? "Delete file?" : "Delete folder?";
+
+            var dialogResult = await _windowManager.ShowQuestion(titleMsg, SelectedFileSystemEntry.FullPath);
+            if (dialogResult != MessageDialogResult.Affirmative)
+                return;
+
             _fileSystemProvider.Delete(SelectedFileSystemEntry.FileOrFolder, SelectedFileSystemEntry.FullPath);
         }
         catch (Exception exception)
@@ -337,6 +343,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private void TimerOnTick(object sender, EventArgs e)
     {
         _timer.Stop();
+        IsBusy = false;
         FolderFilter.Refresh(FileSystemEntries);
         FolderView.Refresh();
 
