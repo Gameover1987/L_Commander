@@ -18,7 +18,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <DataTemplate DataType="{x:Type viewModels:FileManagerTabViewModel}">
-                <local:FileManagerTabControl />
+                <local:FileManagerTabControl Margin="0,3,0,0"/>
             </DataTemplate>
 
             <helpers:BindingProxy x:Key="BindingProxy"
@@ -49,9 +49,10 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <TabControl Grid.Row="1" Margin="0,0,0,0"
-                    ItemsSource="{Binding Tabs}"
-                    SelectedItem="{Binding SelectedTab}">
+        <mah:MetroAnimatedTabControl Grid.Row="1" Margin="0,0,0,0"
+                                     mah:TabControlHelper.Underlined="SelectedTabItem"
+                                     ItemsSource="{Binding Tabs}"
+                                     SelectedItem="{Binding SelectedTab}">
             <TabControl.ItemContainerStyle>
                 <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource {x:Type TabItem}}">
                     <Setter Property="ToolTip" Value="{Binding FullPath}"/>
@@ -89,6 +90,6 @@
                                MaxWidth="300" TextTrimming="CharacterEllipsis"/>
                 </DataTemplate>
             </TabControl.ItemTemplate>
-        </TabControl>
+        </mah:MetroAnimatedTabControl>
     </Grid>
 </UserControl>
