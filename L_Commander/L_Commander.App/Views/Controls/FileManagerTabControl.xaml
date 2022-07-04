@@ -52,31 +52,12 @@
                     </Button.LayoutTransform>
                     <iconPacks:PackIconMaterial Margin="6" Kind="ArrowRight"/>
                 </Button>
+                <Button Style="{StaticResource MahApps.Styles.Button.Circle}" Margin="18,0,0,0"
+                        IsEnabled="{Binding FolderFilter.HasFilters}"
+                        Click="FilterButton_OnClick">
+                    <iconPacks:PackIconMaterial Margin="6" Kind="Filter"/>
+                </Button>
             </StackPanel>
-            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto"
-                          DataContext="{Binding FolderFilter}"
-                          Background="Transparent"
-                          Margin="6,0,0,0">
-                <ScrollViewer.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="Reset filters"
-                                  Command="{Binding ResetFiltersCommand}"/>
-                    </ContextMenu>
-                </ScrollViewer.ContextMenu>
-                <ItemsControl ItemsSource="{Binding Filters}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel Orientation="Horizontal"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="{x:Type filtering:FilterItemViewModel}">
-                            <CheckBox Content="{Binding Name}"
-                                      IsChecked="{Binding IsChecked}" Margin="0,0,6,0"/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
         </Grid>
 
         <!--<ListBox Grid.Row="1" ItemsSource="{Binding FolderView}" Margin="0,6,0,0"

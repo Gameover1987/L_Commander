@@ -8,6 +8,8 @@
                  xmlns:controls="clr-namespace:L_Commander.App.Views.Controls"
                  xmlns:designMock="clr-namespace:L_Commander.App.Views.DesignMock"
                  xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+                 xmlns:views="clr-namespace:L_Commander.App.Views"
+                 xmlns:filtering="clr-namespace:L_Commander.App.ViewModels.Filtering"
                  mc:Ignorable="d"
                  Title="{x:Static app:Resources.MainWindowTitle}" 
                  Height="600" 
@@ -29,6 +31,22 @@
         <KeyBinding Key="Delete"
                     Command="{Binding DeleteCommand}"/>
     </mah:MetroWindow.InputBindings>
+    <mah:MetroWindow.Flyouts>
+        <mah:FlyoutsControl x:Name="flyoutsControl">
+            <mah:Flyout Header="File filters" Theme="Adapt"
+                        Tag="{x:Static views:MainWindow.LeftFlyoutTag}" 
+                        DataContext="{Binding LeftFileManager.SelectedTab.FolderFilter}"
+                        Position="Left">
+              <controls:FolderFilterControl />
+            </mah:Flyout>
+            <mah:Flyout Header="File filters" Theme="Adapt"
+                        Tag="{x:Static views:MainWindow.RightFlyoutTag}"
+                        DataContext="{Binding RightFileManager.SelectedTab.FolderFilter}"
+                        Position="Right">
+                <controls:FolderFilterControl/>
+            </mah:Flyout>
+        </mah:FlyoutsControl>
+    </mah:MetroWindow.Flyouts>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

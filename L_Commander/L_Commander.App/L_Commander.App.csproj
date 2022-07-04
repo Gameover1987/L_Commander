@@ -7,13 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Views\Converters\**" />
-    <EmbeddedResource Remove="Views\Converters\**" />
-    <None Remove="Views\Converters\**" />
-    <Page Remove="Views\Converters\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="AppSettings.json" />
   </ItemGroup>
 

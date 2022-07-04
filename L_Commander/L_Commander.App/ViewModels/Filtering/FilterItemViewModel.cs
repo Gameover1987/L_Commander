@@ -7,9 +7,8 @@ public class FilterItemViewModel : ViewModelBase
 {
     private bool _isChecked;
 
-    public FilterItemViewModel(string name)
+    public FilterItemViewModel()
     {
-        Name = name;
         _isChecked = true;
     }
 
@@ -27,7 +26,11 @@ public class FilterItemViewModel : ViewModelBase
         }
     }
 
-    public string Name { get; set; }
+    public string Extension { get; set; }
+
+    public string Group { get; set; }
+
+    public int Order { get; set; }
     
     public event EventHandler Checked;
 

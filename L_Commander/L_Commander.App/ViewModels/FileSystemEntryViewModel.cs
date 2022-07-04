@@ -46,7 +46,7 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
         InitializeImpl();
     }
 
-    private void InitializeImpl()
+    protected virtual void InitializeImpl()
     {
         var descriptor = _fileSystemProvider.GetEntryDetails(_fullPath);
 

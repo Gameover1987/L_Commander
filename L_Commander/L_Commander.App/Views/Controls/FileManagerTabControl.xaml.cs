@@ -1,8 +1,10 @@
 ﻿using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using L_Commander.App.ViewModels;
+using MahApps.Metro.Controls;
 
 namespace L_Commander.App.Views.Controls
 {
@@ -28,6 +30,21 @@ namespace L_Commander.App.Views.Controls
         private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             _dataContext.OpenCommand.TryExecute();
+        }
+
+        private void FilterButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            var window = (MetroWindow)Window.GetWindow(this);
+            var mainViewModel = (IMainViewModel) window.DataContext;
+            if (mainViewModel.ActiveFileManager == mainViewModel.LeftFileManager)
+            {
+                var flyout = window.Flyouts.Items.Cast<Flyout>().First(x => (string) x.Tag == MainWindow.LeftFlyoutTag);
+                flyout.IsOpen = !flyout.IsOpen;
+            }else if (mainViewModel.ActiveFileManager == mainViewModel.RightFileManager)
+            {
+                var flyout = window.Flyouts.Items.Cast<Flyout>().First(x => (string) x.Tag == MainWindow.RightFlyoutTag);
+                flyout.IsOpen = !flyout.IsOpen;
+            }
         }
     }
 }

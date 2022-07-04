@@ -26,6 +26,9 @@ namespace L_Commander.App.Views
     {
         private IMainViewModel _mainViewModel;
 
+        public const string LeftFlyoutTag = "Left";
+        public const string RightFlyoutTag = "Right";
+
         public MainWindow()
         {
             InitializeComponent();

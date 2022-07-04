@@ -9,17 +9,17 @@ namespace L_Commander.App.ViewModels.Filtering
 {
     public interface IFolderFilterViewModel
     {
-        void Clear();
-
-        void Refresh(IEnumerable<IFileSystemEntryViewModel> fileSystemEntries);
-
         ObservableCollection<FilterItemViewModel> Filters { get; }
 
-        bool IsInitialized { get; }
+        bool HasFilters { get; }
 
         IDelegateCommand ResetFiltersCommand { get; }
 
         event EventHandler<EventArgs> Changed;
+
+        void Clear();
+
+        void Refresh(IEnumerable<IFileSystemEntryViewModel> fileSystemEntries);
 
         bool IsCorrespondsByFilter(IFileSystemEntryViewModel fileSystemEntry);
     }
