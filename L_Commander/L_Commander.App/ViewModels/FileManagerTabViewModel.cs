@@ -382,9 +382,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _timer.Stop();
         IsBusy = false;
         FolderFilter.Refresh(FileSystemEntries);
-        FolderView.Refresh();
-
-        Debug.WriteLine($"TimerRefresh ({FileSystemEntries.Count}) - {FullPath}");
+        FolderView.Refresh();        
     }
 
     private bool FileSystemEntryFilter(object obj)
