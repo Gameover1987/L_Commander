@@ -30,11 +30,6 @@ public static class FolderFilterGroups
         _filterGroupDictionary.Add(".pdf", "Documents");
         _filterGroupDictionary.Add(".rtf", "Documents");
 
-        _filterGroupDictionary.Add(".gp", "Guitar Pro");
-        _filterGroupDictionary.Add(".gp3", "Guitar Pro");
-        _filterGroupDictionary.Add(".gp4", "Guitar Pro");
-        _filterGroupDictionary.Add(".gp5", "Guitar Pro");
-
         _filterGroupDictionary.Add(".bmp", "Images");
         _filterGroupDictionary.Add(".jpeg", "Images");
         _filterGroupDictionary.Add(".jpg", "Images");
