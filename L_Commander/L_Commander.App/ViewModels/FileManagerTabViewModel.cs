@@ -249,7 +249,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
             if (newName.IsNullOrWhiteSpace())
                 return;
 
-            _fileSystemProvider.MakeDirectory(FullPath, newName);
+            var newDirectoryFullPath = _fileSystemProvider.CombinePaths(FullPath, newName);
+            _fileSystemProvider.CreateDirectory(newDirectoryFullPath);
 
         }
         catch (Exception exception)

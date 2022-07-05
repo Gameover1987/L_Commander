@@ -27,8 +27,10 @@ namespace L_Commander.App.OperatingSystem
 
         void Copy(string sourcePath, string destinationPath);
 
-        void MakeDirectory(string path, string folderName);
+        void CreateDirectory(string path);        
 
         bool IsDirectoryExists(string path);
+
+        string CombinePaths(params string[] paths);
     }
 }

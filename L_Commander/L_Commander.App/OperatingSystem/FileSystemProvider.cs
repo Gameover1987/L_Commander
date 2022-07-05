@@ -63,7 +63,7 @@ public sealed class FileSystemProvider : IFileSystemProvider
     public string GetTopLevelPath(string path)
     {
         var parent = Directory.GetParent(path);
-
+        
         return parent.FullName;
     }
 
@@ -115,24 +115,21 @@ public sealed class FileSystemProvider : IFileSystemProvider
 
     public void Copy(string sourcePath, string destinationPath)
     {
-        var sourceFile = new FileInfo(sourcePath);
-        var destinationFile = new FileInfo(destinationPath);
-        if (!destinationFile.Directory.Exists)
-        {
-            destinationFile.Directory.Create();
-        }
-
-        sourceFile.CopyTo(destinationPath);
-    }
-
-    public void MakeDirectory(string path, string folderName)
-    {
-        var directoryPath = Path.Combine(path, folderName);
-        Directory.CreateDirectory(directoryPath);
+        File.Copy(sourcePath, destinationPath, true);
     }
 
     public bool IsDirectoryExists(string path)
     {
         return Directory.Exists(path);
+    }
+
+    public void CreateDirectory(string path)
+    {        
+        Directory.CreateDirectory(path);
+    }
+
+    public string CombinePaths(params string[] paths)
+    {
+        return Path.Combine(paths);
     }
 }

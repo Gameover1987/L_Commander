@@ -28,14 +28,24 @@ public sealed class CopyOperation : ICopyOperation
         return ThreadTaskExtensions.Run(() =>
         {
             var works = GetUnitOfWorks(entries, destDirectory);
-            var aaa = works.Select(x => x.DestinationPath).ToArray();
+            var folders = works.Select(x => _fileSystemProvider.GetTopLevelPath(x.DestinationPath)).Distinct().ToArray();
+            foreach (var folder in folders)
+            {
+                if (!_fileSystemProvider.IsDirectoryExists(folder))
+                {
+                    _fileSystemProvider.CreateDirectory(folder);
+                }
+            }
+
             for (int i = 0; i < works.Length; i++)
             {
                 if (_isCancellationRequested)
                     return;
 
-                Progress?.Invoke(this, new CopyProgressEventArgs { Copied = i, Total = works.Length, CurrentFileName = works[i].SourcePath });
-                _fileSystemProvider.Copy(works[i].SourcePath, works[i].DestinationPath);
+                var unitOfWork = works[i];
+
+                Progress?.Invoke(this, new CopyProgressEventArgs { Copied = i, Total = works.Length, CurrentFileName = unitOfWork.SourcePath });
+                _fileSystemProvider.Copy(unitOfWork.SourcePath, unitOfWork.DestinationPath);
             }
         });
     }
