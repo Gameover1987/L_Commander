@@ -9,6 +9,8 @@ namespace L_Commander.App.OperatingSystem
 
         IEnumerable<string> GetFileSystemEntries(string path);
 
+        IEnumerable<string> GetFilesRecursively(string path);
+
         FileSystemEntryDescriptor GetEntryDetails(string path);
 
         string GetTopLevelPath(string path);
@@ -23,6 +25,10 @@ namespace L_Commander.App.OperatingSystem
 
         void Delete(FileOrFolder fileOrFolder, string path);
 
+        void Copy(string sourcePath, string destinationPath);
+
         void MakeDirectory(string path, string folderName);
+
+        bool IsDirectoryExists(string path);
     }
 }

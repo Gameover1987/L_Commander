@@ -10,12 +10,14 @@ public interface IFileManagerTabViewModel
 
     string ShortPath { get; }
 
+    IFileSystemEntryViewModel[] SelectedEntries { get; set; }
+
     ListCollectionView FolderView { get; }
+
     IFolderFilterViewModel FolderFilter { get; }
 
     IDelegateCommand RenameCommand { get; }
     IDelegateCommand OpenCommand { get; }
-    IDelegateCommand CopyCommand { get; }
     IDelegateCommand MakeDirCommand { get; }
     IDelegateCommand DeleteCommand { get; }
 

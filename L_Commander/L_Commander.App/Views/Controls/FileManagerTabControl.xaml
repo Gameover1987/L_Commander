@@ -95,6 +95,7 @@
                   ItemsSource="{Binding FolderView}"
                   SelectedItem="{Binding SelectedFileSystemEntry}"
                   IsReadOnly="True"
+                  SelectionChanged="DataGrid_OnSelectionChanged"
                   SelectionUnit="FullRow">
             <DataGrid.InputBindings>
                 <KeyBinding Key="Enter"

@@ -30,6 +30,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private string _fullPath;
 
     private IFileSystemEntryViewModel _selectedFileSystemEntry;
+    private IFileSystemEntryViewModel[] _selectedFileSystemEntries = Array.Empty<IFileSystemEntryViewModel>();
     private readonly List<NavigationHistoryItem> _navigationHistory = new List<NavigationHistoryItem>();
     private int _navigationIndex;
 
@@ -60,7 +61,6 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
         RenameCommand = new DelegateCommand(RenameCommandHandler, CanRenameCommandHandler);
         OpenCommand = new DelegateCommand(OpenCommandHandler, CanOpenCommandHandler);
-        CopyCommand = new DelegateCommand(CopyCommandHandler, CanCopyCommandHandler);
         MakeDirCommand = new DelegateCommand(MakeDirCommandHandler, CanMakeDirCommandHandler);
         DeleteCommand = new DelegateCommand(DeleteCommandHandler, CanDeleteCommandHandler);
 
@@ -111,13 +111,21 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         }
     }
 
+    public IFileSystemEntryViewModel[] SelectedEntries
+    {
+        get { return _selectedFileSystemEntries; }
+        set
+        {
+            _selectedFileSystemEntries = value;
+            OnPropertyChanged(() => SelectedEntries);
+        }
+    }
+
     public IFolderFilterViewModel FolderFilter => _folderFolderFilter;
 
     public IDelegateCommand RenameCommand { get; }
 
     public IDelegateCommand OpenCommand { get; }
-
-    public IDelegateCommand CopyCommand { get; }
 
     public IDelegateCommand MakeDirCommand { get; }
 
@@ -226,16 +234,6 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
             _navigationHistory.Add(NavigationHistoryItem.Create(path));
             _navigationIndex++;
         }
-    }
-
-    private bool CanCopyCommandHandler()
-    {
-        return !IsBusy;
-    }
-
-    private void CopyCommandHandler()
-    {
-
     }
 
     private bool CanMakeDirCommandHandler()

@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
+using L_Commander.App.OperatingSystem.Operations;
 using L_Commander.App.ViewModels;
 using L_Commander.App.ViewModels.Factories;
 using L_Commander.App.ViewModels.Filtering;
@@ -89,6 +90,7 @@ namespace L_Commander.App
                 .AddSingleton<IIconCache, IconCache>()
                 .AddSingleton<IFileSystemProvider, FileSystemProvider>()
                 .AddTransient<IFolderWatcher, FolderWatcher>()
+                .AddTransient<ICopyOperation, CopyOperation>()
 
                 // ViewModels
                 .AddTransient<IViewModelFactory, ViewModelFactory>()

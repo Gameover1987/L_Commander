@@ -1,22 +1,33 @@
-﻿using L_Commander.App.Infrastructure;
+﻿using System;
+using System.Linq;
+using L_Commander.App.Infrastructure;
+using L_Commander.App.OperatingSystem.Operations;
 using L_Commander.App.Views;
 using L_Commander.UI.Commands;
+using L_Commander.UI.ViewModels;
+using MahApps.Metro.Controls.Dialogs;
 
 namespace L_Commander.App.ViewModels
 {
-    public class MainViewModel : IMainViewModel
+    public class MainViewModel : ViewModelBase, IMainViewModel
     {
         private readonly ISettingsProvider _settingsProvider;
         private readonly IFileManagerViewModel _leftFileManager;
         private readonly IFileManagerViewModel _rightFileManager;
+        private readonly ICopyOperation _copyOperation;
+        private readonly IWindowManager _windowManager;
+
+        private ProgressDialogController _progressDialogController;
 
         private IWindow _window;
 
-        public MainViewModel(ISettingsProvider settingsProvider, IFileManagerViewModel leftFileManager, IFileManagerViewModel rightFileManager)
+        public MainViewModel(ISettingsProvider settingsProvider, IFileManagerViewModel leftFileManager, IFileManagerViewModel rightFileManager, ICopyOperation copyOperation, IWindowManager windowManager)
         {
             _settingsProvider = settingsProvider;
             _leftFileManager = leftFileManager;
             _rightFileManager = rightFileManager;
+            _copyOperation = copyOperation;
+            _windowManager = windowManager;
 
             ActiveFileManager = LeftFileManager;
 
@@ -32,6 +43,20 @@ namespace L_Commander.App.ViewModels
         public IFileManagerViewModel RightFileManager => _rightFileManager;
 
         public IFileManagerViewModel ActiveFileManager { get; set; }
+
+        public IFileManagerViewModel AnotherFileManager
+        {
+            get
+            {
+                if (ActiveFileManager == null)
+                    return null;
+
+                if (ActiveFileManager == LeftFileManager)
+                    return RightFileManager;
+
+                return LeftFileManager;
+            }
+        }
 
         public IDelegateCommand RenameCommand { get; }
 
@@ -96,12 +121,44 @@ namespace L_Commander.App.ViewModels
 
         private bool CanCopyCommandHandler()
         {
-            return ActiveFileManager?.SelectedTab?.CopyCommand.CanExecute() == true;
+            if (ActiveFileManager?.SelectedTab?.SelectedEntries.Any() == false)
+                return false;
+            if (AnotherFileManager?.SelectedTab == null)
+                return false;
+
+            return !_copyOperation.IsBusy;
         }
 
-        private void CopyCommandHandler()
+        private async void CopyCommandHandler()
         {
-            ActiveFileManager?.SelectedTab?.CopyCommand.TryExecute();
+            var sourceEntries = ActiveFileManager?.SelectedTab.SelectedEntries
+                .Select(x => x.GetDescriptor())
+                .ToArray();
+
+            _progressDialogController = await _windowManager.ShowProgressDialog($"Copying files to \r\n'{AnotherFileManager.SelectedTab.FullPath}'", "Wait for copy");
+            _progressDialogController.Canceled += ProgressDialogControllerOnCanceled;
+            _copyOperation.Progress += CopyOperationOnProgress;
+            await _copyOperation.Execute(sourceEntries, AnotherFileManager.SelectedTab.FullPath);
+
+            await _progressDialogController.CloseAsync();
+        }
+
+        private void ProgressDialogControllerOnCanceled(object sender, EventArgs e)
+        {
+            _copyOperation.Cancel();
+        }
+
+        private void CopyOperationOnProgress(object sender, CopyProgressEventArgs e)
+        {
+            ExecuteInUIThread(() =>
+            {
+                if (_progressDialogController == null)
+                    return;
+
+                _progressDialogController.Maximum = e.Total;
+                _progressDialogController.SetMessage(e.CurrentFileName);
+                _progressDialogController.SetProgress(e.Copied);
+            });
         }
 
         private bool CanMakeDirCommandHandler()

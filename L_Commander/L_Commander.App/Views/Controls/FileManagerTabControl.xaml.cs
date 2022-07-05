@@ -46,5 +46,10 @@ namespace L_Commander.App.Views.Controls
                 flyout.IsOpen = !flyout.IsOpen;
             }
         }
+
+        private void DataGrid_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _dataContext.SelectedEntries = dataGrid.SelectedItems.Cast<IFileSystemEntryViewModel>().ToArray();
+        }
     }
 }

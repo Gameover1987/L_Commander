@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Security.AccessControl;
 
 namespace L_Commander.App.OperatingSystem;
 
@@ -23,9 +24,16 @@ public sealed class FileSystemProvider : IFileSystemProvider
         return entries;
     }
 
+    public IEnumerable<string> GetFilesRecursively(string path)
+    {
+        var files = Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories);
+        return files;
+    }
+
     public FileSystemEntryDescriptor GetEntryDetails(string path)
     {
         var descriptor = new FileSystemEntryDescriptor();
+        descriptor.Path = path;
 
         var attributes = File.GetAttributes(path);
         descriptor.Attributes = attributes;
@@ -105,9 +113,26 @@ public sealed class FileSystemProvider : IFileSystemProvider
         }
     }
 
+    public void Copy(string sourcePath, string destinationPath)
+    {
+        var sourceFile = new FileInfo(sourcePath);
+        var destinationFile = new FileInfo(destinationPath);
+        if (!destinationFile.Directory.Exists)
+        {
+            destinationFile.Directory.Create();
+        }
+
+        sourceFile.CopyTo(destinationPath);
+    }
+
     public void MakeDirectory(string path, string folderName)
     {
         var directoryPath = Path.Combine(path, folderName);
         Directory.CreateDirectory(directoryPath);
+    }
+
+    public bool IsDirectoryExists(string path)
+    {
+        return Directory.Exists(path);
     }
 }

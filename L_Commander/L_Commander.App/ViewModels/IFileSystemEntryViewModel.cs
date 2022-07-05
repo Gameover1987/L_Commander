@@ -29,4 +29,6 @@ public interface IFileSystemEntryViewModel
     bool IsHidden { get; }
 
     void Initialize();
+
+    FileSystemEntryDescriptor GetDescriptor();
 }

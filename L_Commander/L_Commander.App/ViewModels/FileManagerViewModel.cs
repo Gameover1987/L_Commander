@@ -69,6 +69,8 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
         {
             foreach (var path in settings.Paths)
             {
+                if (!_fileSystemProvider.IsDirectoryExists(path))
+                    continue;
                 Tabs.Add(CreateFileManagerTabViewModel(path));
             }
 

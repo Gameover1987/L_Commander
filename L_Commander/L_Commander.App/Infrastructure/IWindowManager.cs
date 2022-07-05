@@ -16,6 +16,8 @@ namespace L_Commander.App.Infrastructure
         Task<MessageDialogResult> ShowMessage(string title, string message);
 
         Task<MessageDialogResult> ShowQuestion(string title, string message);
+
+        Task<ProgressDialogController> ShowProgressDialog(string title, string message);
     }
 
     public sealed class WindowManager : IWindowManager
@@ -38,6 +40,11 @@ namespace L_Commander.App.Infrastructure
         public Task<MessageDialogResult> ShowQuestion(string title, string message)
         {
             return DialogManager.ShowMessageAsync(MainWindow, title, message, MessageDialogStyle.AffirmativeAndNegative);
+        }
+
+        public Task<ProgressDialogController> ShowProgressDialog(string title, string message)
+        {
+            return DialogManager.ShowProgressAsync(MainWindow, title, message, isCancelable: true);
         }
     }
 }

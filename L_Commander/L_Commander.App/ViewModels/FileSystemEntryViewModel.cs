@@ -12,6 +12,7 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
 {
     private readonly string _fullPath;
     private readonly IFileSystemProvider _fileSystemProvider;
+    private FileSystemEntryDescriptor _descriptor;
 
     public FileSystemEntryViewModel(string fullPath, IFileSystemProvider fileSystemProvider)
     {
@@ -46,30 +47,35 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
         InitializeImpl();
     }
 
+    public FileSystemEntryDescriptor GetDescriptor()
+    {
+        return _descriptor;
+    }
+
     protected virtual void InitializeImpl()
     {
-        var descriptor = _fileSystemProvider.GetEntryDetails(_fullPath);
+        _descriptor = _fileSystemProvider.GetEntryDetails(_fullPath);
 
-        FileOrFolder = descriptor.FileOrFolder;
+        FileOrFolder = _descriptor.FileOrFolder;
 
-        if (descriptor.IsFile)
+        if (_descriptor.IsFile)
         {
-            Extension = descriptor.Extension;
+            Extension = _descriptor.Extension;
 
             var numberFormatInfo = new NumberFormatInfo { NumberGroupSeparator = " " };
-            TotalSize = String.Format(numberFormatInfo, "{0:#,#}", descriptor.TotalSize);
+            TotalSize = String.Format(numberFormatInfo, "{0:#,#}", _descriptor.TotalSize);
 
-            Icon = descriptor.Icon;
+            Icon = _descriptor.Icon;
         }
         else
         {
             TotalSize = "<DIR>";
         }
 
-        IsHidden = descriptor.IsHidden;
-        IsSystem = descriptor.IsSystem;
-        Name = descriptor.Name;
-        Created = descriptor.Created;
+        IsHidden = _descriptor.IsHidden;
+        IsSystem = _descriptor.IsSystem;
+        Name = _descriptor.Name;
+        Created = _descriptor.Created;
 
         IsInitialized = true;
 
