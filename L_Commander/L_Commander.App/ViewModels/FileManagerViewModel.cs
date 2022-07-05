@@ -74,7 +74,15 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
                 Tabs.Add(CreateFileManagerTabViewModel(path));
             }
 
-            SelectedTab = Tabs.FirstOrDefault(x => x.FullPath == settings.SelectedPath);
+            var oldSelectedTab = Tabs.FirstOrDefault(x => x.FullPath == settings.SelectedPath);
+            if (oldSelectedTab != null)
+            {
+                SelectedTab = oldSelectedTab;
+            }
+            else
+            {
+                SelectedTab = Tabs.First();
+            }
         }
         else
         {

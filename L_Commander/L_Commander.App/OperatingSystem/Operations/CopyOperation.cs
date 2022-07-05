@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using L_Commander.Common.Extensions;
 
@@ -11,6 +12,9 @@ public sealed class CopyOperation : ICopyOperation
 {
     private readonly IFileSystemProvider _fileSystemProvider;
     private bool _isCancellationRequested;
+
+    private readonly ConcurrentQueue<UnitOfWork> _worksQueue = new ConcurrentQueue<UnitOfWork>();
+    private int _initialCount;
 
     public CopyOperation(IFileSystemProvider fileSystemProvider)
     {
@@ -25,7 +29,9 @@ public sealed class CopyOperation : ICopyOperation
     public Task Execute(FileSystemEntryDescriptor[] entries, string destDirectory)
     {
         _isCancellationRequested = false;
-        return ThreadTaskExtensions.Run(() =>
+
+        var tasks = new List<Task>();
+        return Task.Run(async () =>
         {
             var works = GetUnitOfWorks(entries, destDirectory);
             var folders = works.Select(x => _fileSystemProvider.GetTopLevelPath(x.DestinationPath)).Distinct().ToArray();
@@ -37,16 +43,20 @@ public sealed class CopyOperation : ICopyOperation
                 }
             }
 
-            for (int i = 0; i < works.Length; i++)
+            foreach (var work in works)
             {
-                if (_isCancellationRequested)
-                    return;
-
-                var unitOfWork = works[i];
-
-                Progress?.Invoke(this, new CopyProgressEventArgs { Copied = i, Total = works.Length, CurrentFileName = unitOfWork.SourcePath });
-                _fileSystemProvider.Copy(unitOfWork.SourcePath, unitOfWork.DestinationPath);
+                _worksQueue.Enqueue(work);
             }
+
+            _initialCount = _worksQueue.Count;
+
+            var tasks = new List<Task>();
+            for (int i = 0; i < Environment.ProcessorCount / 2; i++)
+            {
+                tasks.Add(Task.Run(() => ThreadMethod($"CopyTask_({i})")));
+            }
+
+            Task.WaitAll(tasks.ToArray());
         });
     }
 
@@ -56,6 +66,23 @@ public sealed class CopyOperation : ICopyOperation
     }
 
     public event EventHandler<CopyProgressEventArgs> Progress;
+
+    private void ThreadMethod(string methodName)
+    {
+        while (!_worksQueue.IsEmpty)
+        {
+            _worksQueue.TryDequeue(out var work);
+
+            if (work == null)
+                return;
+
+            if (_isCancellationRequested)
+                return;
+
+            Progress?.Invoke(this, new CopyProgressEventArgs { Copied = _initialCount - _worksQueue.Count, Total = _initialCount, CurrentFileName = work.SourcePath });
+            _fileSystemProvider.Copy(work.SourcePath, work.DestinationPath);
+        }
+    }
 
     private UnitOfWork[] GetUnitOfWorks(FileSystemEntryDescriptor[] entries, string destDirectory)
     {

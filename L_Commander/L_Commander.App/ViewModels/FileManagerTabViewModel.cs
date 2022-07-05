@@ -365,7 +365,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
                     case FileChnageType.Rename:
                         var renamedEntry = FileSystemEntries.FirstOrDefault(x => x.FullPath == e.OldPath);
-                        renamedEntry?.Initialize();
+                        renamedEntry?.Rename(e.CurrentPath);
                         break;
                 }
                 _timer.Start();

@@ -30,5 +30,7 @@ public interface IFileSystemEntryViewModel
 
     void Initialize();
 
+    void Rename(string newPath);
+
     FileSystemEntryDescriptor GetDescriptor();
 }

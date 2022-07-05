@@ -10,7 +10,7 @@ namespace L_Commander.App.ViewModels;
 
 public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
 {
-    private readonly string _fullPath;
+    private string _fullPath;
     private readonly IFileSystemProvider _fileSystemProvider;
     private FileSystemEntryDescriptor _descriptor;
 
@@ -80,5 +80,12 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
         IsInitialized = true;
 
         OnPropertyChanged();
+    }
+
+    public void Rename(string newPath)
+    {
+        _fullPath = newPath;
+
+        InitializeImpl();
     }
 }
