@@ -8,6 +8,8 @@ namespace L_Commander.App.ViewModels
 
         void Initialize(FileManagerSettings settings);
 
+        void SwapTabs(IFileManagerTabViewModel sourceTab, IFileManagerTabViewModel targetTab);
+
         FileManagerSettings CollectSettings();
     }
 }

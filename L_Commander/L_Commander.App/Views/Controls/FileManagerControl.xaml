@@ -59,13 +59,16 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <mah:MetroAnimatedTabControl Grid.Row="1" Margin="0,0,0,0"
+        <mah:MetroAnimatedTabControl x:Name="metroTabControl" Grid.Row="1" Margin="0,0,0,0"                                      
                                      mah:TabControlHelper.Underlined="SelectedTabItem"
                                      ItemsSource="{Binding Tabs}"
                                      SelectedItem="{Binding SelectedTab}">
             <TabControl.ItemContainerStyle>
                 <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource {x:Type TabItem}}">
                     <Setter Property="ToolTip" Value="{Binding FullPath}"/>
+                    <Setter Property="AllowDrop" Value="True"/>
+                    <EventSetter Event="PreviewMouseMove" Handler="TabItem_PreviewMouseMove"/>                    
+                    <EventSetter Event="Drop" Handler="TabItem_Drop"/>
                     <Setter Property="ContextMenu">
                         <Setter.Value>
                             <ContextMenu>
@@ -110,10 +113,10 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <iconPacks:PackIconMaterial Grid.Column="0" Kind="Lock" Margin="0,3,0,0"
+                        <iconPacks:PackIconMaterial Grid.Column="0" Kind="Lock" VerticalAlignment="Center" Margin="0,0,3,0"
                                                     Visibility="{Binding IsLocked, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-                        <TextBlock Grid.Column="1" Text="{Binding ShortPath}" Margin="3,0,0,0"
+                        <TextBlock Grid.Column="1" Text="{Binding ShortPath}" 
                                    MaxWidth="300" TextTrimming="CharacterEllipsis"/>
                     </Grid>
                 </DataTemplate>

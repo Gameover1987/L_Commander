@@ -207,4 +207,20 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
         var tab = (IFileManagerTabViewModel)obj;
         _operatingSystemProvider.OpenTerminal(tab.FullPath);
     }
+
+    public void SwapTabs(IFileManagerTabViewModel sourceTab, IFileManagerTabViewModel targetTab)
+    {
+        var sourceIndex = Tabs.IndexOf(sourceTab);
+        if (sourceIndex < 0)
+            return;
+
+        var targetIndex = Tabs.IndexOf(targetTab);
+        if (targetIndex < 0)
+            return;
+                
+        Tabs[sourceIndex] = targetTab;
+        Tabs[targetIndex] = sourceTab;
+
+        SelectedTab = sourceTab;
+    }
 }

@@ -49,6 +49,9 @@ namespace L_Commander.App.Views.Controls
 
         private void DataGrid_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (_dataContext == null)
+                return;
+
             _dataContext.SelectedEntries = dataGrid.SelectedItems.Cast<IFileSystemEntryViewModel>().ToArray();
         }
     }
