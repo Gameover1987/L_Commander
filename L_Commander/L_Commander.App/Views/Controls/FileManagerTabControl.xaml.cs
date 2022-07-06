@@ -52,7 +52,7 @@ namespace L_Commander.App.Views.Controls
             if (_dataContext == null)
                 return;
 
-            _dataContext.SelectedEntries = dataGrid.SelectedItems.Cast<IFileSystemEntryViewModel>().ToArray();
+            _dataContext.SelectedEntries = dataGrid.SelectedItems.Cast<IFileSystemEntryViewModel>().ToArray();            
         }
     }
 }

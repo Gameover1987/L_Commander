@@ -6,8 +6,9 @@
              xmlns:designMock="clr-namespace:L_Commander.App.Views.DesignMock"
              xmlns:app="clr-namespace:L_Commander.App"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:viewModels="clr-namespace:L_Commander.App.ViewModels"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-             xmlns:filtering="clr-namespace:L_Commander.App.ViewModels.Filtering"
+             xmlns:filtering="clr-namespace:L_Commander.App.ViewModels.Filtering" xmlns:controls="clr-namespace:L_Commander.App.Views.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=designMock:DesignMockFileManagerTabViewModel, IsDesignTimeCreatable=True}">
@@ -91,12 +92,13 @@
             </ListBox.ItemTemplate>
         </ListBox>-->
 
-        <DataGrid x:Name="dataGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="0,6,0,0"
-                  ItemsSource="{Binding FolderView}"
-                  SelectedItem="{Binding SelectedFileSystemEntry}"
-                  IsReadOnly="True"
-                  SelectionChanged="DataGrid_OnSelectionChanged"
-                  SelectionUnit="FullRow">
+        <controls:CustomDataGrid x:Name="dataGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="0,6,0,0"
+                                 ItemsSource="{Binding FolderView}"
+                                 SelectedItem="{Binding SelectedFileSystemEntry}"
+                                 IsReadOnly="True"
+                                 Style="{StaticResource MahApps.Styles.DataGrid}"
+                                 SelectionChanged="DataGrid_OnSelectionChanged"
+                                 SelectionUnit="FullRow">
             <DataGrid.InputBindings>
                 <KeyBinding Key="Enter"
                             Command="{Binding OpenCommand}"/>
@@ -127,16 +129,16 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="{x:Static app:Resources.DataGridColumnName_Path}"
-                                    Binding="{Binding Name, Mode=OneWay}" Width="*"/>
-                <DataGridTextColumn Header="{x:Static app:Resources.DataGridColumnName_Type}" 
-                                    Binding="{Binding Extension, Mode=OneWay}" Width="Auto"/>
-                <DataGridTextColumn Header="{x:Static app:Resources.DataGridColumnName_Size}"
-                                    Binding="{Binding TotalSize, Mode=OneWay}" Width="Auto"/>
-                <DataGridTextColumn Header="{x:Static app:Resources.DataGridColumnName_CreationDate}"
-                                    Binding="{Binding Created, Mode=OneWay, StringFormat='dd.MM.yyyy HH:mm:ss'}" Width="Auto"/>
+                <DataGridTextColumn Header="{x:Static app:Resources.DataGridColumnName_Path}" Width="*"
+                                    Binding="{Binding Name, Mode=OneWay}"/>
+                <DataGridTextColumn Header="{x:Static app:Resources.DataGridColumnName_Type}" Width="Auto"
+                                    Binding="{Binding Extension, Mode=OneWay}" />
+                <DataGridTextColumn Header="{x:Static app:Resources.DataGridColumnName_Size}" Width="Auto"
+                                    Binding="{Binding TotalSize, Mode=OneWay}" />
+                <DataGridTextColumn Header="{x:Static app:Resources.DataGridColumnName_CreationDate}" Width="Auto"
+                                    Binding="{Binding Created, Mode=OneWay, StringFormat='dd.MM.yyyy HH:mm:ss'}" />
             </DataGrid.Columns>
-        </DataGrid>
+        </controls:CustomDataGrid>
 
         <mah:MetroProgressBar Grid.Row="2"
                               Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}"

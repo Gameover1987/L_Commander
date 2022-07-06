@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -75,8 +76,9 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _folderView = (ListCollectionView)CollectionViewSource.GetDefaultView(FileSystemEntries);
         _folderView.Filter = FileSystemEntryFilter;
         _folderView.SortDescriptions.Add(new SortDescription(nameof(IFileSystemEntryViewModel.FileOrFolder), ListSortDirection.Ascending));
+        _folderView.SortDescriptions.Add(new SortDescription(nameof(IFileSystemEntryViewModel.Extension), ListSortDirection.Ascending));
         _folderView.SortDescriptions.Add(new SortDescription(nameof(IFileSystemEntryViewModel.Name), ListSortDirection.Ascending));
-    }
+    }    
 
     public string FullPath => _fullPath;
 
