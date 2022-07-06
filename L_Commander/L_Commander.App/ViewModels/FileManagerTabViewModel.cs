@@ -150,7 +150,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     public IDelegateCommand NextCommand { get; }
 
-    public IDelegateCommand TopCommand { get; }  
+    public IDelegateCommand TopCommand { get; }
 
     public void Initialize(string rootPath)
     {
@@ -282,18 +282,25 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         try
         {
             var titleMsg = SelectedFileSystemEntry.IsFile ? "Delete file?" : "Delete folder?";
+            if (SelectedEntries.Length > 1)
+                titleMsg = $"Delete selected items ({SelectedEntries.Length})?";
 
-            var dialogResult = await _windowManager.ShowQuestion(titleMsg, SelectedFileSystemEntry.FullPath);
+            var dialogResult = await _windowManager.ShowQuestion(titleMsg, string.Join(Environment.NewLine, SelectedEntries.Select(x => x.FullPath).OrderBy(x => x)));
             if (dialogResult != MessageDialogResult.Affirmative)
                 return;
 
-            _fileSystemProvider.Delete(SelectedFileSystemEntry.FileOrFolder, SelectedFileSystemEntry.FullPath);
+            IsBusy = true;
+            foreach (var entry in SelectedEntries)
+            {
+                _fileSystemProvider.Delete(entry.FileOrFolder, entry.FullPath);
+            }
+            IsBusy = false;
         }
         catch (Exception exception)
         {
             _exceptionHandler.HandleExceptionWithMessageBox(exception);
         }
-    }
+    }    
 
     private bool CanRefreshCommandHandler()
     {
