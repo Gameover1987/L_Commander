@@ -8,12 +8,22 @@
              xmlns:viewModels="clr-namespace:L_Commander.App.ViewModels"
              xmlns:helpers="clr-namespace:L_Commander.UI.Helpers;assembly=L_Commander.UI"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=designMock:DesignMockFileManagerViewModel, IsDesignTimeCreatable=True}">
     <UserControl.InputBindings>
-        <KeyBinding Key="T" Modifiers="Control"
+        <KeyBinding Gesture="Ctrl+T"
                     Command="{Binding NewTabCommand}"/>
+        <KeyBinding Gesture="Ctrl+W"
+                    Command="{Binding CloseTabCommand}"
+                    CommandParameter="{Binding SelectedTab}"/>
+        <KeyBinding Gesture="Ctrl+Shift+E"
+                    Command="{Binding OpenInExplorerCommand}"
+                    CommandParameter="{Binding SelectedTab}"/>
+        <KeyBinding Gesture="Ctrl+Shift+T"
+                    Command="{Binding OpenInTerminalCommand}"
+                    CommandParameter="{Binding SelectedTab}"/>
     </UserControl.InputBindings>
     <UserControl.Resources>
         <ResourceDictionary>
@@ -66,18 +76,26 @@
                                           Command="{Binding Source={StaticResource BindingProxy}, Path=Data.CopyPathCommand}"
                                           CommandParameter="{Binding}"/>
                                 <MenuItem Header="Open in Explorer" 
+                                          InputGestureText="Ctrl+Shift+E"
                                           Command="{Binding Source={StaticResource BindingProxy}, Path=Data.OpenInExplorerCommand}"
                                           CommandParameter="{Binding}"/>
                                 <MenuItem Header="Open in Command Line" 
+                                          InputGestureText="Ctrl+Shift+T"
                                           Command="{Binding Source={StaticResource BindingProxy}, Path=Data.OpenInTerminalCommand}"
                                           CommandParameter="{Binding}"/>
                                 <Separator/>
                                 <MenuItem Header="Close tab" InputGestureText="Ctrl+W"
                                           Command="{Binding Source={StaticResource BindingProxy}, Path=Data.CloseTabCommand}"
                                           CommandParameter="{Binding}"/>
-                                <MenuItem Header="Close all but this" />
+                                <MenuItem Header="Close all but this"                                            
+                                          Command="{Binding Source={StaticResource BindingProxy}, Path=Data.CloseAllButThisTabCommand}"
+                                          CommandParameter="{Binding}"/>
                                 <Separator/>
-                                <MenuItem Header="Lock tab" IsCheckable="True"/>
+                                <MenuItem Header="Lock tab" 
+                                          IsCheckable="True"
+                                          IsChecked="{Binding IsLocked}"
+                                          Command="{Binding Source={StaticResource BindingProxy}, Path=Data.LockTabCommand}"
+                                          CommandParameter="{Binding}"/>
                                 <MenuItem Header="Add to favorites"/>
                             </ContextMenu>
                         </Setter.Value>
@@ -86,8 +104,18 @@
             </TabControl.ItemContainerStyle>
             <TabControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding ShortPath}"
-                               MaxWidth="300" TextTrimming="CharacterEllipsis"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <iconPacks:PackIconMaterial Grid.Column="0" Kind="Lock" Margin="0,3,0,0"
+                                                    Visibility="{Binding IsLocked, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                        <TextBlock Grid.Column="1" Text="{Binding ShortPath}" Margin="3,0,0,0"
+                                   MaxWidth="300" TextTrimming="CharacterEllipsis"/>
+                    </Grid>
                 </DataTemplate>
             </TabControl.ItemTemplate>
         </mah:MetroAnimatedTabControl>

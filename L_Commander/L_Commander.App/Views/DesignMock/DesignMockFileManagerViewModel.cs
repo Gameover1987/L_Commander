@@ -84,10 +84,10 @@ internal sealed class DesignMockExceptionHandler : IExceptionHandler
 
 internal sealed class DesignMockViewModelFactory : ViewModelFactory
 {
-    public DesignMockViewModelFactory() 
-        :base(new FileSystemProvider(new IconCache()), new DesignMockWindowManager(), new OperatingSystemProvider(), new DesignMockExceptionHandler())
+    public DesignMockViewModelFactory()
+        : base(new FileSystemProvider(new IconCache()), new DesignMockWindowManager(), new OperatingSystemProvider(), new DesignMockExceptionHandler())
     {
-        
+
     }
 }
 
@@ -96,6 +96,21 @@ internal sealed class DesignMockFileManagerViewModel : FileManagerViewModel
     public DesignMockFileManagerViewModel()
         : base(new FileSystemProvider(new IconCache()), new ClipBoardProvider(), new DesignMockViewModelFactory(), new OperatingSystemProvider())
     {
-        Initialize(new FileManagerSettings { Paths = new[] { "C:\\", "D:\\" } });
+        Initialize(new FileManagerSettings
+        {
+            Tabs = new TabSettings[]
+            {
+                new TabSettings 
+                {
+                    Path = @"C:\", 
+                    IsLocked = true 
+                },
+                 new TabSettings
+                {
+                    Path = @"E:\Download",
+                    IsLocked = false
+                }
+            },SelectedPath = @"C:\"
+        });
     }
 }

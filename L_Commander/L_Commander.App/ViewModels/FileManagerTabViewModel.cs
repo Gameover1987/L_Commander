@@ -38,6 +38,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private readonly object _lock = new object();
 
     private bool _isBusy;
+    private bool _isLocked;
 
     public FileManagerTabViewModel(IFolderFilterViewModel folderFolderFilter,
         IFileSystemProvider fileSystemProvider,
@@ -82,6 +83,18 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     public string ShortPath => _fileSystemProvider.GetDirectoryName(_fullPath);
 
     public string Name => _fileSystemProvider.GetDirectoryName(_fullPath);
+
+    public bool IsLocked
+    {
+        get { return _isLocked; }
+        set
+        {
+            if (_isLocked == value)
+                return;
+            _isLocked = value;
+            OnPropertyChanged(() => IsLocked);
+        }
+    }
 
     public bool IsBusy
     {
@@ -137,7 +150,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     public IDelegateCommand NextCommand { get; }
 
-    public IDelegateCommand TopCommand { get; }
+    public IDelegateCommand TopCommand { get; }  
 
     public void Initialize(string rootPath)
     {
@@ -382,7 +395,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _timer.Stop();
         IsBusy = false;
         FolderFilter.Refresh(FileSystemEntries);
-        FolderView.Refresh();        
+        FolderView.Refresh();
     }
 
     private bool FileSystemEntryFilter(object obj)

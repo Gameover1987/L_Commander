@@ -4,6 +4,7 @@ using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.ViewModels.Factories;
 using L_Commander.App.ViewModels.Filtering;
+using L_Commander.Common.Extensions;
 using L_Commander.UI.Commands;
 using L_Commander.UI.ViewModels;
 
@@ -26,7 +27,9 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
         _operatingSystemProvider = operatingSystemProvider;
         ChangeDriveCommand = new DelegateCommand(ChangeDriveCommandHandler, x => CanChangeDriveCommandHandler());
         NewTabCommand = new DelegateCommand(NewTabCommandHandler, CanNewTabCommandHandler);
-        CloseTabCommand = new DelegateCommand(CloseTabCommandHandler, x => CanCloseTabCommandHandler());
+        CloseTabCommand = new DelegateCommand(CloseTabCommandHandler, x => CanCloseTabCommandHandler(x));
+        CloseAllButThisTabCommand = new DelegateCommand(CloseAllButThisTabCommandHandler, x => CanCloseAllButThisTabCommandHandler(x));
+        LockTabCommand = new DelegateCommand(LockTabCommandHandler);
         CopyPathCommand = new DelegateCommand(CopyPathCommandHandler);
         OpenInExplorerCommand = new DelegateCommand(OpenInExplorerCommandHandler);
         OpenInTerminalCommand = new DelegateCommand(OpenInTerminalCommandHandler);
@@ -50,6 +53,8 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
     public IDelegateCommand ChangeDriveCommand { get; }
     public IDelegateCommand NewTabCommand { get; }
     public IDelegateCommand CloseTabCommand { get; }
+    public IDelegateCommand CloseAllButThisTabCommand { get; }
+    public IDelegateCommand LockTabCommand { get; }
     public IDelegateCommand CopyPathCommand { get; }
     public IDelegateCommand OpenInExplorerCommand { get; }
     public IDelegateCommand OpenInTerminalCommand { get; }
@@ -65,13 +70,15 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
         }
 
         Tabs.Clear();
-        if (settings != null && settings.Paths.Any())
+        if (settings != null && settings.Tabs?.Any() == true)
         {
-            foreach (var path in settings.Paths)
+            foreach (var tabSettings in settings.Tabs)
             {
-                if (!_fileSystemProvider.IsDirectoryExists(path))
+                if (!_fileSystemProvider.IsDirectoryExists(tabSettings.Path))
                     continue;
-                Tabs.Add(CreateFileManagerTabViewModel(path));
+                var tab = CreateFileManagerTabViewModel(tabSettings.Path);
+                tab.IsLocked = tabSettings.IsLocked;
+                Tabs.Add(tab);
             }
 
             var oldSelectedTab = Tabs.FirstOrDefault(x => x.FullPath == settings.SelectedPath);
@@ -97,7 +104,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
     {
         return new FileManagerSettings
         {
-            Paths = Tabs.Select(x => x.FullPath).ToArray(),
+            Tabs = Tabs.Select(x => new TabSettings { Path = x.FullPath, IsLocked = x.IsLocked }).ToArray(),
             SelectedPath = SelectedTab?.FullPath
         };
     }
@@ -129,11 +136,22 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
     private void NewTabCommandHandler()
     {
         var newTab = CreateFileManagerTabViewModel(SelectedTab.FullPath);
-        Tabs.Add(newTab);
+        var selectedIndex = Tabs.IndexOf(SelectedTab);
+
+        Tabs.Insert(selectedIndex + 1, newTab);
+
+        SelectedTab = newTab;
     }
 
-    private bool CanCloseTabCommandHandler()
+    private bool CanCloseTabCommandHandler(object obj)
     {
+        var clickedTab = (IFileManagerTabViewModel)obj;
+        if (clickedTab == null)
+            return false;
+
+        if (clickedTab.IsLocked)
+            return false;
+
         return Tabs.Count > 1;
     }
 
@@ -142,6 +160,33 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
         var tab = (IFileManagerTabViewModel)obj;
 
         Tabs.Remove(tab);
+    }
+
+    private bool CanCloseAllButThisTabCommandHandler(object obj)
+    {
+        var clickedTab = (IFileManagerTabViewModel)obj;
+        if (Tabs.Count == 1)
+            return false;
+
+        return Tabs.Where(x => !x.IsLocked && x != clickedTab).Count() > 0;
+    }
+
+    private void CloseAllButThisTabCommandHandler(object obj)
+    {
+        var clickedTab = (IFileManagerTabViewModel)obj;
+
+        var tabsToRemove = Tabs.Where(x => !x.IsLocked && x != clickedTab).ToArray();
+
+        foreach (var tab in tabsToRemove)
+        {
+            Tabs.Remove(tab);
+        }
+    }
+
+    private void LockTabCommandHandler(object obj)
+    {
+        var clickedTab = (IFileManagerTabViewModel)obj;
+        clickedTab.IsLocked.Invert();
     }
 
     private void CopyPathCommandHandler(object obj)
@@ -153,6 +198,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
     private void OpenInExplorerCommandHandler(object obj)
     {
         var tab = (IFileManagerTabViewModel)obj;
+
         _operatingSystemProvider.OpenExplorer(tab.FullPath);
     }
 

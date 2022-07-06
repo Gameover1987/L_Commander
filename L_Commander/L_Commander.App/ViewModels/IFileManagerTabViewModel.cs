@@ -10,6 +10,8 @@ public interface IFileManagerTabViewModel
 
     string ShortPath { get; }
 
+    bool IsLocked { get; set; }
+
     IFileSystemEntryViewModel[] SelectedEntries { get; set; }
 
     ListCollectionView FolderView { get; }
