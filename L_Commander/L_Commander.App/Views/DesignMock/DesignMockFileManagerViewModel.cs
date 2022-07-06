@@ -58,7 +58,7 @@ internal sealed class DesignMockFileManagerTabViewModel : FileManagerTabViewMode
     public DesignMockFileManagerTabViewModel()
         : base(new FolderFilterViewModel(), new FileSystemProvider(new IconCache()), new DesignMockWindowManager(), new OperatingSystemProvider(), new DesignMockExceptionHandler(), new FolderWatcher(), new UiTimer())
     {
-        Initialize("C:\\");
+        Initialize("E:\\Download");
 
         foreach (var fileSystemEntryViewModel in FileSystemEntries)
         {

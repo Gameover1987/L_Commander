@@ -9,6 +9,7 @@
              xmlns:viewModels="clr-namespace:L_Commander.App.ViewModels"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:filtering="clr-namespace:L_Commander.App.ViewModels.Filtering" xmlns:controls="clr-namespace:L_Commander.App.Views.Controls"
+             xmlns:helpers="clr-namespace:L_Commander.UI.Helpers;assembly=L_Commander.UI"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=designMock:DesignMockFileManagerTabViewModel, IsDesignTimeCreatable=True}">
@@ -129,13 +130,20 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="{x:Static app:Resources.DataGridColumnName_Path}" Width="*"
-                                    Binding="{Binding Name, Mode=OneWay}"/>
-                <DataGridTextColumn Header="{x:Static app:Resources.DataGridColumnName_Type}" Width="Auto"
+                <DataGridTextColumn x:Name="fileNameColumn" Header="{x:Static app:Resources.DataGridColumnName_Path}" Width="*"
+                                    Binding="{Binding Name, Mode=OneWay}">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}">
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                            <Setter Property="helpers:TextBlockToolTipHelper.ShowTooltipWhenTrimming" Value="True"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn x:Name="typeColumn" Header="{x:Static app:Resources.DataGridColumnName_Type}" Width="Auto" MinWidth="60"
                                     Binding="{Binding Extension, Mode=OneWay}" />
-                <DataGridTextColumn Header="{x:Static app:Resources.DataGridColumnName_Size}" Width="Auto"
+                <DataGridTextColumn x:Name="totalSizeColumn" Header="{x:Static app:Resources.DataGridColumnName_Size}" Width="Auto" MinWidth="90"
                                     Binding="{Binding TotalSize, Mode=OneWay}" />
-                <DataGridTextColumn Header="{x:Static app:Resources.DataGridColumnName_CreationDate}" Width="Auto"
+                <DataGridTextColumn x:Name="creationDateColumn" Header="{x:Static app:Resources.DataGridColumnName_CreationDate}" Width="100" CanUserResize="False"
                                     Binding="{Binding Created, Mode=OneWay, StringFormat='dd.MM.yyyy HH:mm:ss'}" />
             </DataGrid.Columns>
         </controls:CustomDataGrid>

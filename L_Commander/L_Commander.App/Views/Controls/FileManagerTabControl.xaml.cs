@@ -35,14 +35,15 @@ namespace L_Commander.App.Views.Controls
         private void FilterButton_OnClick(object sender, RoutedEventArgs e)
         {
             var window = (MetroWindow)Window.GetWindow(this);
-            var mainViewModel = (IMainViewModel) window.DataContext;
+            var mainViewModel = (IMainViewModel)window.DataContext;
             if (mainViewModel.ActiveFileManager == mainViewModel.LeftFileManager)
             {
-                var flyout = window.Flyouts.Items.Cast<Flyout>().First(x => (string) x.Tag == MainWindow.LeftFlyoutTag);
+                var flyout = window.Flyouts.Items.Cast<Flyout>().First(x => (string)x.Tag == MainWindow.LeftFlyoutTag);
                 flyout.IsOpen = !flyout.IsOpen;
-            }else if (mainViewModel.ActiveFileManager == mainViewModel.RightFileManager)
+            }
+            else if (mainViewModel.ActiveFileManager == mainViewModel.RightFileManager)
             {
-                var flyout = window.Flyouts.Items.Cast<Flyout>().First(x => (string) x.Tag == MainWindow.RightFlyoutTag);
+                var flyout = window.Flyouts.Items.Cast<Flyout>().First(x => (string)x.Tag == MainWindow.RightFlyoutTag);
                 flyout.IsOpen = !flyout.IsOpen;
             }
         }
@@ -52,7 +53,7 @@ namespace L_Commander.App.Views.Controls
             if (_dataContext == null)
                 return;
 
-            _dataContext.SelectedEntries = dataGrid.SelectedItems.Cast<IFileSystemEntryViewModel>().ToArray();            
+            _dataContext.SelectedEntries = dataGrid.SelectedItems.Cast<IFileSystemEntryViewModel>().ToArray();
         }
     }
 }
