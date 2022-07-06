@@ -118,6 +118,11 @@ public sealed class FileSystemProvider : IFileSystemProvider
         File.Copy(sourcePath, destinationPath, true);
     }
 
+    public void Move(string sourcePath, string destinationPath)
+    {
+        File.Move(sourcePath, destinationPath, true);
+    }
+
     public bool IsDirectoryExists(string path)
     {
         return Directory.Exists(path);
@@ -131,5 +136,5 @@ public sealed class FileSystemProvider : IFileSystemProvider
     public string CombinePaths(params string[] paths)
     {
         return Path.Combine(paths);
-    }
+    }   
 }

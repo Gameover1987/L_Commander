@@ -46,22 +46,27 @@
                                                 <Grid.Style>
                                                     <Style TargetType="{x:Type Grid}">
                                                         <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding Items[0].IsChecked}" Value="False">
-                                                               <DataTrigger.EnterActions>
-                                                                   <BeginStoryboard>
-                                                                       <Storyboard TargetProperty="Opacity" >
-                                                                           <DoubleAnimation From="1.0" To="0.4" Duration="0:0:0.3"/>
-                                                                       </Storyboard>
-                                                                   </BeginStoryboard>
-                                                                </DataTrigger.EnterActions>
-                                                                <DataTrigger.ExitActions>
+                                                            <MultiDataTrigger>
+                                                                <MultiDataTrigger.Conditions>
+                                                                    <Condition Binding="{Binding ItemCount, Converter={StaticResource NonZeroToBoolConverter}}" Value="True"/>
+                                                                    <Condition Binding="{Binding Items[0].IsChecked}" Value="False"/>
+                                                                </MultiDataTrigger.Conditions>
+                                                                <Setter Property="Opacity" Value="0.4"/>
+                                                                <MultiDataTrigger.EnterActions>
+                                                                    <BeginStoryboard>
+                                                                        <Storyboard TargetProperty="Opacity" >
+                                                                            <DoubleAnimation From="1.0" To="0.4" Duration="0:0:0.3"/>
+                                                                        </Storyboard>
+                                                                    </BeginStoryboard>
+                                                                </MultiDataTrigger.EnterActions>
+                                                                <MultiDataTrigger.ExitActions>
                                                                     <BeginStoryboard>
                                                                         <Storyboard TargetProperty="Opacity">
                                                                             <DoubleAnimation From="0.4" To="1.0" Duration="0:0:0.3"/>
                                                                         </Storyboard>
                                                                     </BeginStoryboard>
-                                                                </DataTrigger.ExitActions>
-                                                            </DataTrigger>
+                                                                </MultiDataTrigger.ExitActions>
+                                                            </MultiDataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
                                                 </Grid.Style>

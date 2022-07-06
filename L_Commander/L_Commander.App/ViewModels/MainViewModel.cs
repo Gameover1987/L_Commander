@@ -16,24 +16,26 @@ namespace L_Commander.App.ViewModels
         private readonly IFileManagerViewModel _rightFileManager;
         private readonly ICopyOperation _copyOperation;
         private readonly IWindowManager _windowManager;
-
+        private readonly IExceptionHandler _exceptionHandler;
         private ProgressDialogController _progressDialogController;
 
         private IWindow _window;
 
-        public MainViewModel(ISettingsProvider settingsProvider, IFileManagerViewModel leftFileManager, IFileManagerViewModel rightFileManager, ICopyOperation copyOperation, IWindowManager windowManager)
+        public MainViewModel(ISettingsProvider settingsProvider, IFileManagerViewModel leftFileManager, IFileManagerViewModel rightFileManager, ICopyOperation copyOperation, IWindowManager windowManager, IExceptionHandler exceptionHandler)
         {
             _settingsProvider = settingsProvider;
             _leftFileManager = leftFileManager;
             _rightFileManager = rightFileManager;
             _copyOperation = copyOperation;
+            _copyOperation.Progress += CopyOperationOnProgress;
             _windowManager = windowManager;
-
+            _exceptionHandler = exceptionHandler;
             ActiveFileManager = LeftFileManager;
 
             RenameCommand = new DelegateCommand(RenameCommandHandler, CanRenameCommandHandler);
             OpenCommand = new DelegateCommand(OpenCommandHandler, CanOpenCommandHandler);
             CopyCommand = new DelegateCommand(CopyCommandHandler, CanCopyCommandHandler);
+            MoveCommand = new DelegateCommand(MoveCommandHandler, CanMoveCommandHandler);
             MakeDirCommand = new DelegateCommand(MakeDirCommandHandler, CanMakeDirCommandHandler);
             DeleteCommand = new DelegateCommand(DeleteCommandHandler, CanDeleteCommandHandler);
         }
@@ -63,6 +65,8 @@ namespace L_Commander.App.ViewModels
         public IDelegateCommand OpenCommand { get; }
 
         public IDelegateCommand CopyCommand { get; }
+
+        public IDelegateCommand MoveCommand { get; }
 
         public IDelegateCommand MakeDirCommand { get; set; }
 
@@ -131,16 +135,75 @@ namespace L_Commander.App.ViewModels
 
         private async void CopyCommandHandler()
         {
-            var sourceEntries = ActiveFileManager?.SelectedTab.SelectedEntries
-                .Select(x => x.GetDescriptor())
-                .ToArray();
+            try
+            {
+                var sourceEntries = ActiveFileManager?.SelectedTab.SelectedEntries
+                    .Select(x => x.GetDescriptor())
+                    .ToArray();
 
-            _progressDialogController = await _windowManager.ShowProgressDialog($"Copying files to \r\n'{AnotherFileManager.SelectedTab.FullPath}'", "Wait for copy");
-            _progressDialogController.Canceled += ProgressDialogControllerOnCanceled;
-            _copyOperation.Progress += CopyOperationOnProgress;
-            await _copyOperation.Execute(sourceEntries, AnotherFileManager.SelectedTab.FullPath);
+                var questionSettings = new MetroDialogSettings { DefaultButtonFocus = MessageDialogResult.Affirmative };
+                var result = await _windowManager.ShowQuestion("Copy operation", $"Do you want copy files to '{AnotherFileManager.SelectedTab.FullPath}'?", questionSettings);
+                if (result != MessageDialogResult.Affirmative)
+                    return;
 
-            await _progressDialogController.CloseAsync();
+                _progressDialogController = await _windowManager.ShowProgressDialog($"Copying files to \r\n'{AnotherFileManager.SelectedTab.FullPath}'", "Wait for copy...");
+                _progressDialogController.Canceled += ProgressDialogControllerOnCanceled;
+
+                await _copyOperation.Execute(sourceEntries, AnotherFileManager.SelectedTab.FullPath);
+
+                await _progressDialogController.CloseAsync();
+            }
+            catch (Exception exception)
+            {
+                _exceptionHandler.HandleExceptionWithMessageBox(exception);
+            }
+            finally
+            {
+                if (_progressDialogController != null)
+                    _progressDialogController.Canceled -= ProgressDialogControllerOnCanceled;
+            }
+        }
+
+        private bool CanMoveCommandHandler()
+        {
+            if (ActiveFileManager?.SelectedTab?.SelectedEntries.Any() == false)
+                return false;
+            if (AnotherFileManager?.SelectedTab == null)
+                return false;
+
+            return !_copyOperation.IsBusy;
+        }
+
+        private async void MoveCommandHandler()
+        {
+            try
+            {
+
+                var sourceEntries = ActiveFileManager?.SelectedTab.SelectedEntries
+                   .Select(x => x.GetDescriptor())
+                   .ToArray();
+
+                var questionSettings = new MetroDialogSettings { DefaultButtonFocus = MessageDialogResult.Affirmative };
+                var result = await _windowManager.ShowQuestion("Move operation", $"Do you want move files to '{AnotherFileManager.SelectedTab.FullPath}'?", questionSettings);
+                if (result != MessageDialogResult.Affirmative)
+                    return;
+
+                _progressDialogController = await _windowManager.ShowProgressDialog($"Moving files to \r\n'{AnotherFileManager.SelectedTab.FullPath}'", "Wait for move...");
+                _progressDialogController.Canceled += ProgressDialogControllerOnCanceled;
+
+                await _copyOperation.Execute(sourceEntries, AnotherFileManager.SelectedTab.FullPath, cleanupSourceEntries:true);
+
+                await _progressDialogController.CloseAsync();
+            }
+            catch (Exception exception)
+            {
+                _exceptionHandler.HandleExceptionWithMessageBox(exception);
+            }
+            finally
+            {
+                if (_progressDialogController != null)
+                    _progressDialogController.Canceled -= ProgressDialogControllerOnCanceled;
+            }
         }
 
         private void ProgressDialogControllerOnCanceled(object sender, EventArgs e)

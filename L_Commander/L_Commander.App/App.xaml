@@ -6,29 +6,30 @@
              xmlns:converters="clr-namespace:L_Commander.UI.Converters;assembly=L_Commander.UI"
              Startup="App_OnStartup">
     <Application.Resources>
-         <ResourceDictionary>
-             <ResourceDictionary.MergedDictionaries>
-                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-             <Style BasedOn="{StaticResource MahApps.Styles.CustomValidationPopup}" 
+            <Style BasedOn="{StaticResource MahApps.Styles.CustomValidationPopup}" 
                     TargetType="{x:Type mah:CustomValidationPopup}">
-                 <Setter Property="CloseOnMouseLeftButtonDown" Value="False" />
-                 <Setter Property="ShowValidationErrorOnMouseOver" Value="False" />
-             </Style>
+                <Setter Property="CloseOnMouseLeftButtonDown" Value="False" />
+                <Setter Property="ShowValidationErrorOnMouseOver" Value="False" />
+            </Style>
 
-             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-             <converters:BoolToInvisibilityConverter x:Key="BoolToInvisibilityConverter"/>
-             <converters:EnumToBoolConverter x:Key="EnumToBoolConverter"/>
-             <converters:EnumNotEqualToBoolConverter x:Key="EnumNotEqualToBoolConverter"/>
-             <converters:NotNullToBoolConverter x:Key="NotNullToBoolConverter"/>
-             <converters:IntToBoolConverter x:Key="IntToBoolConverter"/>
-             <converters:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter"/>
-             <converters:EnumToInvisibilityConverter x:Key="EnumToInvisibilityConverter"/>
-             <converters:InvertBoolConverter x:Key="InvertBoolConverter"/>
-             <converters:SystemIconConverter x:Key="SystemIconConverter"/>
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <converters:BoolToInvisibilityConverter x:Key="BoolToInvisibilityConverter"/>
+            <converters:EnumToBoolConverter x:Key="EnumToBoolConverter"/>
+            <converters:EnumNotEqualToBoolConverter x:Key="EnumNotEqualToBoolConverter"/>
+            <converters:NotNullToBoolConverter x:Key="NotNullToBoolConverter"/>
+            <converters:IntToBoolConverter x:Key="IntToBoolConverter"/>
+            <converters:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter"/>
+            <converters:EnumToInvisibilityConverter x:Key="EnumToInvisibilityConverter"/>
+            <converters:InvertBoolConverter x:Key="InvertBoolConverter"/>
+            <converters:SystemIconConverter x:Key="SystemIconConverter"/>
+            <converters:NonZeroToBoolConverter x:Key="NonZeroToBoolConverter"/>
 
         </ResourceDictionary>
     </Application.Resources>

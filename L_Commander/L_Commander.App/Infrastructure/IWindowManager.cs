@@ -15,7 +15,7 @@ namespace L_Commander.App.Infrastructure
 
         Task<MessageDialogResult> ShowMessage(string title, string message);
 
-        Task<MessageDialogResult> ShowQuestion(string title, string message);
+        Task<MessageDialogResult> ShowQuestion(string title, string message, MetroDialogSettings settings = null);
 
         Task<ProgressDialogController> ShowProgressDialog(string title, string message);
     }
@@ -37,9 +37,9 @@ namespace L_Commander.App.Infrastructure
             return DialogManager.ShowMessageAsync(MainWindow, title, message, MessageDialogStyle.Affirmative);
         }
 
-        public Task<MessageDialogResult> ShowQuestion(string title, string message)
+        public Task<MessageDialogResult> ShowQuestion(string title, string message, MetroDialogSettings settings = null)
         {
-            return DialogManager.ShowMessageAsync(MainWindow, title, message, MessageDialogStyle.AffirmativeAndNegative);
+            return DialogManager.ShowMessageAsync(MainWindow, title, message, MessageDialogStyle.AffirmativeAndNegative, settings);
         }
 
         public Task<ProgressDialogController> ShowProgressDialog(string title, string message)

@@ -17,7 +17,7 @@ namespace L_Commander.App.OperatingSystem.Operations
     {
         bool IsBusy { get; }
 
-        Task Execute(FileSystemEntryDescriptor[] entries, string destDirectory);
+        Task Execute(FileSystemEntryDescriptor[] entries, string destDirectory, bool cleanupSourceEntries = false);
 
         void Cancel();
 

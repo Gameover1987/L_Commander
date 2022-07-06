@@ -25,7 +25,7 @@ internal sealed class DesignMockWindowManager : IWindowManager
         throw new NotImplementedException();
     }
 
-    public Task<MessageDialogResult> ShowQuestion(string title, string message)
+    public Task<MessageDialogResult> ShowQuestion(string title, string message, MetroDialogSettings settings = null)
     {
         throw new NotImplementedException();
     }
@@ -40,7 +40,7 @@ internal sealed class DesignMockCopyOperation : ICopyOperation
 {
     public bool IsBusy { get; }
 
-    public Task Execute(FileSystemEntryDescriptor[] entries, string destDirectory)
+    public Task Execute(FileSystemEntryDescriptor[] entries, string destDirectory, bool cleanupSourceFiles = false)
     {
         throw new NotImplementedException();
     }
@@ -48,7 +48,7 @@ internal sealed class DesignMockCopyOperation : ICopyOperation
     public void Cancel()
     {
         throw new NotImplementedException();
-    }
+    }   
 
     public event EventHandler<CopyProgressEventArgs> Progress;
 }
