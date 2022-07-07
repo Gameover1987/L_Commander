@@ -11,19 +11,32 @@ namespace L_Commander.App.Views.DesignMock
     {
         public void Save(ClientSettings settings)
         {
-            throw new System.NotImplementedException();
+
         }
 
         public ClientSettings Get()
         {
-            throw new System.NotImplementedException();
+            return new ClientSettings
+            {
+                TagSettings = new TagSettings
+                {
+                    IsEnabled = true,
+                    Tags = new Tag[]
+                {
+                    new Tag { Text = "Important",
+                        Color = 1,
+                        Path = @"C:\Important"
+                    },
+                }
+                }
+            };
         }
     }
 
     internal sealed class DesignMockMainViewModel : MainViewModel
     {
-        public DesignMockMainViewModel() 
-            : base(new DesignMockSettingsProvider(),new DesignMockFileManagerViewModel(), new DesignMockFileManagerViewModel(), new DesignMockCopyOperation(), new DesignMockWindowManager(), new DesignMockExceptionHandler())
+        public DesignMockMainViewModel()
+            : base(new DesignMockSettingsProvider(), new DesignMockFileManagerViewModel(), new DesignMockFileManagerViewModel(), new DesignMockCopyOperation(), new DesignMockWindowManager(), new DesignMockExceptionHandler(), new DesignMockSettingsViewModel())
         {
         }
     }

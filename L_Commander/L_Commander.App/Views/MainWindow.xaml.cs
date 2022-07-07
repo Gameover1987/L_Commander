@@ -35,7 +35,7 @@ namespace L_Commander.App.Views
 
             DataContextChanged += OnDataContextChanged;
             Loaded+= OnLoaded;
-            Closing += OnClosing;
+            Closing += OnClosing;            
         }
 
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)

@@ -24,7 +24,8 @@ namespace L_Commander.App.Views.Controls
 
         private void FileManagerControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            _fileManager = (IFileManagerViewModel)e.NewValue;
+            if (e.NewValue is IFileManagerViewModel)
+                _fileManager = (IFileManagerViewModel)e.NewValue;
         }
 
         private void TabItem_PreviewMouseMove(object sender, MouseEventArgs e)

@@ -2,6 +2,7 @@
 using System.Linq;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem.Operations;
+using L_Commander.App.ViewModels.Settings;
 using L_Commander.App.Views;
 using L_Commander.UI.Commands;
 using L_Commander.UI.ViewModels;
@@ -17,11 +18,18 @@ namespace L_Commander.App.ViewModels
         private readonly ICopyOperation _copyOperation;
         private readonly IWindowManager _windowManager;
         private readonly IExceptionHandler _exceptionHandler;
+        private readonly ISettingsViewModel _settingsViewModel;
         private ProgressDialogController _progressDialogController;
 
         private IWindow _window;
 
-        public MainViewModel(ISettingsProvider settingsProvider, IFileManagerViewModel leftFileManager, IFileManagerViewModel rightFileManager, ICopyOperation copyOperation, IWindowManager windowManager, IExceptionHandler exceptionHandler)
+        public MainViewModel(ISettingsProvider settingsProvider,
+            IFileManagerViewModel leftFileManager,
+            IFileManagerViewModel rightFileManager,
+            ICopyOperation copyOperation,
+            IWindowManager windowManager,
+            IExceptionHandler exceptionHandler,
+            ISettingsViewModel settingsViewModel)
         {
             _settingsProvider = settingsProvider;
             _leftFileManager = leftFileManager;
@@ -30,6 +38,7 @@ namespace L_Commander.App.ViewModels
             _copyOperation.Progress += CopyOperationOnProgress;
             _windowManager = windowManager;
             _exceptionHandler = exceptionHandler;
+            this._settingsViewModel = settingsViewModel;
             ActiveFileManager = LeftFileManager;
 
             RenameCommand = new DelegateCommand(RenameCommandHandler, CanRenameCommandHandler);
@@ -38,6 +47,7 @@ namespace L_Commander.App.ViewModels
             MoveCommand = new DelegateCommand(MoveCommandHandler, CanMoveCommandHandler);
             MakeDirCommand = new DelegateCommand(MakeDirCommandHandler, CanMakeDirCommandHandler);
             DeleteCommand = new DelegateCommand(DeleteCommandHandler, CanDeleteCommandHandler);
+            ShowSettingsCommand = new DelegateCommand(ShowSettingsCommandHandler);
         }
 
         public IFileManagerViewModel LeftFileManager => _leftFileManager;
@@ -71,6 +81,8 @@ namespace L_Commander.App.ViewModels
         public IDelegateCommand MakeDirCommand { get; set; }
 
         public IDelegateCommand DeleteCommand { get; }
+
+        public IDelegateCommand ShowSettingsCommand { get; }
 
         public void Initialize(IWindow window)
         {
@@ -191,7 +203,7 @@ namespace L_Commander.App.ViewModels
                 _progressDialogController = await _windowManager.ShowProgressDialog($"Moving files to \r\n'{AnotherFileManager.SelectedTab.FullPath}'", "Wait for move...");
                 _progressDialogController.Canceled += ProgressDialogControllerOnCanceled;
 
-                await _copyOperation.Execute(sourceEntries, AnotherFileManager.SelectedTab.FullPath, cleanupSourceEntries:true);
+                await _copyOperation.Execute(sourceEntries, AnotherFileManager.SelectedTab.FullPath, cleanupSourceEntries: true);
 
                 await _progressDialogController.CloseAsync();
             }
@@ -242,6 +254,17 @@ namespace L_Commander.App.ViewModels
         private void DeleteCommandHandler()
         {
             ActiveFileManager?.SelectedTab?.DeleteCommand.TryExecute();
+        }
+
+        private void ShowSettingsCommandHandler()
+        {
+            _settingsViewModel.Initialize();
+            if (!_windowManager.ShowDialogWindow<SettingsWindow>(_settingsViewModel))
+            {
+                return;
+            }
+
+            _settingsViewModel.Save();
         }
     }
 }

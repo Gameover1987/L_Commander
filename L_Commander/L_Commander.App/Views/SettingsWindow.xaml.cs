@@ -15,13 +15,13 @@ using System.Windows.Shapes;
 namespace L_Commander.App.Views
 {
     /// <summary>
-    /// Interaction logic for RenameWindow.xaml
+    /// Interaction logic for SettingsWindow.xaml
     /// </summary>
-    public partial class RenameWindow : Window
+    public partial class SettingsWindow
     {
-        public RenameWindow()
+        public SettingsWindow()
         {
-            InitializeComponent();
+            InitializeComponent();            
         }
     }
 }

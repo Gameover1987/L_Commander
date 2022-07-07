@@ -7,6 +7,7 @@ using L_Commander.App.OperatingSystem.Operations;
 using L_Commander.App.ViewModels;
 using L_Commander.App.ViewModels.Factories;
 using L_Commander.App.ViewModels.Filtering;
+using L_Commander.App.ViewModels.Settings;
 using L_Commander.App.Views;
 using L_Commander.UI.Commands;
 using L_Commander.UI.Infrastructure;
@@ -96,6 +97,7 @@ namespace L_Commander.App
                 .AddTransient<IViewModelFactory, ViewModelFactory>()
                 .AddTransient<IFolderFilterViewModel, FolderFilterViewModel>()
                 .AddSingleton<IMainViewModel, MainViewModel>()
+                .AddSingleton<ISettingsViewModel, SettingsViewModel>()
                 .AddTransient<IFileManagerViewModel, FileManagerViewModel>();
 
             return serviceCollection.BuildServiceProvider();

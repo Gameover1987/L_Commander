@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.OperatingSystem.Operations;
@@ -31,6 +32,11 @@ internal sealed class DesignMockWindowManager : IWindowManager
     }
 
     public Task<ProgressDialogController> ShowProgressDialog(string title, string message)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool ShowDialogWindow<T>(object viewModel) where T : Window
     {
         throw new NotImplementedException();
     }

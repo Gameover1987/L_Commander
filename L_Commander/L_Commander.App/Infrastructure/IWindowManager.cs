@@ -18,6 +18,8 @@ namespace L_Commander.App.Infrastructure
         Task<MessageDialogResult> ShowQuestion(string title, string message, MetroDialogSettings settings = null);
 
         Task<ProgressDialogController> ShowProgressDialog(string title, string message);
+
+        bool ShowDialogWindow<T>(object viewModel) where T : Window;
     }
 
     public sealed class WindowManager : IWindowManager
@@ -45,6 +47,14 @@ namespace L_Commander.App.Infrastructure
         public Task<ProgressDialogController> ShowProgressDialog(string title, string message)
         {
             return DialogManager.ShowProgressAsync(MainWindow, title, message, isCancelable: true);
+        }
+
+        public bool ShowDialogWindow<T>(object viewModel) where T : Window
+        {
+            var dialog = Activator.CreateInstance<T>();
+            dialog.Owner = MainWindow;
+            dialog.DataContext = viewModel;
+            return dialog.ShowDialog() == true;
         }
     }
 }
