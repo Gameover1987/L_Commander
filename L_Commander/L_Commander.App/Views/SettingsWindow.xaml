@@ -9,15 +9,24 @@
                  xmlns:designMock="clr-namespace:L_Commander.App.Views.DesignMock"
                  xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
                  xmlns:views="clr-namespace:L_Commander.App.Views"
-                 xmlns:local="clr-namespace:L_Commander.App.Views"
+                 xmlns:settingsViewModels="clr-namespace:L_Commander.App.ViewModels.Settings"                 
                  mc:Ignorable="d"
                  GlowBrush="{DynamicResource MahApps.Brushes.Accent}"                 
                  ResizeMode="CanResizeWithGrip"
-                 MinWidth="600"
-                 MinHeight="450"
+                 MinHeight="600"
+                 Height="600"
+                 MinWidth="800"
+                 Width="800"
                  ShowIconOnTitleBar="True"
                  WindowStartupLocation="CenterScreen"
                  d:DataContext="{d:DesignInstance Type=designMock:DesignMockSettingsViewModel, IsDesignTimeCreatable=True}">
+    <mah:MetroWindow.Resources>
+        <ResourceDictionary>
+            <DataTemplate DataType="{x:Type settingsViewModels:TagSettingsItemViewModel}">
+                <controls:TagsSettingControl/>
+            </DataTemplate>
+        </ResourceDictionary>
+    </mah:MetroWindow.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -29,14 +38,29 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <ListBox Grid.Row="0" Grid.Column="0" Width="200"
-                 ItemsSource="{Binding Items}"></ListBox>
-        
-        <Separator Grid.Row="1"/>
+        <ListBox Grid.Row="0" Grid.Column="0" Width="200" Margin="0,6,0,0"
+                 BorderThickness="0,0,1,0"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 ItemsSource="{Binding Items}"
+                 SelectedItem="{Binding SelectedItem}">
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type settingsViewModels:ISettingsItemViewModel}">
+                    <TextBlock Text="{Binding DisplayName}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <ContentControl Grid.Row="0" Grid.Column="1" Margin="6,6,0,0"
+                        Content="{Binding SelectedItem}"/>
+
+        <Separator Grid.Row="1" Grid.ColumnSpan="2"/>
 
         <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="12">
-            <Button Content="OK" Width="100"/>
-            <Button Content="Cancel" Width="100" Margin="6,0,0,0"/>
+            <Button Content="OK" Width="100"
+                    Command="{Binding OkCommand}"
+                    IsDefault="True"/>
+            <Button Content="Cancel" Width="100" Margin="6,0,0,0"
+                    IsCancel="True"/>
         </StackPanel>
     </Grid>
 </mah:MetroWindow>

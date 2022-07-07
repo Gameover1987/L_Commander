@@ -1,4 +1,5 @@
 ﻿using L_Commander.App.Infrastructure;
+using L_Commander.UI.Commands;
 using L_Commander.UI.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,8 @@ namespace L_Commander.App.ViewModels.Settings
         public SettingsViewModel(ISettingsProvider settingProvider)
         {
             _settingProvider = settingProvider;
+
+            OkCommand = new DelegateCommand(x => { }, x => CanOkCommandHandler());
         }
 
         public ObservableCollection<ISettingsItemViewModel> Items { get; } = new ObservableCollection<ISettingsItemViewModel>();
@@ -50,9 +53,45 @@ namespace L_Commander.App.ViewModels.Settings
             }
         }
 
+        public IDelegateCommand OkCommand { get; }
+
         public void Initialize()
         {
             var settings = _settingProvider.Get();
+            settings.TagSettings = new TagSettings();
+            settings.TagSettings.Tags = new Tag[]
+                {
+                    new Tag()
+                    {
+                        Text = "Red",
+                        Color = 16711680
+                    },
+                    new Tag()
+                    {
+                        Text = "Orange",
+                        Color = 16753920
+                    },
+                    new Tag()
+                    {
+                        Text = "Green",
+                        Color = 32768
+                    },
+                    new Tag()
+                    {
+                        Text = "Light blue",
+                        Color = 11393254
+                    },
+                    new Tag()
+                    {
+                        Text = "Blue",
+                        Color = 255
+                    },
+                    new Tag()
+                    {
+                        Text = "Violet",
+                        Color = 15631086
+                    },
+                };
 
             Items.Clear();
             foreach (var item in GetSettingsItems(settings))
@@ -68,12 +107,17 @@ namespace L_Commander.App.ViewModels.Settings
 
         }
 
+        private bool CanOkCommandHandler()
+        {
+            return true;
+        }
+
         private static ISettingsItemViewModel[] GetSettingsItems(ClientSettings clientSettings)
         {
             return new ISettingsItemViewModel[]
             {
-                new TagSettingsItemViewModel(),
+                new TagSettingsItemViewModel(clientSettings.TagSettings),
             };
-        }
+        }        
     }
 }

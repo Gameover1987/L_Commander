@@ -1,0 +1,50 @@
+﻿<UserControl x:Class="L_Commander.App.Views.Controls.TagsSettingControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:L_Commander.App.Views.Controls"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:settingsViewModels="clr-namespace:L_Commander.App.ViewModels.Settings"                 
+             mc:Ignorable="d" 
+             xmlns:designMock="clr-namespace:L_Commander.App.Views.DesignMock"            
+             d:DesignHeight="450" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance Type={x:Type designMock:DesignMockTagSettingsItemViewModel}, IsDesignTimeCreatable=True}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <mah:ToggleSwitch Grid.Row="0" 
+                          OnContent="File system tags are enabled"
+                          OffContent="Enable file system tags"
+                          IsOn="{Binding IsEnabled}"/>
+        <ListBox Grid.Row="1" Margin="0,6,0,0"
+                 IsEnabled="{Binding IsEnabled}"
+                 ItemsSource="{Binding Tags}"
+                 SelectedItem="{Binding SelectedTag}"                 >
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type settingsViewModels:TagViewModel}">
+                    <Grid HorizontalAlignment="Left">
+                        <Border CornerRadius="5" Margin="5"
+                                Background="{Binding Color, Converter={StaticResource ColorToBrushConverter}, Mode=OneWay}">
+                            <TextBlock Text="{Binding Name}" Margin="3"
+                                       Foreground="{Binding Color, Converter={StaticResource ReadableColorConverter}}"/>
+                        </Border>                       
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,6,0,0">
+            <Button Content="Add tag" Width="100"
+                    Command="{Binding AddTagCommand}"/>
+            <Button Content="Edit tag" Width="100" Margin="6,0,0,0"
+                    Command="{Binding AddTagCommand}"/>
+            <Button Content="Delete tag" Width="100" Margin="6,0,0,0"
+                    Command="{Binding AddTagCommand}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
