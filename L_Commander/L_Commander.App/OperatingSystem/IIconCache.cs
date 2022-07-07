@@ -15,8 +15,6 @@ namespace L_Commander.App.OperatingSystem
     {
         private string[] _stopExtensions = new string[] {".exe"};
         private readonly Dictionary<string, ImageSource> _cache = new Dictionary<string, ImageSource>();
-        
-        
 
         public ImageSource GetByPath(string path)
         {

@@ -25,7 +25,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
         _clipBoardHelper = clipBoardHelper;
         _viewModelFactory = viewModelFactory;
         _operatingSystemProvider = operatingSystemProvider;
-        ChangeDriveCommand = new DelegateCommand(ChangeDriveCommandHandler, x => CanChangeDriveCommandHandler());
+        ChangeDriveCommand = new DelegateCommand(ChangeDriveCommandHandler, x => CanChangeDriveCommandHandler(x));
         NewTabCommand = new DelegateCommand(NewTabCommandHandler, CanNewTabCommandHandler);
         CloseTabCommand = new DelegateCommand(CloseTabCommandHandler, x => CanCloseTabCommandHandler(x));
         CloseAllButThisTabCommand = new DelegateCommand(CloseAllButThisTabCommandHandler, x => CanCloseAllButThisTabCommandHandler(x));
@@ -117,9 +117,10 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
         return fileManagerTabViewModel;
     }
 
-    private bool CanChangeDriveCommandHandler()
+    private bool CanChangeDriveCommandHandler(object obj)
     {
-        return true;
+        var drive = (DriveViewModel)obj;
+        return drive.IsReady;
     }
 
     private void ChangeDriveCommandHandler(object obj)
@@ -217,7 +218,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
         var targetIndex = Tabs.IndexOf(targetTab);
         if (targetIndex < 0)
             return;
-                
+
         Tabs[sourceIndex] = targetTab;
         Tabs[targetIndex] = sourceTab;
 

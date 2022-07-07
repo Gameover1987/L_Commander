@@ -17,11 +17,19 @@ public class DriveViewModel : ViewModelBase
     {
         get
         {
+            if (!_driveInfo.IsReady)
+                return _driveInfo.Name;
+
             if (_driveInfo.VolumeLabel.IsNullOrWhiteSpace())
                 return _driveInfo.Name;
 
             return $"{_driveInfo.Name} - {_driveInfo.VolumeLabel}";
         }
+    }
+
+    public bool IsReady
+    {
+        get { return _driveInfo.IsReady; }
     }
 
     public string RootPath

@@ -76,7 +76,6 @@ public sealed class CopyOperation : ICopyOperation
                         });
                         _fileSystemProvider.Delete(entries[i].FileOrFolder, entries[i].Path);
                     }
-
                 }
             }
             finally
