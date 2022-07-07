@@ -78,7 +78,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _folderView.SortDescriptions.Add(new SortDescription(nameof(IFileSystemEntryViewModel.FileOrFolder), ListSortDirection.Ascending));
         _folderView.SortDescriptions.Add(new SortDescription(nameof(IFileSystemEntryViewModel.Extension), ListSortDirection.Ascending));
         _folderView.SortDescriptions.Add(new SortDescription(nameof(IFileSystemEntryViewModel.Name), ListSortDirection.Ascending));
-    }    
+    }
 
     public string FullPath => _fullPath;
 
@@ -292,9 +292,17 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
                 return;
 
             IsBusy = true;
+            var exceptions = new List<Exception>();
             foreach (var entry in SelectedEntries)
             {
-                _fileSystemProvider.Delete(entry.FileOrFolder, entry.FullPath);
+                try
+                {
+                    _fileSystemProvider.Delete(entry.FileOrFolder, entry.FullPath);
+                }
+                catch (Exception exception)
+                {
+                    exceptions.Add(exception);
+                }
             }
             IsBusy = false;
         }
@@ -302,7 +310,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         {
             _exceptionHandler.HandleExceptionWithMessageBox(exception);
         }
-    }    
+    }
 
     private bool CanRefreshCommandHandler()
     {

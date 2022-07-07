@@ -15,8 +15,8 @@ public class UnitOfWork
 
         SourcePath = sourcePath;
 
-        var sourceWithoutRoot = sourcePath.Substring(sourceRoot.Length);
-        DestinationPath = Path.Combine(destinationDirectory, sourceWithoutRoot);
+        var sourceWithoutRoot = sourcePath.Substring(sourceRoot.Length + 1);
+        DestinationPath = destinationDirectory + "\\" + sourceWithoutRoot;
     }
 
     public string SourcePath { get; }

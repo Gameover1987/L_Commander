@@ -14,6 +14,7 @@ public sealed class CopyOperation : ICopyOperation
     private bool _isCancellationRequested;
 
     private readonly ConcurrentQueue<UnitOfWork> _worksQueue = new ConcurrentQueue<UnitOfWork>();
+    private readonly ConcurrentBag<Exception> _exceptions = new ConcurrentBag<Exception>();
     private int _initialCount;
     private int _entriesCount;
 
@@ -29,8 +30,7 @@ public sealed class CopyOperation : ICopyOperation
         _isCancellationRequested = false;
 
         var tasks = new List<Task>();
-        return Task.Run(async () =>
-        {
+        return Task.Run(() => {
             IsBusy = true;
             try
             {
@@ -82,6 +82,8 @@ public sealed class CopyOperation : ICopyOperation
             {
                 IsBusy = false;
             }
+
+            return Task.CompletedTask;
         });
     }
 
@@ -94,32 +96,40 @@ public sealed class CopyOperation : ICopyOperation
 
     private void ThreadMethod(bool isMoving)
     {
-        while (!_worksQueue.IsEmpty)
+        try
         {
-            _worksQueue.TryDequeue(out var work);
 
-            if (work == null)
-                return;
-
-            if (_isCancellationRequested)
-                return;
-
-            Progress?.Invoke(this, new CopyProgressEventArgs
+            while (!_worksQueue.IsEmpty)
             {
-                Copied = isMoving == true ?
-                    _initialCount - _entriesCount - _worksQueue.Count :
-                    _initialCount - _worksQueue.Count,
-                Total = _initialCount,
-                CurrentFileName = work.SourcePath
-            });
-            if (isMoving)
-            {
-                _fileSystemProvider.Move(work.SourcePath, work.DestinationPath);
+                _worksQueue.TryDequeue(out var work);
+
+                if (work == null)
+                    return;
+
+                if (_isCancellationRequested)
+                    return;
+
+                Progress?.Invoke(this, new CopyProgressEventArgs
+                {
+                    Copied = isMoving == true ?
+                        _initialCount - _entriesCount - _worksQueue.Count :
+                        _initialCount - _worksQueue.Count,
+                    Total = _initialCount,
+                    CurrentFileName = work.SourcePath
+                });
+                if (isMoving)
+                {
+                    _fileSystemProvider.Move(work.SourcePath, work.DestinationPath);
+                }
+                else
+                {
+                    _fileSystemProvider.Copy(work.SourcePath, work.DestinationPath);
+                }
             }
-            else
-            {
-                _fileSystemProvider.Copy(work.SourcePath, work.DestinationPath);
-            }
+        }
+        catch (Exception exception)
+        {
+            _exceptions.Add(exception);
         }
     }
 
