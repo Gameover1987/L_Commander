@@ -28,6 +28,15 @@
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type settingsViewModels:TagViewModel}">
                     <Grid HorizontalAlignment="Left">
+                        <Grid.Style>
+                            <Style TargetType="{x:Type Grid}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}, Path=DataContext.IsEnabled}" Value="False">
+                                        <Setter Property="Opacity" Value="0.6"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
                         <Border CornerRadius="5" Margin="5"
                                 Background="{Binding Color, Converter={StaticResource ColorToBrushConverter}, Mode=OneWay}">
                             <TextBlock Text="{Binding Name}" Margin="3"

@@ -1,4 +1,5 @@
 ﻿using L_Commander.App.Infrastructure;
+using L_Commander.Common.Extensions;
 using L_Commander.UI.Commands;
 using L_Commander.UI.ViewModels;
 using System;
@@ -7,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace L_Commander.App.ViewModels.Settings
 {
@@ -70,6 +72,11 @@ namespace L_Commander.App.ViewModels.Settings
                     {
                         Text = "Orange",
                         Color = 16753920
+                    },
+                    new Tag()
+                    {
+                        Text = "Yellow",
+                        Color = Colors.Yellow.ToInt()
                     },
                     new Tag()
                     {
