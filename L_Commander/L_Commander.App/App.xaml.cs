@@ -92,6 +92,7 @@ namespace L_Commander.App
                 .AddSingleton<IFileSystemProvider, FileSystemProvider>()
                 .AddTransient<IFolderWatcher, FolderWatcher>()
                 .AddTransient<ICopyOperation, CopyOperation>()
+                .AddTransient<IMoveOperation, MoveOperation>()
 
                 // ViewModels
                 .AddTransient<IViewModelFactory, ViewModelFactory>()

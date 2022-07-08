@@ -3,7 +3,16 @@ using System.Threading.Tasks;
 
 namespace L_Commander.App.OperatingSystem.Operations
 {
-    public class CopyProgressEventArgs : EventArgs
+    public interface ICopyOperationEventArgs : IOperationEventArgs
+    {
+        public long Copied { get; set; }
+
+        public long Total { get; set; }
+
+        public string CurrentFileName { get; set; }
+    }
+
+    public class CopyProgressEventArgs : EventArgs, ICopyOperationEventArgs
     {
         public long Copied { get; set; }
 
@@ -13,14 +22,17 @@ namespace L_Commander.App.OperatingSystem.Operations
 
     }
 
-    public interface ICopyOperation
+    public class MoveProgressEventArgs : EventArgs, ICopyOperationEventArgs
     {
-        bool IsBusy { get; }
+        public long Copied { get; set; }
 
-        Task Execute(FileSystemEntryDescriptor[] entries, string destDirectory, bool cleanupSourceEntries = false);
+        public long Total { get; set; }
 
-        void Cancel();
+        public string CurrentFileName { get; set; }
+    }
 
-        event EventHandler<CopyProgressEventArgs> Progress;
+    public interface ICopyOperation : IFileSystemOperation<CopyProgressEventArgs>
+    {
+        void Initialize(FileSystemEntryDescriptor[] entries, string destDirectory);
     }
 }

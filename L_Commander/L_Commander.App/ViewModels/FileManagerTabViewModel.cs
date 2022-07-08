@@ -9,6 +9,7 @@ using System.Windows.Data;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.ViewModels.Filtering;
+using L_Commander.Common;
 using L_Commander.Common.Extensions;
 using L_Commander.UI.Commands;
 using L_Commander.UI.Infrastructure;
@@ -308,12 +309,14 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
                 try
                 {
                     _fileSystemProvider.Delete(entry.FileOrFolder, entry.FullPath);
+                    FileSystemEntries.Remove(entry);
                 }
                 catch (Exception exception)
                 {
                     exceptions.Add(exception);
                 }
             }
+
             IsBusy = false;
         }
         catch (Exception exception)
@@ -379,8 +382,6 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _folderView.Refresh();
     }
 
-    private int _count;
-
     private void FolderWatcherOnChanged(object sender, FileChangedEventArgs e)
     {
         ExecuteInUIThread(() =>
@@ -399,8 +400,6 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
                     case FileChnageType.Delete:
                         var deletedEntry = FileSystemEntries.FirstOrDefault(x => x.FullPath == e.CurrentPath);
-                        _count++;
-                        Debug.WriteLine($"{_count} - {deletedEntry.FullPath}");
                         if (deletedEntry != null)
                         {
                             FileSystemEntries.Remove(deletedEntry);

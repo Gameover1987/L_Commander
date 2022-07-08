@@ -16,6 +16,7 @@ namespace L_Commander.App.ViewModels
         private readonly IFileManagerViewModel _leftFileManager;
         private readonly IFileManagerViewModel _rightFileManager;
         private readonly ICopyOperation _copyOperation;
+        private readonly IMoveOperation _moveOperation;
         private readonly IWindowManager _windowManager;
         private readonly IExceptionHandler _exceptionHandler;
         private readonly ISettingsViewModel _settingsViewModel;
@@ -27,6 +28,7 @@ namespace L_Commander.App.ViewModels
             IFileManagerViewModel leftFileManager,
             IFileManagerViewModel rightFileManager,
             ICopyOperation copyOperation,
+            IMoveOperation moveOperation,
             IWindowManager windowManager,
             IExceptionHandler exceptionHandler,
             ISettingsViewModel settingsViewModel)
@@ -35,7 +37,9 @@ namespace L_Commander.App.ViewModels
             _leftFileManager = leftFileManager;
             _rightFileManager = rightFileManager;
             _copyOperation = copyOperation;
-            _copyOperation.Progress += CopyOperationOnProgress;
+            _moveOperation = moveOperation;
+            _moveOperation.Progress += CopyMoveOperationOnProgress;
+            _copyOperation.Progress += CopyMoveOperationOnProgress;
             _windowManager = windowManager;
             _exceptionHandler = exceptionHandler;
             _settingsViewModel = settingsViewModel;
@@ -142,7 +146,7 @@ namespace L_Commander.App.ViewModels
             if (AnotherFileManager?.SelectedTab == null)
                 return false;
 
-            return !_copyOperation.IsBusy;
+            return !_copyOperation.IsStarted;
         }
 
         private async void CopyCommandHandler()
@@ -161,7 +165,8 @@ namespace L_Commander.App.ViewModels
                 _progressDialogController = await _windowManager.ShowProgressDialog($"Copying files to \r\n'{AnotherFileManager.SelectedTab.FullPath}'", "Wait for copy...");
                 _progressDialogController.Canceled += ProgressDialogControllerOnCanceled;
 
-                await _copyOperation.Execute(sourceEntries, AnotherFileManager.SelectedTab.FullPath);
+                _copyOperation.Initialize(sourceEntries, AnotherFileManager.SelectedTab.FullPath);
+                await _copyOperation.Execute();
 
                 await _progressDialogController.CloseAsync();
             }
@@ -183,7 +188,7 @@ namespace L_Commander.App.ViewModels
             if (AnotherFileManager?.SelectedTab == null)
                 return false;
 
-            return !_copyOperation.IsBusy;
+            return !_copyOperation.IsStarted;
         }
 
         private async void MoveCommandHandler()
@@ -203,7 +208,8 @@ namespace L_Commander.App.ViewModels
                 _progressDialogController = await _windowManager.ShowProgressDialog($"Moving files to \r\n'{AnotherFileManager.SelectedTab.FullPath}'", "Wait for move...");
                 _progressDialogController.Canceled += ProgressDialogControllerOnCanceled;
 
-                await _copyOperation.Execute(sourceEntries, AnotherFileManager.SelectedTab.FullPath, cleanupSourceEntries: true);
+                _moveOperation.Initialize(sourceEntries, AnotherFileManager.SelectedTab.FullPath);
+                await _moveOperation.Execute();
 
                 await _progressDialogController.CloseAsync();
             }
@@ -223,7 +229,7 @@ namespace L_Commander.App.ViewModels
             _copyOperation.Cancel();
         }
 
-        private void CopyOperationOnProgress(object sender, CopyProgressEventArgs e)
+        private void CopyMoveOperationOnProgress(object sender, CopyProgressEventArgs e)
         {
             ExecuteInUIThread(() =>
             {

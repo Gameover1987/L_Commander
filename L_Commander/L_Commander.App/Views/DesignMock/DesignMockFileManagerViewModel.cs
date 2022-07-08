@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
-using L_Commander.App.OperatingSystem.Operations;
 using L_Commander.App.ViewModels;
 using L_Commander.App.ViewModels.Factories;
 using L_Commander.App.ViewModels.Filtering;
@@ -40,23 +39,6 @@ internal sealed class DesignMockWindowManager : IWindowManager
     {
         throw new NotImplementedException();
     }
-}
-
-internal sealed class DesignMockCopyOperation : ICopyOperation
-{
-    public bool IsBusy { get; }
-
-    public Task Execute(FileSystemEntryDescriptor[] entries, string destDirectory, bool cleanupSourceFiles = false)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Cancel()
-    {
-        throw new NotImplementedException();
-    }   
-
-    public event EventHandler<CopyProgressEventArgs> Progress;
 }
 
 internal sealed class DesignMockFileManagerTabViewModel : FileManagerTabViewModel

@@ -36,7 +36,14 @@ namespace L_Commander.App.Views.DesignMock
     internal sealed class DesignMockMainViewModel : MainViewModel
     {
         public DesignMockMainViewModel()
-            : base(new DesignMockSettingsProvider(), new DesignMockFileManagerViewModel(), new DesignMockFileManagerViewModel(), new DesignMockCopyOperation(), new DesignMockWindowManager(), new DesignMockExceptionHandler(), new DesignMockSettingsViewModel())
+            : base(new DesignMockSettingsProvider(), 
+                  new DesignMockFileManagerViewModel(), 
+                  new DesignMockFileManagerViewModel(), 
+                  new DesignMockCopyOperation(), 
+                  new DesignMockMoveOperation(), 
+                  new DesignMockWindowManager(),
+                  new DesignMockExceptionHandler(), 
+                  new DesignMockSettingsViewModel())
         {
         }
     }

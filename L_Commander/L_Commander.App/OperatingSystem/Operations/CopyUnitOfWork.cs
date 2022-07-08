@@ -3,16 +3,15 @@ using System.IO;
 
 namespace L_Commander.App.OperatingSystem.Operations;
 
-public class UnitOfWork
+public interface ICopyUnitOfWork : IUnitOfWork
 {
-    private readonly string _sourceRoot;
-    private readonly string _destinationDirectory;
+    string SourcePath { get; }
+}
 
-    public UnitOfWork(string sourceRoot, string sourcePath, string destinationDirectory)
+public class CopyUnitOfWork : ICopyUnitOfWork
+{
+    public CopyUnitOfWork(string sourceRoot, string sourcePath, string destinationDirectory)
     {
-        _sourceRoot = sourceRoot;
-        _destinationDirectory = destinationDirectory;
-
         SourcePath = sourcePath;
 
         var sourceWithoutRoot = sourcePath.Substring(sourceRoot.Length + 1);
