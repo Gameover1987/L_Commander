@@ -287,7 +287,17 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
             if (SelectedEntries.Length > 1)
                 titleMsg = $"Delete selected items ({SelectedEntries.Length})?";
 
-            var dialogResult = await _windowManager.ShowQuestion(titleMsg, string.Join(Environment.NewLine, SelectedEntries.Select(x => x.FullPath).OrderBy(x => x)));
+            var message = string.Join(Environment.NewLine, SelectedEntries.Select(x => x.FullPath).Take(100).OrderBy(x => x));
+            if (SelectedEntries.Length > 50)
+            {
+                var stringList = SelectedEntries.Select(x => x.FullPath).Take(50).OrderBy(x => x).ToList();
+                stringList.Add("...");
+                stringList.Add("And other file system entries?");
+
+                message = string.Join(Environment.NewLine, stringList);
+            }
+
+            var dialogResult = await _windowManager.ShowQuestion(titleMsg, message);
             if (dialogResult != MessageDialogResult.Affirmative)
                 return;
 
@@ -369,6 +379,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _folderView.Refresh();
     }
 
+    private int _count;
+
     private void FolderWatcherOnChanged(object sender, FileChangedEventArgs e)
     {
         ExecuteInUIThread(() =>
@@ -387,6 +399,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
                     case FileChnageType.Delete:
                         var deletedEntry = FileSystemEntries.FirstOrDefault(x => x.FullPath == e.CurrentPath);
+                        _count++;
+                        Debug.WriteLine($"{_count} - {deletedEntry.FullPath}");
                         if (deletedEntry != null)
                         {
                             FileSystemEntries.Remove(deletedEntry);

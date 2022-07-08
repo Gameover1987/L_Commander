@@ -38,7 +38,7 @@ namespace L_Commander.App.ViewModels
             _copyOperation.Progress += CopyOperationOnProgress;
             _windowManager = windowManager;
             _exceptionHandler = exceptionHandler;
-            this._settingsViewModel = settingsViewModel;
+            _settingsViewModel = settingsViewModel;
             ActiveFileManager = LeftFileManager;
 
             RenameCommand = new DelegateCommand(RenameCommandHandler, CanRenameCommandHandler);
