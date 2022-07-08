@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace L_Commander.App.OperatingSystem.Operations
 {
-    public interface IMoveOperation : IFileSystemOperation<CopyProgressEventArgs>
+    public interface IMoveOperation : IFileSystemOperation<OperationProgressEventArgs>
     {
         void Initialize(FileSystemEntryDescriptor[] entries, string destDirectory);
     }
 
-    public sealed class MoveOperation : OperationBase<CopyUnitOfWork, CopyProgressEventArgs>, IMoveOperation
+    public sealed class MoveOperation : OperationBase<CopyUnitOfWork>, IMoveOperation
     {
         private readonly IFileSystemProvider _fileSystemProvider;
 
@@ -33,7 +33,7 @@ namespace L_Commander.App.OperatingSystem.Operations
             _isCancellationRequested = false;
         }
 
-        public event EventHandler<CopyProgressEventArgs> Progress;
+        public event EventHandler<OperationProgressEventArgs> Progress;
 
         protected override void PrepareWorksQueue()
         {
@@ -49,17 +49,17 @@ namespace L_Commander.App.OperatingSystem.Operations
 
             foreach (var work in works)
             {
-                _works.Enqueue(work);
+                _worksQueue.Enqueue(work);
             }
 
-            _initialCount = _works.Count + _entries.Length;
+            _initialCount = _worksQueue.Count + _entries.Length;
         }
 
         protected override void ThreadMethod()
         {
-            while (!_works.IsEmpty)
+            while (!_worksQueue.IsEmpty)
             {
-                _works.TryDequeue(out var work);
+                _worksQueue.TryDequeue(out var work);
 
                 if (work == null)
                     return;
@@ -67,11 +67,11 @@ namespace L_Commander.App.OperatingSystem.Operations
                 if (_isCancellationRequested)
                     return;
 
-                Progress?.Invoke(this, new CopyProgressEventArgs
+                Progress?.Invoke(this, new OperationProgressEventArgs
                 {
-                    Copied = _initialCount - _entries.Length - _works.Count,
+                    Processed = _initialCount - _entries.Length - _worksQueue.Count,
                     Total = _initialCount,
-                    CurrentFileName = work.SourcePath
+                    CurrentItemName = work.SourcePath
                 });
 
                 _fileSystemProvider.Move(work.SourcePath, work.DestinationPath);
@@ -82,11 +82,11 @@ namespace L_Commander.App.OperatingSystem.Operations
         {
             for (int i = 0; i < _entries.Length; i++)
             {
-                Progress?.Invoke(this, new CopyProgressEventArgs
+                Progress?.Invoke(this, new OperationProgressEventArgs
                 {
-                    Copied = _initialCount - (_entries.Length - i),
+                    Processed = _initialCount - (_entries.Length - i),
                     Total = _initialCount,
-                    CurrentFileName = _entries[i].Path
+                    CurrentItemName = _entries[i].Path
                 });
                 _fileSystemProvider.Delete(_entries[i].FileOrFolder, _entries[i].Path);
             }
@@ -111,5 +111,5 @@ namespace L_Commander.App.OperatingSystem.Operations
 
             return units.ToArray();
         }
-    }
+    }  
 }

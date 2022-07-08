@@ -7,12 +7,11 @@ using L_Commander.Common.Extensions;
 
 namespace L_Commander.App.OperatingSystem.Operations;
 
-public sealed class CopyOperation : OperationBase<CopyUnitOfWork, CopyProgressEventArgs>, ICopyOperation
+public sealed class CopyOperation : OperationBase<CopyUnitOfWork>, ICopyOperation
 {
     private readonly IFileSystemProvider _fileSystemProvider;    
 
-    private int _initialCount;
-    private int _entriesCount;
+    private int _initialCount;    
 
     private FileSystemEntryDescriptor[] _entries;
     private string _destDirectory;
@@ -30,7 +29,7 @@ public sealed class CopyOperation : OperationBase<CopyUnitOfWork, CopyProgressEv
         _isCancellationRequested = false;
     }
 
-    public event EventHandler<CopyProgressEventArgs> Progress;
+    public event EventHandler<OperationProgressEventArgs> Progress;
 
     protected override void PrepareWorksQueue()
     {
@@ -46,17 +45,17 @@ public sealed class CopyOperation : OperationBase<CopyUnitOfWork, CopyProgressEv
 
         foreach (var work in works)
         {
-            _works.Enqueue(work);
+            _worksQueue.Enqueue(work);
         }
 
-        _initialCount = _works.Count;
+        _initialCount = _worksQueue.Count;
     }
 
     protected override void ThreadMethod()
     {
-        while (!_works.IsEmpty)
+        while (!_worksQueue.IsEmpty)
         {
-            _works.TryDequeue(out var work);
+            _worksQueue.TryDequeue(out var work);
 
             if (work == null)
                 return;
@@ -72,11 +71,11 @@ public sealed class CopyOperation : OperationBase<CopyUnitOfWork, CopyProgressEv
 
     private void NotifyProgress(ICopyUnitOfWork work)
     {
-        Progress?.Invoke(this, new CopyProgressEventArgs
+        Progress?.Invoke(this, new OperationProgressEventArgs
         {
-            Copied = _initialCount - _works.Count,
+            Processed = _initialCount - _worksQueue.Count,
             Total = _initialCount,
-            CurrentFileName = work.SourcePath
+            CurrentItemName = work.SourcePath
         });
     }
 

@@ -93,6 +93,7 @@ namespace L_Commander.App
                 .AddTransient<IFolderWatcher, FolderWatcher>()
                 .AddTransient<ICopyOperation, CopyOperation>()
                 .AddTransient<IMoveOperation, MoveOperation>()
+                .AddTransient<IDeleteOperation, DeleteOperation>()
 
                 // ViewModels
                 .AddTransient<IViewModelFactory, ViewModelFactory>()

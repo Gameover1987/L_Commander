@@ -20,8 +20,7 @@ public interface IFileManagerTabViewModel
 
     IDelegateCommand RenameCommand { get; }
     IDelegateCommand OpenCommand { get; }
-    IDelegateCommand MakeDirCommand { get; }
-    IDelegateCommand DeleteCommand { get; }
+    IDelegateCommand MakeDirCommand { get; }    
 
     void Initialize(string rootPath);
 }

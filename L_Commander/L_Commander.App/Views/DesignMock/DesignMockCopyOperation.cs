@@ -9,7 +9,7 @@ internal sealed class DesignMockCopyOperation : ICopyOperation
 {
     public bool IsStarted => throw new NotImplementedException();
 
-    public event EventHandler<CopyProgressEventArgs> Progress;
+    public event EventHandler<OperationProgressEventArgs> Progress;
 
     public void Cancel()
     {
@@ -31,7 +31,7 @@ internal sealed class DesignMockMoveOperation : IMoveOperation
 {
     public bool IsStarted => throw new NotImplementedException();
 
-    public event EventHandler<CopyProgressEventArgs> Progress;
+    public event EventHandler<OperationProgressEventArgs> Progress;
 
     public void Cancel()
     {
@@ -44,6 +44,28 @@ internal sealed class DesignMockMoveOperation : IMoveOperation
     }
 
     public void Initialize(FileSystemEntryDescriptor[] entries, string destDirectory)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+internal sealed class DesignMockDeleteOperation : IDeleteOperation
+{
+    public bool IsStarted => throw new NotImplementedException();
+
+    public event EventHandler<OperationProgressEventArgs> Progress;
+
+    public void Cancel()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Execute()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Initialize(FileSystemEntryDescriptor[] entries)
     {
         throw new NotImplementedException();
     }

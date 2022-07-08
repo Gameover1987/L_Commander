@@ -10,11 +10,6 @@ public interface IUnitOfWork
 
 }
 
-public interface IOperationEventArgs
-{
-
-}
-
 public interface IFileSystemOperation<TArgs>
 {
     bool IsStarted { get; }
@@ -26,11 +21,10 @@ public interface IFileSystemOperation<TArgs>
     void Cancel();
 }
 
-public abstract class OperationBase<TUnit, TArgs> : IFileSystemOperation<TArgs>
-    where TUnit : class, IUnitOfWork 
-    where TArgs : IOperationEventArgs
+public abstract class OperationBase<TUnit> : IFileSystemOperation<OperationProgressEventArgs>
+    where TUnit : class, IUnitOfWork     
 {
-    protected readonly ConcurrentQueue<TUnit> _works = new ConcurrentQueue<TUnit>();
+    protected readonly ConcurrentQueue<TUnit> _worksQueue = new ConcurrentQueue<TUnit>();
     protected readonly ConcurrentBag<Exception> _errors = new ConcurrentBag<Exception>();
 
     protected bool _isCancellationRequested;
@@ -38,7 +32,7 @@ public abstract class OperationBase<TUnit, TArgs> : IFileSystemOperation<TArgs>
 
     public bool IsStarted { get; protected set; }
 
-    public event EventHandler<TArgs> Progress;
+    public event EventHandler<OperationProgressEventArgs> Progress;
 
     public Task Execute()
     {

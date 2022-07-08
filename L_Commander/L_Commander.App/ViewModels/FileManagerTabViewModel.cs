@@ -64,8 +64,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
         RenameCommand = new DelegateCommand(RenameCommandHandler, CanRenameCommandHandler);
         OpenCommand = new DelegateCommand(OpenCommandHandler, CanOpenCommandHandler);
-        MakeDirCommand = new DelegateCommand(MakeDirCommandHandler, CanMakeDirCommandHandler);
-        DeleteCommand = new DelegateCommand(DeleteCommandHandler, CanDeleteCommandHandler);
+        MakeDirCommand = new DelegateCommand(MakeDirCommandHandler, CanMakeDirCommandHandler);        
 
         RefreshCommand = new DelegateCommand(RefreshCommandHandler, CanRefreshCommandHandler);
         BackCommand = new DelegateCommand(BackCommandHandler, CanBackCommandHandler);
@@ -144,8 +143,6 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     public IDelegateCommand OpenCommand { get; }
 
     public IDelegateCommand MakeDirCommand { get; }
-
-    public IDelegateCommand DeleteCommand { get; }
 
     public IDelegateCommand RefreshCommand { get; }
 
@@ -273,57 +270,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         {
             _exceptionHandler.HandleExceptionWithMessageBox(exception);
         }
-    }
-
-    private bool CanDeleteCommandHandler()
-    {
-        return SelectedFileSystemEntry != null;
-    }
-
-    private async void DeleteCommandHandler()
-    {
-        try
-        {
-            var titleMsg = SelectedFileSystemEntry.IsFile ? "Delete file?" : "Delete folder?";
-            if (SelectedEntries.Length > 1)
-                titleMsg = $"Delete selected items ({SelectedEntries.Length})?";
-
-            var message = string.Join(Environment.NewLine, SelectedEntries.Select(x => x.FullPath).Take(100).OrderBy(x => x));
-            if (SelectedEntries.Length > 50)
-            {
-                var stringList = SelectedEntries.Select(x => x.FullPath).Take(50).OrderBy(x => x).ToList();
-                stringList.Add("...");
-                stringList.Add("And other file system entries?");
-
-                message = string.Join(Environment.NewLine, stringList);
-            }
-
-            var dialogResult = await _windowManager.ShowQuestion(titleMsg, message);
-            if (dialogResult != MessageDialogResult.Affirmative)
-                return;
-
-            IsBusy = true;
-            var exceptions = new List<Exception>();
-            foreach (var entry in SelectedEntries)
-            {
-                try
-                {
-                    _fileSystemProvider.Delete(entry.FileOrFolder, entry.FullPath);
-                    FileSystemEntries.Remove(entry);
-                }
-                catch (Exception exception)
-                {
-                    exceptions.Add(exception);
-                }
-            }
-
-            IsBusy = false;
-        }
-        catch (Exception exception)
-        {
-            _exceptionHandler.HandleExceptionWithMessageBox(exception);
-        }
-    }
+    }    
 
     private bool CanRefreshCommandHandler()
     {

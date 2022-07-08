@@ -17,6 +17,7 @@ namespace L_Commander.App.ViewModels
         private readonly IFileManagerViewModel _rightFileManager;
         private readonly ICopyOperation _copyOperation;
         private readonly IMoveOperation _moveOperation;
+        private readonly IDeleteOperation _deleteOperation;
         private readonly IWindowManager _windowManager;
         private readonly IExceptionHandler _exceptionHandler;
         private readonly ISettingsViewModel _settingsViewModel;
@@ -29,6 +30,7 @@ namespace L_Commander.App.ViewModels
             IFileManagerViewModel rightFileManager,
             ICopyOperation copyOperation,
             IMoveOperation moveOperation,
+            IDeleteOperation deleteOperation,
             IWindowManager windowManager,
             IExceptionHandler exceptionHandler,
             ISettingsViewModel settingsViewModel)
@@ -38,6 +40,8 @@ namespace L_Commander.App.ViewModels
             _rightFileManager = rightFileManager;
             _copyOperation = copyOperation;
             _moveOperation = moveOperation;
+            _deleteOperation = deleteOperation;
+            _deleteOperation.Progress += CopyMoveOperationOnProgress;
             _moveOperation.Progress += CopyMoveOperationOnProgress;
             _copyOperation.Progress += CopyMoveOperationOnProgress;
             _windowManager = windowManager;
@@ -82,9 +86,9 @@ namespace L_Commander.App.ViewModels
 
         public IDelegateCommand MoveCommand { get; }
 
-        public IDelegateCommand MakeDirCommand { get; set; }
-
         public IDelegateCommand DeleteCommand { get; }
+
+        public IDelegateCommand MakeDirCommand { get; set; }        
 
         public IDelegateCommand ShowSettingsCommand { get; }
 
@@ -195,7 +199,6 @@ namespace L_Commander.App.ViewModels
         {
             try
             {
-
                 var sourceEntries = ActiveFileManager?.SelectedTab.SelectedEntries
                    .Select(x => x.GetDescriptor())
                    .ToArray();
@@ -229,7 +232,7 @@ namespace L_Commander.App.ViewModels
             _copyOperation.Cancel();
         }
 
-        private void CopyMoveOperationOnProgress(object sender, CopyProgressEventArgs e)
+        private void CopyMoveOperationOnProgress(object sender, OperationProgressEventArgs e)
         {
             ExecuteInUIThread(() =>
             {
@@ -237,8 +240,8 @@ namespace L_Commander.App.ViewModels
                     return;
 
                 _progressDialogController.Maximum = e.Total;
-                _progressDialogController.SetMessage(e.CurrentFileName);
-                _progressDialogController.SetProgress(e.Copied);
+                _progressDialogController.SetMessage(e.CurrentItemName);
+                _progressDialogController.SetProgress(e.Processed);
             });
         }
 
@@ -254,12 +257,49 @@ namespace L_Commander.App.ViewModels
 
         private bool CanDeleteCommandHandler()
         {
-            return ActiveFileManager?.SelectedTab?.DeleteCommand.CanExecute() == true;
+            return ActiveFileManager?.SelectedTab?.SelectedEntries.Any() == true;
         }
 
-        private void DeleteCommandHandler()
+        private async void DeleteCommandHandler()
         {
-            ActiveFileManager?.SelectedTab?.DeleteCommand.TryExecute();
+            try
+            {
+                var selectedEntries = ActiveFileManager.SelectedTab.SelectedEntries.ToArray();
+                var titleMsg = $"Delete operation ({selectedEntries.Length}) items";
+
+                var message = string.Join(Environment.NewLine, selectedEntries.Select(x => x.FullPath).Take(100).OrderBy(x => x));
+                if (selectedEntries.Length > 50)
+                {
+                    var stringList = selectedEntries.Select(x => x.FullPath).Take(50).OrderBy(x => x).ToList();
+                    stringList.Add("...");
+                    stringList.Add("And other file system entries?");
+
+                    message = string.Join(Environment.NewLine, stringList);
+                }
+
+                var dialogResult = await _windowManager.ShowQuestion(titleMsg, message);
+                if (dialogResult != MessageDialogResult.Affirmative)
+                    return;
+
+                _progressDialogController = await _windowManager.ShowProgressDialog($"Deleting", "Wait for delete...");
+                _progressDialogController.Canceled += ProgressDialogControllerOnCanceled;
+
+                _deleteOperation.Initialize(selectedEntries.Select(x => x.GetDescriptor()).ToArray());
+                await _deleteOperation.Execute();
+
+                ActiveFileManager.SelectedTab.Initialize(ActiveFileManager.SelectedTab.FullPath);
+
+                await _progressDialogController.CloseAsync();
+            }
+            catch (Exception exception)
+            {
+                _exceptionHandler.HandleExceptionWithMessageBox(exception);
+            }
+            finally
+            {
+                if (_progressDialogController != null)
+                    _progressDialogController.Canceled -= ProgressDialogControllerOnCanceled;
+            }
         }
 
         private void ShowSettingsCommandHandler()

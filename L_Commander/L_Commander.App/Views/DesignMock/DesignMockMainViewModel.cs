@@ -41,6 +41,7 @@ namespace L_Commander.App.Views.DesignMock
                   new DesignMockFileManagerViewModel(), 
                   new DesignMockCopyOperation(), 
                   new DesignMockMoveOperation(), 
+                  new DesignMockDeleteOperation(),
                   new DesignMockWindowManager(),
                   new DesignMockExceptionHandler(), 
                   new DesignMockSettingsViewModel())
