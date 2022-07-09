@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.AccessControl;
+using System.Threading.Tasks;
 
 namespace L_Commander.App.OperatingSystem;
 
@@ -138,6 +140,13 @@ public sealed class FileSystemProvider : IFileSystemProvider
     public string CombinePaths(params string[] paths)
     {
         return Path.Combine(paths);
+    }
+
+    public long CalculateFolderSize(string folderPath)
+    {
+        var dirInfo = new DirectoryInfo(folderPath);
+        long dirSize = dirInfo.EnumerateFiles("*", SearchOption.AllDirectories).Sum(file => file.Length);
+        return dirSize;
     }
 
     public bool IsFileExists(string filePath)

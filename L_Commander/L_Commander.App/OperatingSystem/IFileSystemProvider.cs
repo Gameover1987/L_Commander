@@ -35,6 +35,8 @@ namespace L_Commander.App.OperatingSystem
 
         bool IsFileExists(string file);
 
-        string CombinePaths(params string[] paths);        
+        string CombinePaths(params string[] paths);
+
+        long CalculateFolderSize(string folderPath);
     }
 }

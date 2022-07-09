@@ -30,6 +30,8 @@ public interface IFileSystemEntryViewModel
 
     void Initialize();
 
+    void CalculateFolderSize();
+
     void Rename(string newPath);
 
     FileSystemEntryDescriptor GetDescriptor();

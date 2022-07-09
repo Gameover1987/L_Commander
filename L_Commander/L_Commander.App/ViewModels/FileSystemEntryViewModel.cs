@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Globalization;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
 using L_Commander.Common.Extensions;
 using L_Commander.UI.ViewModels;
@@ -12,12 +15,16 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
 {
     private string _fullPath;
     private readonly IFileSystemProvider _fileSystemProvider;
+    private readonly IExceptionHandler _exceptionHandler;
     private FileSystemEntryDescriptor _descriptor;
+    private bool _isBusy;
+    private long _totalSize;
 
-    public FileSystemEntryViewModel(string fullPath, IFileSystemProvider fileSystemProvider)
+    public FileSystemEntryViewModel(string fullPath, IFileSystemProvider fileSystemProvider, IExceptionHandler exceptionHandler)
     {
         _fullPath = fullPath;
         _fileSystemProvider = fileSystemProvider;
+        _exceptionHandler = exceptionHandler;
     }
 
     public ImageSource Icon { get; private set; }
@@ -25,6 +32,18 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
     public string FullPath => _fullPath;
 
     public string Name { get; private set; }
+
+    public bool IsBusy
+    {
+        get { return _isBusy; }
+        set
+        {
+            if (_isBusy == value)
+                return;
+            _isBusy = value;
+            OnPropertyChanged(() => IsBusy);
+        }
+    }
 
     public bool IsFile => FileOrFolder == FileOrFolder.File;
 
@@ -38,13 +57,47 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
 
     public string Extension { get; private set; }
 
-    public long TotalSize { get; private set; }
+    public long TotalSize
+    {
+        get { return _totalSize; }
+        private set
+        {
+            if (_totalSize == value)
+                return;
+            _totalSize = value;
+            OnPropertyChanged(() => TotalSize);
+        }
+    }
 
     public DateTime Created { get; private set; }
 
     public void Initialize()
     {
         InitializeImpl();
+    }
+
+    public async void CalculateFolderSize()
+    {
+        if (IsFile)
+            return;
+
+        try
+        {
+            IsBusy = true;
+            TotalSize = await Task.Run(() =>
+            {
+                Thread.Sleep(1000);
+                return _fileSystemProvider.CalculateFolderSize(FullPath);
+            });
+        }
+        catch (Exception exception)
+        {
+            _exceptionHandler.HandleExceptionWithMessageBox(exception);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     public FileSystemEntryDescriptor GetDescriptor()
@@ -66,6 +119,10 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
             TotalSize = _descriptor.TotalSize;
 
             Icon = _descriptor.Icon;
+        }
+        else
+        {
+            TotalSize = -1;
         }
 
         IsHidden = _descriptor.IsHidden;

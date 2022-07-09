@@ -13,8 +13,11 @@ namespace L_Commander.App.Views.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             long totalSize = (long)value;
-            if (totalSize == 0)
+            if (totalSize == -1)
                 return string.Empty;
+
+            if (totalSize == 0)
+                return totalSize.ToString();
 
             var numberFormatInfo = new NumberFormatInfo { NumberGroupSeparator = " " };
             var totalSizeStr = String.Format(numberFormatInfo, "{0:#,#}", totalSize);

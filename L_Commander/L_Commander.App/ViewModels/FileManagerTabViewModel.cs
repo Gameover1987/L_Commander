@@ -65,7 +65,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
         RenameCommand = new DelegateCommand(RenameCommandHandler, CanRenameCommandHandler);
         OpenCommand = new DelegateCommand(OpenCommandHandler, CanOpenCommandHandler);
-        MakeDirCommand = new DelegateCommand(MakeDirCommandHandler, CanMakeDirCommandHandler);        
+        MakeDirCommand = new DelegateCommand(MakeDirCommandHandler, CanMakeDirCommandHandler);
+        CalculateFolderSizeCommand = new DelegateCommand(CalculateFolderSizeCommandHandler, CanCalculateFolderSizeCommandHandler);
 
         RefreshCommand = new DelegateCommand(RefreshCommandHandler, CanRefreshCommandHandler);
         BackCommand = new DelegateCommand(BackCommandHandler, CanBackCommandHandler);
@@ -145,6 +146,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     public IDelegateCommand MakeDirCommand { get; }
 
+    public IDelegateCommand CalculateFolderSizeCommand { get; }
+
     public IDelegateCommand RefreshCommand { get; }
 
     public IDelegateCommand BackCommand { get; }
@@ -202,7 +205,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     protected virtual IFileSystemEntryViewModel CreateFileSystemEntryViewModel(string path)
     {
-        return new FileSystemEntryViewModel(path, _fileSystemProvider);
+        return new FileSystemEntryViewModel(path, _fileSystemProvider, _exceptionHandler);
     }
 
     private bool CanRenameCommandHandler()
@@ -271,7 +274,23 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         {
             _exceptionHandler.HandleExceptionWithMessageBox(exception);
         }
-    }    
+    }
+
+    private bool CanCalculateFolderSizeCommandHandler()
+    {
+        if (IsBusy)
+            return false;
+
+        return SelectedEntries.Any(x => x.FileOrFolder == FileOrFolder.Folder);
+    }
+
+    private void CalculateFolderSizeCommandHandler()
+    {
+        foreach (var selectedEntry in SelectedEntries)
+        {
+            selectedEntry.CalculateFolderSize();
+        }
+    }
 
     private bool CanRefreshCommandHandler()
     {

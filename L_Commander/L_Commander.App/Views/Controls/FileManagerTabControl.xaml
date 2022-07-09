@@ -20,6 +20,8 @@
                     Command="{Binding RenameCommand}"/>
         <KeyBinding Key="F7"
                     Command="{Binding MakeDirCommand}"/>
+        <KeyBinding Key="Space"
+                    Command="{Binding CalculateFolderSizeCommand}"/>
     </UserControl.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
