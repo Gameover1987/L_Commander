@@ -38,7 +38,7 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
 
     public string Extension { get; private set; }
 
-    public string TotalSize { get; private set; }
+    public long TotalSize { get; private set; }
 
     public DateTime Created { get; private set; }
 
@@ -63,13 +63,9 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
             Extension = _descriptor.Extension;
 
             var numberFormatInfo = new NumberFormatInfo { NumberGroupSeparator = " " };
-            TotalSize = String.Format(numberFormatInfo, "{0:#,#}", _descriptor.TotalSize);
+            TotalSize = _descriptor.TotalSize;
 
             Icon = _descriptor.Icon;
-        }
-        else
-        {
-            TotalSize = "<DIR>";
         }
 
         IsHidden = _descriptor.IsHidden;

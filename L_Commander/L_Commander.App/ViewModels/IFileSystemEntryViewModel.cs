@@ -14,7 +14,7 @@ public interface IFileSystemEntryViewModel
 
     string Extension { get; }
 
-    string TotalSize { get; }
+    long TotalSize { get; }
 
     DateTime Created { get; }
 

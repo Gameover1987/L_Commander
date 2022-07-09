@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:L_Commander.App"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-             xmlns:converters="clr-namespace:L_Commander.UI.Converters;assembly=L_Commander.UI"             
+             xmlns:converters="clr-namespace:L_Commander.UI.Converters;assembly=L_Commander.UI"
+             xmlns:converters1="clr-namespace:L_Commander.App.Views.Converters"
              Startup="App_OnStartup">
     <Application.Resources>
         <ResourceDictionary>
@@ -32,7 +33,7 @@
             <converters:NonZeroToBoolConverter x:Key="NonZeroToBoolConverter"/>
             <converters:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
             <converters:ReadableColorConverter x:Key="ReadableColorConverter"/>
-
+            <converters1:TotalSizeToStringConverter x:Key="TotalSizeToStringConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
