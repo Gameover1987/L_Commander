@@ -1,15 +1,8 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace L_Commander.App.OperatingSystem.Operations
 {
-    public interface IDeleteOperation : IFileSystemOperation<OperationProgressEventArgs>
-    {
-        void Initialize(FileSystemEntryDescriptor[] entries);
-    }
-
     public sealed class DeleteOperation : OperationBase<DeleteUnitOfWork>, IDeleteOperation
     {
         private readonly IFileSystemProvider _fileSystemProvider;
@@ -23,51 +16,43 @@ namespace L_Commander.App.OperatingSystem.Operations
             _fileSystemProvider = fileSystemProvider;
         }
 
-        public event EventHandler<OperationProgressEventArgs> Progress;
-
         public void Initialize(FileSystemEntryDescriptor[] entries)
         {
-            _entries = entries;            
+            _entries = entries;
             _isInitialized = true;
-            _isCancellationRequested = false;
         }
 
-        protected override void PrepareWorksQueue()
-        {            
-            foreach(var work in _entries.Select(x => new DeleteUnitOfWork(x.FileOrFolder, x.Path)))
+        protected override OperationProgressEventArgs GetProgressEventArgs(DeleteUnitOfWork unitOfWork)
+        {
+            return new OperationProgressEventArgs
+            {
+                Processed = _initialCount - _entries.Length - _worksQueue.Count,
+                Total = _initialCount,
+                CurrentItemName = unitOfWork.SourcePath
+            };
+        }
+
+        protected override void Setup()
+        {
+            foreach (var work in _entries.Select(x => new DeleteUnitOfWork(x.FileOrFolder, x.Path)))
             {
                 _worksQueue.Enqueue(work);
             }
 
-            _initialCount = _worksQueue.Count;
+            _initialCount = _worksQueue.Count + _entries.Length;
         }
 
-        protected override async void ThreadMethod()
+        protected override void Cleanup()
         {
-            while (!_worksQueue.IsEmpty)
+            foreach (var descriptor in _entries)
             {
-                _worksQueue.TryDequeue(out var work);
-
-                if (work == null)
-                    return;
-
-                if (_isCancellationRequested)
-                    return;
-
-                NotifyProgress(work);
-
-                _fileSystemProvider.Delete(work.FileOrFolder, work.Path);
+                _fileSystemProvider.Delete(descriptor.FileOrFolder, descriptor.Path);
             }
         }
 
-        private void NotifyProgress(DeleteUnitOfWork work)
+        protected override void ThreadMethod(DeleteUnitOfWork unitOfWork)
         {
-            Progress?.Invoke(this, new OperationProgressEventArgs
-            {
-                Processed = _initialCount - _worksQueue.Count,
-                Total = _initialCount,
-                CurrentItemName = work.Path
-            });
+            _fileSystemProvider.Delete(unitOfWork.FileOrFolder, unitOfWork.SourcePath);
         }
     }
 }

@@ -55,5 +55,15 @@ namespace L_Commander.App.Views.Controls
 
             _dataContext.SelectedEntries = dataGrid.SelectedItems.Cast<IFileSystemEntryViewModel>().ToArray();
         }
+
+        private void DataGrid_OnPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete)
+            {
+                var window = (MetroWindow)Window.GetWindow(this);
+                var mainViewModel = (IMainViewModel)window.DataContext;
+                mainViewModel.DeleteCommand.TryExecute();
+            }
+        }
     }
 }

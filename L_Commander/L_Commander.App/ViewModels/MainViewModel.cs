@@ -41,9 +41,9 @@ namespace L_Commander.App.ViewModels
             _copyOperation = copyOperation;
             _moveOperation = moveOperation;
             _deleteOperation = deleteOperation;
-            _deleteOperation.Progress += CopyMoveOperationOnProgress;
-            _moveOperation.Progress += CopyMoveOperationOnProgress;
-            _copyOperation.Progress += CopyMoveOperationOnProgress;
+            _deleteOperation.Progress += FileSystemOperationOnProgress;
+            _moveOperation.Progress += FileSystemOperationOnProgress;
+            _copyOperation.Progress += FileSystemOperationOnProgress;
             _windowManager = windowManager;
             _exceptionHandler = exceptionHandler;
             _settingsViewModel = settingsViewModel;
@@ -88,7 +88,7 @@ namespace L_Commander.App.ViewModels
 
         public IDelegateCommand DeleteCommand { get; }
 
-        public IDelegateCommand MakeDirCommand { get; set; }        
+        public IDelegateCommand MakeDirCommand { get; set; }
 
         public IDelegateCommand ShowSettingsCommand { get; }
 
@@ -214,6 +214,8 @@ namespace L_Commander.App.ViewModels
                 _moveOperation.Initialize(sourceEntries, AnotherFileManager.SelectedTab.FullPath);
                 await _moveOperation.Execute();
 
+                ActiveFileManager.SelectedTab.ReLoad();
+
                 await _progressDialogController.CloseAsync();
             }
             catch (Exception exception)
@@ -225,34 +227,6 @@ namespace L_Commander.App.ViewModels
                 if (_progressDialogController != null)
                     _progressDialogController.Canceled -= ProgressDialogControllerOnCanceled;
             }
-        }
-
-        private void ProgressDialogControllerOnCanceled(object sender, EventArgs e)
-        {
-            _copyOperation.Cancel();
-        }
-
-        private void CopyMoveOperationOnProgress(object sender, OperationProgressEventArgs e)
-        {
-            ExecuteInUIThread(() =>
-            {
-                if (_progressDialogController == null)
-                    return;
-
-                _progressDialogController.Maximum = e.Total;
-                _progressDialogController.SetMessage(e.CurrentItemName);
-                _progressDialogController.SetProgress(e.Processed);
-            });
-        }
-
-        private bool CanMakeDirCommandHandler()
-        {
-            return ActiveFileManager?.SelectedTab?.MakeDirCommand.CanExecute() == true;
-        }
-
-        private void MakeDirCommandHandler()
-        {
-            ActiveFileManager?.SelectedTab?.MakeDirCommand.TryExecute();
         }
 
         private bool CanDeleteCommandHandler()
@@ -287,7 +261,7 @@ namespace L_Commander.App.ViewModels
                 _deleteOperation.Initialize(selectedEntries.Select(x => x.GetDescriptor()).ToArray());
                 await _deleteOperation.Execute();
 
-                ActiveFileManager.SelectedTab.Initialize(ActiveFileManager.SelectedTab.FullPath);
+                ActiveFileManager.SelectedTab.ReLoad();
 
                 await _progressDialogController.CloseAsync();
             }
@@ -300,7 +274,17 @@ namespace L_Commander.App.ViewModels
                 if (_progressDialogController != null)
                     _progressDialogController.Canceled -= ProgressDialogControllerOnCanceled;
             }
+        }       
+
+        private bool CanMakeDirCommandHandler()
+        {
+            return ActiveFileManager?.SelectedTab?.MakeDirCommand.CanExecute() == true;
         }
+
+        private void MakeDirCommandHandler()
+        {
+            ActiveFileManager?.SelectedTab?.MakeDirCommand.TryExecute();
+        }        
 
         private void ShowSettingsCommandHandler()
         {
@@ -311,6 +295,31 @@ namespace L_Commander.App.ViewModels
             }
 
             _settingsViewModel.Save();
+        }
+
+        private void ProgressDialogControllerOnCanceled(object sender, EventArgs e)
+        {
+            if (_copyOperation.IsStarted)
+                _copyOperation.Cancel();
+
+            if (_moveOperation.IsStarted)
+                _moveOperation.Cancel();
+
+            if (_deleteOperation.IsStarted)
+                _deleteOperation.Cancel();
+        }
+
+        private void FileSystemOperationOnProgress(object sender, OperationProgressEventArgs e)
+        {
+            ExecuteInUIThread(() =>
+            {
+                if (_progressDialogController == null)
+                    return;
+
+                _progressDialogController.Maximum = e.Total;
+                _progressDialogController.SetMessage(e.CurrentItemName);
+                _progressDialogController.SetProgress(e.Processed);
+            });
         }
     }
 }

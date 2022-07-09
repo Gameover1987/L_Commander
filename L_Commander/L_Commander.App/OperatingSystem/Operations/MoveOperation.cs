@@ -6,11 +6,6 @@ using System.Threading.Tasks;
 
 namespace L_Commander.App.OperatingSystem.Operations
 {
-    public interface IMoveOperation : IFileSystemOperation<OperationProgressEventArgs>
-    {
-        void Initialize(FileSystemEntryDescriptor[] entries, string destDirectory);
-    }
-
     public sealed class MoveOperation : OperationBase<CopyUnitOfWork>, IMoveOperation
     {
         private readonly IFileSystemProvider _fileSystemProvider;
@@ -30,12 +25,9 @@ namespace L_Commander.App.OperatingSystem.Operations
             _entries = entries;
             _destDirectory = destDirectory;
             _isInitialized = true;
-            _isCancellationRequested = false;
-        }
+        }        
 
-        public event EventHandler<OperationProgressEventArgs> Progress;
-
-        protected override void PrepareWorksQueue()
+        protected override void Setup()
         {
             var works = GetUnitOfWorks(_entries, _destDirectory);
             var folders = works.Select(x => _fileSystemProvider.GetTopLevelPath(x.DestinationPath)).Distinct().ToArray();
@@ -55,42 +47,28 @@ namespace L_Commander.App.OperatingSystem.Operations
             _initialCount = _worksQueue.Count + _entries.Length;
         }
 
-        protected override void ThreadMethod()
+        protected override void ThreadMethod(CopyUnitOfWork unitOfWork)
         {
-            while (!_worksQueue.IsEmpty)
+            _fileSystemProvider.Move(unitOfWork.SourcePath, unitOfWork.DestinationPath);
+        }
+
+        protected override void Cleanup()
+        {
+            foreach (var descriptor in _entries)
             {
-                _worksQueue.TryDequeue(out var work);
-
-                if (work == null)
-                    return;
-
-                if (_isCancellationRequested)
-                    return;
-
-                Progress?.Invoke(this, new OperationProgressEventArgs
-                {
-                    Processed = _initialCount - _entries.Length - _worksQueue.Count,
-                    Total = _initialCount,
-                    CurrentItemName = work.SourcePath
-                });
-
-                _fileSystemProvider.Move(work.SourcePath, work.DestinationPath);
+                _fileSystemProvider.Delete(descriptor.FileOrFolder, descriptor.Path);
             }
         }
 
-        protected override void AfterThreadWorks()
+        protected override OperationProgressEventArgs GetProgressEventArgs(CopyUnitOfWork unitOfWork)
         {
-            for (int i = 0; i < _entries.Length; i++)
+            return new OperationProgressEventArgs
             {
-                Progress?.Invoke(this, new OperationProgressEventArgs
-                {
-                    Processed = _initialCount - (_entries.Length - i),
-                    Total = _initialCount,
-                    CurrentItemName = _entries[i].Path
-                });
-                _fileSystemProvider.Delete(_entries[i].FileOrFolder, _entries[i].Path);
-            }
-        }
+                Processed = _initialCount - _worksQueue.Count,
+                Total = _initialCount,
+                CurrentItemName = unitOfWork.SourcePath
+            };
+        }             
 
         private CopyUnitOfWork[] GetUnitOfWorks(FileSystemEntryDescriptor[] entries, string destDirectory)
         {

@@ -9,9 +9,9 @@ namespace L_Commander.App.OperatingSystem.Operations;
 
 public sealed class CopyOperation : OperationBase<CopyUnitOfWork>, ICopyOperation
 {
-    private readonly IFileSystemProvider _fileSystemProvider;    
+    private readonly IFileSystemProvider _fileSystemProvider;
 
-    private int _initialCount;    
+    private int _initialCount;
 
     private FileSystemEntryDescriptor[] _entries;
     private string _destDirectory;
@@ -25,13 +25,10 @@ public sealed class CopyOperation : OperationBase<CopyUnitOfWork>, ICopyOperatio
     {
         _entries = entries;
         _destDirectory = destDirectory;
-        _isInitialized = true;
-        _isCancellationRequested = false;
+        _isInitialized = true;        
     }
 
-    public event EventHandler<OperationProgressEventArgs> Progress;
-
-    protected override void PrepareWorksQueue()
+    protected override void Setup()
     {
         var works = GetUnitOfWorks(_entries, _destDirectory);
         var folders = works.Select(x => _fileSystemProvider.GetTopLevelPath(x.DestinationPath)).Distinct().ToArray();
@@ -51,32 +48,19 @@ public sealed class CopyOperation : OperationBase<CopyUnitOfWork>, ICopyOperatio
         _initialCount = _worksQueue.Count;
     }
 
-    protected override void ThreadMethod()
+    protected override void ThreadMethod(CopyUnitOfWork unitOfWork)
     {
-        while (!_worksQueue.IsEmpty)
-        {
-            _worksQueue.TryDequeue(out var work);
-
-            if (work == null)
-                return;
-
-            if (_isCancellationRequested)
-                return;
-
-            NotifyProgress(work);
-
-            _fileSystemProvider.Copy(work.SourcePath, work.DestinationPath);
-        }
+        _fileSystemProvider.Copy(unitOfWork.SourcePath, unitOfWork.DestinationPath);
     }
 
-    private void NotifyProgress(ICopyUnitOfWork work)
+    protected override OperationProgressEventArgs GetProgressEventArgs(CopyUnitOfWork unitOfWork)
     {
-        Progress?.Invoke(this, new OperationProgressEventArgs
+        return new OperationProgressEventArgs
         {
             Processed = _initialCount - _worksQueue.Count,
             Total = _initialCount,
-            CurrentItemName = work.SourcePath
-        });
+            CurrentItemName = unitOfWork.SourcePath
+        };
     }
 
     private CopyUnitOfWork[] GetUnitOfWorks(FileSystemEntryDescriptor[] entries, string destDirectory)

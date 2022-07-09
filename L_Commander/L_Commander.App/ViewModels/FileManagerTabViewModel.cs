@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Data;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
@@ -174,7 +175,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _folderFolderFilter.Clear();
         try
         {
-            await ThreadTaskExtensions.Run(() =>
+            await Task.Run(() =>
             {
                 var items = _fileSystemProvider
                     .GetFileSystemEntries(rootPath)
@@ -393,6 +394,11 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         }
 
         return true;
+    }
+
+    public void ReLoad()
+    {
+        SetPath(FullPath);
     }
 
     private class NavigationHistoryItem

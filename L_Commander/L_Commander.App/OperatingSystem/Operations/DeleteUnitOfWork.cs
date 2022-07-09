@@ -5,10 +5,10 @@ public class DeleteUnitOfWork : IUnitOfWork
     public DeleteUnitOfWork(FileOrFolder fileOrFolder, string path)
     {
         FileOrFolder = fileOrFolder;
-        Path = path;
+        SourcePath = path;
     }
 
     public FileOrFolder FileOrFolder { get; }
 
-    public string Path { get; }
+    public string SourcePath { get; }
 }

@@ -32,8 +32,6 @@
                     Command="{Binding MoveCommand}"/>
         <KeyBinding Key="F7"
                     Command="{Binding MakeDirCommand}"/>
-        <KeyBinding Key="Delete"
-                    Command="{Binding DeleteCommand}"/>
     </mah:MetroWindow.InputBindings>
     <mah:MetroWindow.Flyouts>
         <mah:FlyoutsControl x:Name="flyoutsControl">

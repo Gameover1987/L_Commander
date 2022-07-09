@@ -91,9 +91,9 @@ namespace L_Commander.App
                 .AddSingleton<IIconCache, IconCache>()
                 .AddSingleton<IFileSystemProvider, FileSystemProvider>()
                 .AddTransient<IFolderWatcher, FolderWatcher>()
-                .AddTransient<ICopyOperation, CopyOperation>()
-                .AddTransient<IMoveOperation, MoveOperation>()
-                .AddTransient<IDeleteOperation, DeleteOperation>()
+                .AddSingleton<ICopyOperation, CopyOperation>()
+                .AddSingleton<IMoveOperation, MoveOperation>()
+                .AddSingleton<IDeleteOperation, DeleteOperation>()
 
                 // ViewModels
                 .AddTransient<IViewModelFactory, ViewModelFactory>()

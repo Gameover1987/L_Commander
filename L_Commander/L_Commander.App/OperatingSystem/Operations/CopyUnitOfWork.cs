@@ -3,12 +3,7 @@ using System.IO;
 
 namespace L_Commander.App.OperatingSystem.Operations;
 
-public interface ICopyUnitOfWork : IUnitOfWork
-{
-    string SourcePath { get; }
-}
-
-public class CopyUnitOfWork : ICopyUnitOfWork
+public class CopyUnitOfWork : IUnitOfWork
 {
     public CopyUnitOfWork(string sourceRoot, string sourcePath, string destinationDirectory)
     {

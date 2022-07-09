@@ -33,6 +33,8 @@ namespace L_Commander.App.OperatingSystem
 
         bool IsDirectoryExists(string path);
 
+        bool IsFileExists(string file);
+
         string CombinePaths(params string[] paths);        
     }
 }

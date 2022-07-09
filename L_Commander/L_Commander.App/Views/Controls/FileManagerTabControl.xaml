@@ -99,12 +99,11 @@
                                  IsReadOnly="True"
                                  Style="{StaticResource MahApps.Styles.DataGrid}"
                                  SelectionChanged="DataGrid_OnSelectionChanged"
+                                 PreviewKeyDown="DataGrid_OnPreviewKeyDown"
                                  SelectionUnit="FullRow">
             <DataGrid.InputBindings>
                 <KeyBinding Key="Enter"
                             Command="{Binding OpenCommand}"/>
-                <KeyBinding Key="Delete"
-                            Command="{Binding DeleteCommand}"/>
             </DataGrid.InputBindings>
             <DataGrid.RowStyle>
                 <Style TargetType="{x:Type DataGridRow}"
