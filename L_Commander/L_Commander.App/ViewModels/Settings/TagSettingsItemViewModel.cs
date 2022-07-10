@@ -2,28 +2,30 @@
 using L_Commander.UI.Commands;
 using L_Commander.UI.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using L_Commander.App.Views;
+using Newtonsoft.Json;
 
 namespace L_Commander.App.ViewModels.Settings
 {
     public class TagSettingsItemViewModel : ViewModelBase, ISettingsItemViewModel
     {
+        private readonly TagSettings _tagSettings;
+        private readonly IAddTagViewModel _addTagViewModel;
+        private readonly IWindowManager _windowManager;
         private bool _isEnabled;
         private TagViewModel _selectedTag;
 
-        public TagSettingsItemViewModel(TagSettings tagSettings)
+        public TagSettingsItemViewModel(TagSettings tagSettings, IAddTagViewModel addTagViewModel, IWindowManager windowManager)
         {
-            if (tagSettings != null)
-            {
-                _isEnabled = tagSettings.IsEnabled;
-            }
+            _tagSettings = tagSettings ?? new TagSettings { Tags = Array.Empty<Tag>() };
+            _addTagViewModel = addTagViewModel;
+            _windowManager = windowManager;
 
             Tags.Clear();
-            foreach (var tag in tagSettings.Tags)
+            _isEnabled = _tagSettings.IsEnabled;
+            foreach (var tag in _tagSettings.Tags)
             {
                 Tags.Add(new TagViewModel(tag));
             }
@@ -46,13 +48,37 @@ namespace L_Commander.App.ViewModels.Settings
             }
         }
 
-        public string DisplayName { get { return "Tag settings"; } }
+        public string DisplayName => "Tag settings";
+
+        public bool IsChanged
+        {
+            get
+            {
+                if (_tagSettings.IsEnabled != IsEnabled)
+                    return true;
+
+                if (_tagSettings.Tags.Length != Tags.Count)
+                    return true;
+
+                var sourceJson = JsonConvert.SerializeObject(_tagSettings.Tags, Formatting.Indented);
+                var currentJson = JsonConvert.SerializeObject(Tags.Select(x => x.GetTag()).ToArray());
+
+                return sourceJson != currentJson;
+            }
+        }
+
+        public void Save(ClientSettings settings)
+        {
+            settings.TagSettings = new TagSettings();
+            settings.TagSettings.IsEnabled = true;
+            settings.TagSettings.Tags = Tags.Select(x => x.GetTag()).ToArray();
+        }
 
         public ObservableCollection<TagViewModel> Tags { get; } = new ObservableCollection<TagViewModel>();
 
         public TagViewModel SelectedTag
         {
-            get { return _selectedTag; }
+            get => _selectedTag;
             set
             {
                 if (_selectedTag == value)
@@ -70,7 +96,12 @@ namespace L_Commander.App.ViewModels.Settings
 
         private void AddTagCommandHandler()
         {
+            _addTagViewModel.Initialize(null);
+            if (!_windowManager.ShowDialogWindow<AddTagWindow>(_addTagViewModel))
+                return;
 
+            var tag = _addTagViewModel.GetTag();
+            Tags.Add(new TagViewModel(tag));
         }
 
         private bool CanEditTagCommandHandler()
@@ -80,7 +111,12 @@ namespace L_Commander.App.ViewModels.Settings
 
         private void EditTagCommandHandler()
         {
+            _addTagViewModel.Initialize(SelectedTag.GetTag());
+            if (!_windowManager.ShowDialogWindow<AddTagWindow>(_addTagViewModel))
+                return;
 
+            var tag = _addTagViewModel.GetTag();
+            SelectedTag.Update(tag);
         }
 
         private bool CanDeleteCommandHandler()
@@ -90,7 +126,7 @@ namespace L_Commander.App.ViewModels.Settings
 
         private void DeleteCommandHandler()
         {
-
+            Tags.Remove(SelectedTag);
         }
     }
 }

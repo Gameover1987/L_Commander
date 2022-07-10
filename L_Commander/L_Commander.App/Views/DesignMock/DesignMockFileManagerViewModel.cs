@@ -70,10 +70,10 @@ internal sealed class DesignMockExceptionHandler : IExceptionHandler
     }
 }
 
-internal sealed class DesignMockViewModelFactory : ViewModelFactory
+internal sealed class DesignMockFileManagerTabViewModelFactory : FileManagerTabViewModelFactory
 {
-    public DesignMockViewModelFactory()
-        : base(new FileSystemProvider(new IconCache()), new DesignMockWindowManager(), new OperatingSystemProvider(), new DesignMockExceptionHandler())
+    public DesignMockFileManagerTabViewModelFactory()
+        : base(new FileSystemProvider(new IconCache()), new DesignMockWindowManager(), new OperatingSystemProvider(), new DesignMockExceptionHandler(), new DesignMockAddTagViewModel())
     {
 
     }
@@ -82,7 +82,7 @@ internal sealed class DesignMockViewModelFactory : ViewModelFactory
 internal sealed class DesignMockFileManagerViewModel : FileManagerViewModel
 {
     public DesignMockFileManagerViewModel()
-        : base(new FileSystemProvider(new IconCache()), new ClipBoardProvider(), new DesignMockViewModelFactory(), new OperatingSystemProvider())
+        : base(new FileSystemProvider(new IconCache()), new ClipBoardProvider(), new DesignMockFileManagerTabViewModelFactory(), new OperatingSystemProvider())
     {
         Initialize(new FileManagerSettings
         {

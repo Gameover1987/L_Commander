@@ -96,7 +96,9 @@ namespace L_Commander.App
                 .AddSingleton<IDeleteOperation, DeleteOperation>()
 
                 // ViewModels
-                .AddTransient<IViewModelFactory, ViewModelFactory>()
+                .AddSingleton<IFileManagerTabViewModelFactory, FileManagerTabViewModelFactory>()
+                .AddSingleton<ISettingsItemsViewModelFactory, SettingsItemsViewModelFactory>()
+                .AddSingleton<IAddTagViewModel, AddTagViewModel>()
                 .AddTransient<IFolderFilterViewModel, FolderFilterViewModel>()
                 .AddSingleton<IMainViewModel, MainViewModel>()
                 .AddSingleton<ISettingsViewModel, SettingsViewModel>()

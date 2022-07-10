@@ -8,35 +8,45 @@ namespace L_Commander.App.ViewModels.Settings
 {
     public class TagViewModel : ViewModelBase
     {
-        private string _name;        
-        private Color _color;
+        private Tag _tag;
 
         public TagViewModel(Tag tag)
         {
-            _name = tag.Text;
-            _color = tag.Color.ToColor();
+            _tag = tag;
         }
 
         public string Name
         {
-            get { return _name; }
+            get { return _tag.Text; }
             set
             {
-                if (_name == value)
+                if (_tag.Text == value)
                     return;
-                _name = value;
+                _tag.Text = value;
                 OnPropertyChanged(() => Name);
             }
         }
 
         public Color Color
         {
-            get { return _color; }
+            get { return _tag.Color.ToColor(); }
             set
             {
-                _color = value;                
+                _tag.Color = value.ToInt();                
                 OnPropertyChanged(() => Color);
             }
+        }
+
+        public Tag GetTag()
+        {
+            return _tag;
+        }
+
+        public void Update(Tag tag)
+        {
+            _tag = tag;
+
+            OnPropertyChanged();
         }
     }
 }

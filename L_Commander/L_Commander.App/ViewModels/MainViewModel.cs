@@ -102,7 +102,12 @@ namespace L_Commander.App.ViewModels
 
         public void SaveSettings()
         {
-            var settings = new ClientSettings
+            var oldSettings = _settingsProvider.Get();
+
+            if (oldSettings == null)
+                oldSettings = new ClientSettings();
+
+            var currentSettings = new ClientSettings
             {
                 MainWindowSettings = new MainWindowSettings
                 {
@@ -112,10 +117,11 @@ namespace L_Commander.App.ViewModels
                     Height = _window.Height
                 },
                 LeftFileManagerSettings = LeftFileManager.CollectSettings(),
-                RightFileManagerSettings = RightFileManager.CollectSettings()
+                RightFileManagerSettings = RightFileManager.CollectSettings(),
+                TagSettings = oldSettings.TagSettings
             };
 
-            _settingsProvider.Save(settings);
+            _settingsProvider.Save(currentSettings);
         }
 
         public MainWindowSettings GetMainWindowSettings()
@@ -171,8 +177,6 @@ namespace L_Commander.App.ViewModels
 
                 _copyOperation.Initialize(sourceEntries, AnotherFileManager.SelectedTab.FullPath);
                 await _copyOperation.Execute();
-
-                await _progressDialogController.CloseAsync();
             }
             catch (Exception exception)
             {
@@ -180,6 +184,7 @@ namespace L_Commander.App.ViewModels
             }
             finally
             {
+                await _progressDialogController.CloseAsync();
                 if (_progressDialogController != null)
                     _progressDialogController.Canceled -= ProgressDialogControllerOnCanceled;
             }
@@ -215,8 +220,6 @@ namespace L_Commander.App.ViewModels
                 await _moveOperation.Execute();
 
                 ActiveFileManager.SelectedTab.ReLoad();
-
-                await _progressDialogController.CloseAsync();
             }
             catch (Exception exception)
             {
@@ -224,6 +227,7 @@ namespace L_Commander.App.ViewModels
             }
             finally
             {
+                await _progressDialogController.CloseAsync();
                 if (_progressDialogController != null)
                     _progressDialogController.Canceled -= ProgressDialogControllerOnCanceled;
             }
@@ -262,8 +266,6 @@ namespace L_Commander.App.ViewModels
                 await _deleteOperation.Execute();
 
                 ActiveFileManager.SelectedTab.ReLoad();
-
-                await _progressDialogController.CloseAsync();
             }
             catch (Exception exception)
             {
@@ -271,6 +273,7 @@ namespace L_Commander.App.ViewModels
             }
             finally
             {
+                await _progressDialogController.CloseAsync();
                 if (_progressDialogController != null)
                     _progressDialogController.Canceled -= ProgressDialogControllerOnCanceled;
             }

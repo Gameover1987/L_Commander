@@ -14,16 +14,16 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
 {
     private readonly IFileSystemProvider _fileSystemProvider;
     private readonly IClipBoardProvider _clipBoardHelper;
-    private readonly IViewModelFactory _viewModelFactory;
+    private readonly IFileManagerTabViewModelFactory _fileManagerTabViewModelFactory;
     private readonly IOperatingSystemProvider _operatingSystemProvider;
 
     private IFileManagerTabViewModel _selectedTab;
 
-    public FileManagerViewModel(IFileSystemProvider fileSystemProvider, IClipBoardProvider clipBoardHelper, IViewModelFactory viewModelFactory, IOperatingSystemProvider operatingSystemProvider)
+    public FileManagerViewModel(IFileSystemProvider fileSystemProvider, IClipBoardProvider clipBoardHelper, IFileManagerTabViewModelFactory fileManagerTabViewModelFactory, IOperatingSystemProvider operatingSystemProvider)
     {
         _fileSystemProvider = fileSystemProvider;
         _clipBoardHelper = clipBoardHelper;
-        _viewModelFactory = viewModelFactory;
+        _fileManagerTabViewModelFactory = fileManagerTabViewModelFactory;
         _operatingSystemProvider = operatingSystemProvider;
         ChangeDriveCommand = new DelegateCommand(ChangeDriveCommandHandler, x => CanChangeDriveCommandHandler(x));
         NewTabCommand = new DelegateCommand(NewTabCommandHandler, CanNewTabCommandHandler);
@@ -111,7 +111,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
 
     protected virtual IFileManagerTabViewModel CreateFileManagerTabViewModel(string path)
     {
-        var fileManagerTabViewModel = _viewModelFactory.CreateFileManagerTab();
+        var fileManagerTabViewModel = _fileManagerTabViewModelFactory.CreateFileManagerTab();
         fileManagerTabViewModel.Initialize(path);
 
         return fileManagerTabViewModel;

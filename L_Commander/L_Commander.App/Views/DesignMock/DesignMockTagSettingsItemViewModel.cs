@@ -7,7 +7,7 @@ namespace L_Commander.App.Views.DesignMock
     internal sealed class DesignMockTagSettingsItemViewModel : TagSettingsItemViewModel
     {
         public DesignMockTagSettingsItemViewModel()
-            : base(CreateTagSettings())
+            : base(CreateTagSettings(), new DesignMockAddTagViewModel(), new DesignMockWindowManager())
         {
             SelectedTag = Tags.FirstOrDefault();
         }

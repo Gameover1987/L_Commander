@@ -18,6 +18,7 @@
                  MinWidth="800"
                  Width="800"
                  ShowIconOnTitleBar="True"
+                 ShowInTaskbar="False"
                  WindowStartupLocation="CenterScreen"
                  d:DataContext="{d:DesignInstance Type=designMock:DesignMockSettingsViewModel, IsDesignTimeCreatable=True}">
     <mah:MetroWindow.Resources>
@@ -53,12 +54,12 @@
         <ContentControl Grid.Row="0" Grid.Column="1" Margin="6,6,0,0"
                         Content="{Binding SelectedItem}"/>
 
-        <Separator Grid.Row="1" Grid.ColumnSpan="2"/>
+        <Separator Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="0" />
 
-        <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="12">
+        <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="12">
             <Button Content="OK" Width="100"
                     Command="{Binding OkCommand}"
-                    IsDefault="True"/>
+                    IsDefault="True" Click="ButtonOK_Click"/>
             <Button Content="Cancel" Width="100" Margin="6,0,0,0"
                     IsCancel="True"/>
         </StackPanel>

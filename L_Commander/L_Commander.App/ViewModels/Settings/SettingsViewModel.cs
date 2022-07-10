@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using L_Commander.App.ViewModels.Factories;
 
 namespace L_Commander.App.ViewModels.Settings
 {
@@ -22,21 +23,23 @@ namespace L_Commander.App.ViewModels.Settings
     public interface ISettingsItemViewModel
     {
         string DisplayName { get; }
-    }
 
-    public class SettingsItemViewModelBase : ViewModelBase
-    {
-        public string DisplayName { get; }
+        bool IsChanged { get; }
+
+        void Save(ClientSettings settings);
     }
 
     public class SettingsViewModel : ViewModelBase, ISettingsViewModel
     {
         private readonly ISettingsProvider _settingProvider;
+        private readonly ISettingsItemsViewModelFactory _factory;
         private ISettingsItemViewModel _selectedSettingsItem;
+        private ClientSettings _settings;
 
-        public SettingsViewModel(ISettingsProvider settingProvider)
+        public SettingsViewModel(ISettingsProvider settingProvider, ISettingsItemsViewModelFactory factory)
         {
             _settingProvider = settingProvider;
+            _factory = factory;
 
             OkCommand = new DelegateCommand(x => { }, x => CanOkCommandHandler());
         }
@@ -59,49 +62,10 @@ namespace L_Commander.App.ViewModels.Settings
 
         public void Initialize()
         {
-            var settings = _settingProvider.Get();
-            settings.TagSettings = new TagSettings();
-            settings.TagSettings.Tags = new Tag[]
-                {
-                    new Tag()
-                    {
-                        Text = "Red",
-                        Color = 16711680
-                    },
-                    new Tag()
-                    {
-                        Text = "Orange",
-                        Color = 16753920
-                    },
-                    new Tag()
-                    {
-                        Text = "Yellow",
-                        Color = Colors.Yellow.ToInt()
-                    },
-                    new Tag()
-                    {
-                        Text = "Green",
-                        Color = 32768
-                    },
-                    new Tag()
-                    {
-                        Text = "Light blue",
-                        Color = 11393254
-                    },
-                    new Tag()
-                    {
-                        Text = "Blue",
-                        Color = 255
-                    },
-                    new Tag()
-                    {
-                        Text = "Violet",
-                        Color = 15631086
-                    },
-                };
+            _settings = _settingProvider.Get();
 
             Items.Clear();
-            foreach (var item in GetSettingsItems(settings))
+            foreach (var item in _factory.CreateSettingsItems(_settings))
             {
                 Items.Add(item);
             }
@@ -111,20 +75,18 @@ namespace L_Commander.App.ViewModels.Settings
 
         public void Save()
         {
+            foreach (var settingsItemViewModel in Items.Where(x => x.IsChanged))
+            {
+                settingsItemViewModel.Save(_settings);
+            }
 
+            _settingProvider.Save(_settings);
         }
 
         private bool CanOkCommandHandler()
         {
-            return true;
+            return Items.Any(x => x.IsChanged);
         }
-
-        private static ISettingsItemViewModel[] GetSettingsItems(ClientSettings clientSettings)
-        {
-            return new ISettingsItemViewModel[]
-            {
-                new TagSettingsItemViewModel(clientSettings.TagSettings),
-            };
-        }        
+       
     }
 }

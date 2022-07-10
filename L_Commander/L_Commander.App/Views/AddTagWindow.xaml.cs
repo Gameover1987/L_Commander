@@ -23,5 +23,10 @@ namespace L_Commander.App.Views
         {
             InitializeComponent();
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;
+        }
     }
 }

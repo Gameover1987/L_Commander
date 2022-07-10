@@ -1,4 +1,6 @@
-﻿namespace L_Commander.App.Infrastructure;
+﻿using System;
+
+namespace L_Commander.App.Infrastructure;
 
 /// <summary>
 /// Main window settings
@@ -40,11 +42,11 @@ public class FileManagerSettings
 /// </summary>
 public class Tag
 {
+    public Guid Guid { get; set; }
+
     public string Text { get; set; }
 
     public int Color { get; set; }    
-
-    public string Path { get; set; }
 }
 
 /// <summary>

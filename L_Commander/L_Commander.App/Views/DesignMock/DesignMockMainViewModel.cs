@@ -22,12 +22,13 @@ namespace L_Commander.App.Views.DesignMock
                 {
                     IsEnabled = true,
                     Tags = new Tag[]
-                {
-                    new Tag { Text = "Important",
-                        Color = 1,
-                        Path = @"C:\Important"
-                    },
-                }
+                    {
+                        new Tag
+                        {
+                            Text = "Important",
+                            Color = 1,
+                        },
+                    }
                 }
             };
         }
@@ -36,14 +37,14 @@ namespace L_Commander.App.Views.DesignMock
     internal sealed class DesignMockMainViewModel : MainViewModel
     {
         public DesignMockMainViewModel()
-            : base(new DesignMockSettingsProvider(), 
-                  new DesignMockFileManagerViewModel(), 
-                  new DesignMockFileManagerViewModel(), 
-                  new DesignMockCopyOperation(), 
-                  new DesignMockMoveOperation(), 
+            : base(new DesignMockSettingsProvider(),
+                  new DesignMockFileManagerViewModel(),
+                  new DesignMockFileManagerViewModel(),
+                  new DesignMockCopyOperation(),
+                  new DesignMockMoveOperation(),
                   new DesignMockDeleteOperation(),
                   new DesignMockWindowManager(),
-                  new DesignMockExceptionHandler(), 
+                  new DesignMockExceptionHandler(),
                   new DesignMockSettingsViewModel())
         {
         }

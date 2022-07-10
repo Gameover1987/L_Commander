@@ -17,10 +17,8 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <mah:ToggleSwitch Grid.Row="0" 
-                          OnContent="File system tags are enabled"
-                          OffContent="Enable file system tags"
-                          IsOn="{Binding IsEnabled}"/>
+        <CheckBox Grid.Row="0" Content="Use file system tags"
+                  IsChecked="{Binding IsEnabled}"/>
         <ListBox Grid.Row="1" Margin="0,6,0,0"
                  IsEnabled="{Binding IsEnabled}"
                  ItemsSource="{Binding Tags}"
@@ -47,11 +45,12 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,6,0,0">
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,6,0,0"
+                    IsEnabled="{Binding IsEnabled}">
             <Button Content="Add tag" Width="100"
                     Command="{Binding AddTagCommand}"/>
             <Button Content="Edit tag" Width="100" Margin="6,0,0,0"
-                    Command="{Binding AddTagCommand}"/>
+                    Command="{Binding EditTagCommand}"/>
             <Button Content="Delete tag" Width="100" Margin="6,0,0,0"
                     Command="{Binding AddTagCommand}"/>
         </StackPanel>
