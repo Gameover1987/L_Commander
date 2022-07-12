@@ -15,7 +15,7 @@ public interface IMainViewModel
 
     IDelegateCommand DeleteCommand { get; }
 
-    void Initialize(IWindow window);
+    void Initialize();
 
     void SaveSettings();
 

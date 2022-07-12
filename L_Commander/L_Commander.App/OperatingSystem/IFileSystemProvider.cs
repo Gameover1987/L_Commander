@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace L_Commander.App.OperatingSystem
@@ -38,5 +39,9 @@ namespace L_Commander.App.OperatingSystem
         string CombinePaths(params string[] paths);
 
         long CalculateFolderSize(string folderPath);
+
+        void Initialize();
+
+        event EventHandler DrivesChanged;
     }
 }

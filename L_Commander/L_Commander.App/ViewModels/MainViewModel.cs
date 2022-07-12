@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using L_Commander.App.Infrastructure;
+using L_Commander.App.OperatingSystem;
 using L_Commander.App.OperatingSystem.Operations;
 using L_Commander.App.ViewModels.Settings;
 using L_Commander.App.Views;
@@ -21,9 +22,8 @@ namespace L_Commander.App.ViewModels
         private readonly IWindowManager _windowManager;
         private readonly IExceptionHandler _exceptionHandler;
         private readonly ISettingsViewModel _settingsViewModel;
+        private readonly IFileSystemProvider _fileSystemProvider;
         private ProgressDialogController _progressDialogController;
-
-        private IWindow _window;
 
         public MainViewModel(ISettingsProvider settingsProvider,
             IFileManagerViewModel leftFileManager,
@@ -33,7 +33,8 @@ namespace L_Commander.App.ViewModels
             IDeleteOperation deleteOperation,
             IWindowManager windowManager,
             IExceptionHandler exceptionHandler,
-            ISettingsViewModel settingsViewModel)
+            ISettingsViewModel settingsViewModel,
+            IFileSystemProvider fileSystemProvider)
         {
             _settingsProvider = settingsProvider;
             _leftFileManager = leftFileManager;
@@ -47,6 +48,8 @@ namespace L_Commander.App.ViewModels
             _windowManager = windowManager;
             _exceptionHandler = exceptionHandler;
             _settingsViewModel = settingsViewModel;
+            _fileSystemProvider = fileSystemProvider;
+
             ActiveFileManager = LeftFileManager;
 
             RenameCommand = new DelegateCommand(RenameCommandHandler, CanRenameCommandHandler);
@@ -92,12 +95,13 @@ namespace L_Commander.App.ViewModels
 
         public IDelegateCommand ShowSettingsCommand { get; }
 
-        public void Initialize(IWindow window)
+        public void Initialize()
         {
-            _window = window;
             var settings = _settingsProvider.Get();
             _leftFileManager.Initialize(settings?.LeftFileManagerSettings);
             _rightFileManager.Initialize(settings?.RightFileManagerSettings);
+
+            _fileSystemProvider.Initialize();
         }
 
         public void SaveSettings()
@@ -111,10 +115,10 @@ namespace L_Commander.App.ViewModels
             {
                 MainWindowSettings = new MainWindowSettings
                 {
-                    Left = _window.Left,
-                    Top = _window.Top,
-                    Width = _window.Width,
-                    Height = _window.Height
+                    Left = _windowManager.MainWindow.Left,
+                    Top = _windowManager.MainWindow.Top,
+                    Width = _windowManager.MainWindow.Width,
+                    Height = _windowManager.MainWindow.Height
                 },
                 LeftFileManagerSettings = LeftFileManager.CollectSettings(),
                 RightFileManagerSettings = RightFileManager.CollectSettings(),

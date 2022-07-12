@@ -45,6 +45,7 @@ public class FolderFilterViewModel : ViewModelBase, IFolderFilterViewModel
     public void Refresh(IEnumerable<IFileSystemEntryViewModel> fileSystemEntries)
     {
         var groups = fileSystemEntries
+            .Where(x => x != null)
             .Where(x => x.IsFile)
             .GroupBy(x => x.Extension.ToLower())
             .OrderBy(x => x.Key)

@@ -9,12 +9,15 @@ using L_Commander.App.ViewModels;
 using L_Commander.App.ViewModels.Factories;
 using L_Commander.App.ViewModels.Filtering;
 using L_Commander.UI.Infrastructure;
+using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 
 namespace L_Commander.App.Views.DesignMock;
 
 internal sealed class DesignMockWindowManager : IWindowManager
 {
+    public MetroWindow MainWindow { get; }
+
     public Task<string> ShowInputBox(string title, string message, MetroDialogSettings settings = null)
     {
         throw new NotImplementedException();

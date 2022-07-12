@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
@@ -22,9 +23,11 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
     public FileManagerViewModel(IFileSystemProvider fileSystemProvider, IClipBoardProvider clipBoardHelper, IFileManagerTabViewModelFactory fileManagerTabViewModelFactory, IOperatingSystemProvider operatingSystemProvider)
     {
         _fileSystemProvider = fileSystemProvider;
+        _fileSystemProvider.DrivesChanged += FileSystemProviderOnDrivesChanged;
         _clipBoardHelper = clipBoardHelper;
         _fileManagerTabViewModelFactory = fileManagerTabViewModelFactory;
         _operatingSystemProvider = operatingSystemProvider;
+
         ChangeDriveCommand = new DelegateCommand(ChangeDriveCommandHandler, x => CanChangeDriveCommandHandler(x));
         NewTabCommand = new DelegateCommand(NewTabCommandHandler, CanNewTabCommandHandler);
         CloseTabCommand = new DelegateCommand(CloseTabCommandHandler, x => CanCloseTabCommandHandler(x));
@@ -109,6 +112,22 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
         };
     }
 
+    public void SwapTabs(IFileManagerTabViewModel sourceTab, IFileManagerTabViewModel targetTab)
+    {
+        var sourceIndex = Tabs.IndexOf(sourceTab);
+        if (sourceIndex < 0)
+            return;
+
+        var targetIndex = Tabs.IndexOf(targetTab);
+        if (targetIndex < 0)
+            return;
+
+        Tabs[sourceIndex] = targetTab;
+        Tabs[targetIndex] = sourceTab;
+
+        SelectedTab = sourceTab;
+    }
+
     protected virtual IFileManagerTabViewModel CreateFileManagerTabViewModel(string path)
     {
         var fileManagerTabViewModel = _fileManagerTabViewModelFactory.CreateFileManagerTab();
@@ -169,7 +188,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
         if (Tabs.Count == 1)
             return false;
 
-        return Tabs.Where(x => !x.IsLocked && x != clickedTab).Count() > 0;
+        return Tabs.Count(x => !x.IsLocked && x != clickedTab) > 0;
     }
 
     private void CloseAllButThisTabCommandHandler(object obj)
@@ -209,19 +228,14 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
         _operatingSystemProvider.OpenTerminal(tab.FullPath);
     }
 
-    public void SwapTabs(IFileManagerTabViewModel sourceTab, IFileManagerTabViewModel targetTab)
+    private void FileSystemProviderOnDrivesChanged(object sender, EventArgs e)
     {
-        var sourceIndex = Tabs.IndexOf(sourceTab);
-        if (sourceIndex < 0)
-            return;
+        Drives.Clear();
 
-        var targetIndex = Tabs.IndexOf(targetTab);
-        if (targetIndex < 0)
-            return;
-
-        Tabs[sourceIndex] = targetTab;
-        Tabs[targetIndex] = sourceTab;
-
-        SelectedTab = sourceTab;
+        var driveInfos = _fileSystemProvider.GetDrives();
+        foreach (var driveInfo in driveInfos)
+        {
+            Drives.Add(new DriveViewModel(driveInfo));
+        }
     }
 }

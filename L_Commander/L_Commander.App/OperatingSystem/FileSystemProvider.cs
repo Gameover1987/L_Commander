@@ -1,13 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Interop;
+using ControlzEx.Standard;
 
 namespace L_Commander.App.OperatingSystem;
 
 public sealed class FileSystemProvider : IFileSystemProvider
 {
+    private const int WM_DEVICECHANGE = 0x0219;
+
     private readonly IIconCache _iconCache;
 
     public FileSystemProvider(IIconCache iconCache)
@@ -152,5 +158,25 @@ public sealed class FileSystemProvider : IFileSystemProvider
     public bool IsFileExists(string filePath)
     {
         return File.Exists(filePath);
+    }
+
+    public void Initialize()
+    {
+        if (Application.Current?.MainWindow == null)
+            return;
+
+        var source = PresentationSource.FromVisual(Application.Current.MainWindow) as HwndSource;
+        source?.AddHook(WndProc);
+    }
+
+    public event EventHandler DrivesChanged;
+
+    private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (msg != WM_DEVICECHANGE)
+            return IntPtr.Zero;
+
+        DrivesChanged?.Invoke(this, EventArgs.Empty);
+        return IntPtr.Zero;
     }
 }

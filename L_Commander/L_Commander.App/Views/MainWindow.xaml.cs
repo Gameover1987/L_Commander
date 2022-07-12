@@ -1,21 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using System.Windows.Interop;
 using L_Commander.App.ViewModels;
 using MahApps.Metro.Controls;
-using MahApps.Metro.Controls.Dialogs;
 
 namespace L_Commander.App.Views
 {
@@ -34,18 +23,19 @@ namespace L_Commander.App.Views
             InitializeComponent();
 
             DataContextChanged += OnDataContextChanged;
-            Loaded+= OnLoaded;
-            Closing += OnClosing;            
+            Loaded += OnLoaded;
+            Closing += OnClosing;
         }
 
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             _mainViewModel = (IMainViewModel)DataContext;
-            _mainViewModel?.Initialize(this);
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
+            _mainViewModel.Initialize();
+
             var mainWindowSettings = _mainViewModel.GetMainWindowSettings();
             if (mainWindowSettings == null)
                 return;
