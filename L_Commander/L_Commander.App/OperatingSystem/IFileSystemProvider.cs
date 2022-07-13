@@ -12,7 +12,7 @@ namespace L_Commander.App.OperatingSystem
 
         IEnumerable<string> GetFilesRecursively(string path);
 
-        FileSystemEntryDescriptor GetEntryDetails(string path);
+        FileSystemEntryDescriptor GetFileSystemDescriptor(string path);
 
         string GetTopLevelPath(string path);
 

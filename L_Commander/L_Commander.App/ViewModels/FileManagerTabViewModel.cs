@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
+using L_Commander.App.ViewModels.Factories;
 using L_Commander.App.ViewModels.Filtering;
 using L_Commander.Common;
 using L_Commander.Common.Extensions;
@@ -30,6 +31,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private readonly IExceptionHandler _exceptionHandler;
     private readonly IFolderWatcher _folderWatcher;
     private readonly IUiTimer _timer;
+    private readonly IFileSystemEntryViewModelFactory _fileSystemEntryViewModelFactory;
     private string _fullPath;
 
     private IFileSystemEntryViewModel _selectedFileSystemEntry;
@@ -49,7 +51,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         IOperatingSystemProvider operatingSystemProvider,
         IExceptionHandler exceptionHandler,
         IFolderWatcher folderWatcher,
-        IUiTimer timer)
+        IUiTimer timer,
+        IFileSystemEntryViewModelFactory fileSystemEntryViewModelFactory)
     {
         _folderFolderFilter = folderFolderFilter;
         _folderFolderFilter.Changed += FolderFolderFilterOnChanged;
@@ -59,6 +62,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _exceptionHandler = exceptionHandler;
         _folderWatcher = folderWatcher;
         _timer = timer;
+        _fileSystemEntryViewModelFactory = fileSystemEntryViewModelFactory;
         _timer.Initialize(TimeSpan.FromMilliseconds(TimerInterval));
         _timer.Tick += TimerOnTick;
         _folderWatcher.Changed += FolderWatcherOnChanged;
@@ -182,7 +186,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
             {
                 var items = _fileSystemProvider
                     .GetFileSystemEntries(rootPath)
-                    .Select(CreateFileSystemEntryViewModel);
+                    .Select(_fileSystemEntryViewModelFactory.CreateEntryViewModel);
                 foreach (var fileSystemEntryViewModel in items)
                 {
                     fileSystemEntryViewModel.Initialize();
@@ -201,11 +205,6 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         }
 
         OnPropertyChanged();
-    }
-
-    protected virtual IFileSystemEntryViewModel CreateFileSystemEntryViewModel(string path)
-    {
-        return new FileSystemEntryViewModel(path, _fileSystemProvider, _exceptionHandler);
     }
 
     private bool CanRenameCommandHandler()
@@ -360,7 +359,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
                 switch (e.Change)
                 {
                     case FileChnageType.Create:
-                        var newEntry = CreateFileSystemEntryViewModel(e.CurrentPath);
+                        var newEntry = _fileSystemEntryViewModelFactory.CreateEntryViewModel(e.CurrentPath);
                         newEntry.Initialize();
                         FileSystemEntries.Add(newEntry);
                         break;

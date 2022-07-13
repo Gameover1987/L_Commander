@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Windows.Media;
 using L_Commander.App.OperatingSystem;
 
@@ -35,4 +36,6 @@ public interface IFileSystemEntryViewModel
     void Rename(string newPath);
 
     FileSystemEntryDescriptor GetDescriptor();
+
+    ObservableCollection<ContextMenuItemViewModel> ContextMenuItems { get; }
 }

@@ -95,13 +95,17 @@ namespace L_Commander.App
                 .AddSingleton<IMoveOperation, MoveOperation>()
                 .AddSingleton<IDeleteOperation, DeleteOperation>()
 
-                // ViewModels
+                // Factories
                 .AddSingleton<IFileManagerTabViewModelFactory, FileManagerTabViewModelFactory>()
                 .AddSingleton<ISettingsItemsViewModelFactory, SettingsItemsViewModelFactory>()
+                .AddSingleton<IFileSystemEntryViewModelFactory, FileSystemEntryViewModelFactory>()
+
+                // ViewModels
                 .AddSingleton<IAddTagViewModel, AddTagViewModel>()
                 .AddTransient<IFolderFilterViewModel, FolderFilterViewModel>()
                 .AddSingleton<IMainViewModel, MainViewModel>()
                 .AddSingleton<ISettingsViewModel, SettingsViewModel>()
+                .AddSingleton<IContextMenuItemProvider, ContextMenuItemProvider>()
                 .AddTransient<IFileManagerViewModel, FileManagerViewModel>();
 
             return serviceCollection.BuildServiceProvider();

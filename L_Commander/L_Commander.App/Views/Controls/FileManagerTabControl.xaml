@@ -8,11 +8,17 @@
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:viewModels="clr-namespace:L_Commander.App.ViewModels"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-             xmlns:filtering="clr-namespace:L_Commander.App.ViewModels.Filtering" xmlns:controls="clr-namespace:L_Commander.App.Views.Controls"
+             xmlns:controls="clr-namespace:L_Commander.App.Views.Controls"
              xmlns:helpers="clr-namespace:L_Commander.UI.Helpers;assembly=L_Commander.UI"
              mc:Ignorable="d" 
-             d:DesignHeight="800" d:DesignWidth="800"
+             d:DesignHeight="1200" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=designMock:DesignMockFileManagerTabViewModel, IsDesignTimeCreatable=True}">
+    <UserControl.Resources>
+        <ResourceDictionary>
+
+            
+        </ResourceDictionary>
+    </UserControl.Resources>
     <UserControl.InputBindings>
         <KeyBinding Key="Back"
                     Command="{Binding TopCommand}"/>
@@ -79,6 +85,48 @@
             <DataGrid.RowStyle>
                 <Style TargetType="{x:Type DataGridRow}"
                        BasedOn="{StaticResource MahApps.Styles.DataGridRow}">
+                    <Setter Property="ContextMenu">
+                        <Setter.Value>
+                            <ContextMenu ItemsSource="{Binding ContextMenuItems}"
+                                         d:DataContext="{d:DesignInstance Type=viewModels:FileSystemEntryViewModel, IsDesignTimeCreatable=False}">
+                                <ContextMenu.ItemContainerStyle>
+                                    <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MahApps.Styles.MenuItem}">
+                                        <Setter Property="Icon" Value="{Binding Icon, Mode=OneWay}"/>
+                                        <Setter Property="Header" Value="{Binding DisplayName, Mode=OneWay}"/>
+                                        <Setter Property="IsChecked" Value="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <Setter Property="IsCheckable" Value="{Binding IsCheckable}"/>
+                                        <Setter Property="Command" Value="{Binding Command}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSeparator}" Value="True">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="{x:Type MenuItem}">
+                                                            <Separator>
+                                                                <Separator.Template>
+                                                                    <ControlTemplate TargetType="{x:Type Separator}">
+                                                                        <Grid Margin="0 6 0 4" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                                                                            <Rectangle Height="1" Margin="20 0 1 1"
+                                                                                Fill="{DynamicResource MahApps.Brushes.Gray7}"
+                                                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                                                UseLayoutRounding="True" />
+                                                                            <Rectangle Height="1" Margin="20 1 1 0"
+                                                                                Fill="{DynamicResource MahApps.Brushes.ThemeBackground}"
+                                                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                                                UseLayoutRounding="True" />
+                                                                        </Grid>
+                                                                    </ControlTemplate>
+                                                                </Separator.Template>
+                                                            </Separator>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ContextMenu.ItemContainerStyle>
+                            </ContextMenu>
+                        </Setter.Value>
+                    </Setter>
                     <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick"/>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsHidden}" Value="True">

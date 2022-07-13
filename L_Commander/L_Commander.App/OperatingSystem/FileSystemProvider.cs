@@ -38,7 +38,7 @@ public sealed class FileSystemProvider : IFileSystemProvider
         return files;
     }
 
-    public FileSystemEntryDescriptor GetEntryDetails(string path)
+    public FileSystemEntryDescriptor GetFileSystemDescriptor(string path)
     {
         var descriptor = new FileSystemEntryDescriptor();
         descriptor.Path = path;

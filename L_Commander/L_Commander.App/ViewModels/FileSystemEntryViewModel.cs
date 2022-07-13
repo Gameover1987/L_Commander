@@ -1,30 +1,32 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
-using L_Commander.Common.Extensions;
 using L_Commander.UI.ViewModels;
 
 namespace L_Commander.App.ViewModels;
 
 public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
 {
-    private string _fullPath;
     private readonly IFileSystemProvider _fileSystemProvider;
     private readonly IExceptionHandler _exceptionHandler;
+    private readonly IContextMenuItemProvider _contextMenuItemProvider;
+
+    private string _fullPath;
     private FileSystemEntryDescriptor _descriptor;
     private bool _isBusy;
     private long _totalSize;
 
-    public FileSystemEntryViewModel(string fullPath, IFileSystemProvider fileSystemProvider, IExceptionHandler exceptionHandler)
+    public FileSystemEntryViewModel(string fullPath, IFileSystemProvider fileSystemProvider, IExceptionHandler exceptionHandler, IContextMenuItemProvider contextMenuItemProvider)
     {
         _fullPath = fullPath;
         _fileSystemProvider = fileSystemProvider;
         _exceptionHandler = exceptionHandler;
+        _contextMenuItemProvider = contextMenuItemProvider;
     }
 
     public ImageSource Icon { get; private set; }
@@ -71,6 +73,8 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
 
     public DateTime Created { get; private set; }
 
+    public ObservableCollection<ContextMenuItemViewModel> ContextMenuItems { get; } = new ObservableCollection<ContextMenuItemViewModel>();
+
     public void Initialize()
     {
         InitializeImpl();
@@ -107,28 +111,30 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
 
     protected virtual void InitializeImpl()
     {
-        _descriptor = _fileSystemProvider.GetEntryDetails(_fullPath);
+        _descriptor = _fileSystemProvider.GetFileSystemDescriptor(_fullPath);
 
         FileOrFolder = _descriptor.FileOrFolder;
+        IsHidden = _descriptor.IsHidden;
+        IsSystem = _descriptor.IsSystem;
+        Name = _descriptor.Name;
+        Created = _descriptor.Created;
+
+        ContextMenuItems.Clear();
+        foreach (var menuItemViewModel in _contextMenuItemProvider.GetMenuItems(_descriptor))
+        {
+            ContextMenuItems.Add(menuItemViewModel);
+        }
 
         if (_descriptor.IsFile)
         {
             Extension = _descriptor.Extension;
-
-            var numberFormatInfo = new NumberFormatInfo { NumberGroupSeparator = " " };
             TotalSize = _descriptor.TotalSize;
-
             Icon = _descriptor.Icon;
         }
         else
         {
             TotalSize = -1;
         }
-
-        IsHidden = _descriptor.IsHidden;
-        IsSystem = _descriptor.IsSystem;
-        Name = _descriptor.Name;
-        Created = _descriptor.Created;
 
         IsInitialized = true;
 
