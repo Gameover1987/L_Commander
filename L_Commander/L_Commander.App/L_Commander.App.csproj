@@ -4,16 +4,20 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>L_logo.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="AppSettings.json" />
+    <None Remove="L_logo.png" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="AppSettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="L_logo.ico" />
+    <Resource Include="L_logo.png" />
   </ItemGroup>
 
   <ItemGroup>
