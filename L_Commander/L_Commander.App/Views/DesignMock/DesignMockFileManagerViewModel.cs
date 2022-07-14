@@ -8,6 +8,7 @@ using L_Commander.App.OperatingSystem;
 using L_Commander.App.ViewModels;
 using L_Commander.App.ViewModels.Factories;
 using L_Commander.App.ViewModels.Filtering;
+using L_Commander.Common.Extensions;
 using L_Commander.UI.Infrastructure;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
@@ -56,11 +57,13 @@ internal sealed class DesignMockFileManagerTabViewModel : FileManagerTabViewMode
             new UiTimer(),
             new FileSystemEntryViewModelFactory(new FileSystemProvider(new IconCache()), new DesignMockExceptionHandler(), new DesignMockContextMenuItemProvider(), new DesignMockTagRepository()))
     {
+        ThreadTaskExtensions.IsSyncRun = true;
         Initialize("E:\\Download");
 
         foreach (var fileSystemEntryViewModel in FileSystemEntries)
         {
             fileSystemEntryViewModel.Initialize();
+            fileSystemEntryViewModel.LoadTags();
         }
 
         SelectedFileSystemEntry = FileSystemEntries.FirstOrDefault();

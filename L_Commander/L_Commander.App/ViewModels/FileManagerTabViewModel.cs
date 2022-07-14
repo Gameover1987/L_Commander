@@ -182,7 +182,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _folderFolderFilter.Clear();
         try
         {
-            await Task.Run(() =>
+            await ThreadTaskExtensions.Run(() =>
             {
                 var items = _fileSystemProvider
                     .GetFileSystemEntries(rootPath)

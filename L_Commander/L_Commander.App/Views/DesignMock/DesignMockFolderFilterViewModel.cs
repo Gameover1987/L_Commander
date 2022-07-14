@@ -33,7 +33,7 @@ namespace L_Commander.App.Views.DesignMock
         public Tag[] GetTags(FileSystemEntryDescriptor descriptor)
         {
             var random = new Random(DateTime.Now.Millisecond);
-            return _tags.Take(random.Next(0, _tags.Length)).ToArray();
+            return _tags.Take(random.Next(1, _tags.Length)).ToArray();
         }
 
         public void SetTags(string path, Tag[] tags)

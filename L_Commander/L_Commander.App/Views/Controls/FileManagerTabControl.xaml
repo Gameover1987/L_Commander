@@ -188,7 +188,8 @@
                                 <TextBlock Grid.Column="0" Text="{Binding Name}"
                                            TextTrimming="CharacterEllipsis"
                                            helpers:TextBlockToolTipHelper.ShowTooltipWhenTrimming="True"/>
-                                <ItemsControl Grid.Column="1" MaxWidth="300" HorizontalAlignment="Right"
+
+                                <ItemsControl Grid.Column="1" MaxWidth="100" HorizontalAlignment="Right"
                                               ItemsSource="{Binding Tags}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -197,11 +198,11 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate DataType="{x:Type infrastructure:Tag}">
-                                            <Ellipse Width="20" Height="20"
+                                            <Rectangle Width="5"
                                                      ToolTip="{Binding Text}"
                                                      Stroke="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
                                                      Fill="{Binding Color, Converter={StaticResource ColorToBrushConverter}}"
-                                                     Margin="0,0,3,0"/>
+                                                     Margin="0,0,1,0"/>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
