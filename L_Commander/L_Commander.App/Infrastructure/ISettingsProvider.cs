@@ -16,7 +16,7 @@ namespace L_Commander.App.Infrastructure
 
         public void Save(ClientSettings settings)
         {
-            var settingsJson =JsonConvert.SerializeObject(settings, Formatting.Indented);
+            var settingsJson = JsonConvert.SerializeObject(settings, Formatting.Indented);
             File.WriteAllText(ClientSettingsFileName, settingsJson);
         }
 

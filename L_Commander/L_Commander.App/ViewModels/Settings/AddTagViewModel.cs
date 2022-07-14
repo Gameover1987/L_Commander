@@ -20,6 +20,7 @@ namespace L_Commander.App.ViewModels.Settings
 
     public class AddTagViewModel : ViewModelBase, IAddTagViewModel
     {
+        private Guid _guid;
         private string _text;
         private Color _color;
 
@@ -61,11 +62,13 @@ namespace L_Commander.App.ViewModels.Settings
         {
             if (tag == null)
             {
+                _guid = Guid.NewGuid();
                 Title = "Add tag";
                 Text = string.Empty;
                 return;
             }
 
+            _guid = tag.Guid;
             Title = "Edit existed tag";
             Text = tag.Text;
             Color = tag.Color.ToColor();
@@ -76,6 +79,7 @@ namespace L_Commander.App.ViewModels.Settings
         {
             return new Tag
             {
+                Guid = _guid,
                 Text = Text,
                 Color = Color.ToInt()
             };

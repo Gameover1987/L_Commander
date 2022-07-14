@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Windows.Media;
+using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
 
 namespace L_Commander.App.ViewModels;
@@ -33,9 +34,13 @@ public interface IFileSystemEntryViewModel
 
     void CalculateFolderSize();
 
+    void LoadTags();
+
     void Rename(string newPath);
 
     FileSystemEntryDescriptor GetDescriptor();
+
+    ObservableCollection<Tag> Tags { get; }
 
     ObservableCollection<ContextMenuItemViewModel> ContextMenuItems { get; }
 }

@@ -70,7 +70,7 @@ namespace L_Commander.App.ViewModels.Settings
         public void Save(ClientSettings settings)
         {
             settings.TagSettings = new TagSettings();
-            settings.TagSettings.IsEnabled = true;
+            settings.TagSettings.IsEnabled = IsEnabled;
             settings.TagSettings.Tags = Tags.Select(x => x.GetTag()).ToArray();
         }
 

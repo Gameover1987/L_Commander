@@ -10,13 +10,24 @@
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:controls="clr-namespace:L_Commander.App.Views.Controls"
              xmlns:helpers="clr-namespace:L_Commander.UI.Helpers;assembly=L_Commander.UI"
+             xmlns:infrastructure="clr-namespace:L_Commander.App.Infrastructure"
              mc:Ignorable="d" 
              d:DesignHeight="1200" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=designMock:DesignMockFileManagerTabViewModel, IsDesignTimeCreatable=True}">
     <UserControl.Resources>
         <ResourceDictionary>
-
-            
+            <DataTemplate DataType="{x:Type infrastructure:Tag}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Rectangle Grid.Column="0" Width="16" Height="16"
+                               Fill="{Binding Color, Converter={StaticResource ColorToBrushConverter}}"
+                               Stroke="Gray" StrokeThickness="1" RadiusX="0" RadiusY="0" Margin="0 0 0 0" />
+                    <TextBlock Grid.Column="1" Text="{Binding Text}" Margin="6,0,0,0"/>
+                </Grid>
+            </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
     <UserControl.InputBindings>
@@ -91,12 +102,28 @@
                                          d:DataContext="{d:DesignInstance Type=viewModels:FileSystemEntryViewModel, IsDesignTimeCreatable=False}">
                                 <ContextMenu.ItemContainerStyle>
                                     <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MahApps.Styles.MenuItem}">
-                                        <Setter Property="Icon" Value="{Binding Icon, Mode=OneWay}"/>
                                         <Setter Property="Header" Value="{Binding DisplayName, Mode=OneWay}"/>
                                         <Setter Property="IsChecked" Value="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                         <Setter Property="IsCheckable" Value="{Binding IsCheckable}"/>
                                         <Setter Property="Command" Value="{Binding Command}"/>
+                                        <Setter Property="InputGestureText" Value="{Binding GestureText}"/>
+                                        <Setter Property="IsEnabled" Value="{Binding IsEnabled}"/>
+                                        <Setter Property="ItemsSource" Value="{Binding Children}"/>
+                                        <Setter Property="ItemContainerStyle">
+                                            <Setter.Value>
+                                                <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MahApps.Styles.MenuItem}">
+                                                    <Setter Property="Header" Value="{Binding Data}"/>
+                                                    <Setter Property="Command" Value="{Binding Command}"/>
+                                                    <Setter Property="CommandParameter" Value="{Binding}"/>
+                                                    <Setter Property="IsChecked" Value="{Binding IsChecked, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                    <Setter Property="IsCheckable" Value="True"/>
+                                                </Style>
+                                            </Setter.Value>
+                                        </Setter>
                                         <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsDefault}" Value="True">
+                                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                            </DataTrigger>
                                             <DataTrigger Binding="{Binding IsSeparator}" Value="True">
                                                 <Setter Property="Template">
                                                     <Setter.Value>
@@ -128,6 +155,7 @@
                         </Setter.Value>
                     </Setter>
                     <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick"/>
+                    <EventSetter Event="Loaded" Handler="DataGridRow_OnLoaded"></EventSetter>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsHidden}" Value="True">
                             <Setter Property="Opacity" Value="0.6"/>
@@ -148,15 +176,39 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn x:Name="fileNameColumn" Header="{x:Static app:Resources.DataGridColumnName_Path}" Width="*"
-                                    Binding="{Binding Name, Mode=OneWay}">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="{x:Type TextBlock}">
-                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
-                            <Setter Property="helpers:TextBlockToolTipHelper.ShowTooltipWhenTrimming" Value="True"/>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
+                <DataGridTemplateColumn x:Name="fileNameColumn" Header="{x:Static app:Resources.DataGridColumnName_Path}" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0" Text="{Binding Name}"
+                                           TextTrimming="CharacterEllipsis"
+                                           helpers:TextBlockToolTipHelper.ShowTooltipWhenTrimming="True"/>
+                                <ItemsControl Grid.Column="1" MaxWidth="300" HorizontalAlignment="Right"
+                                              ItemsSource="{Binding Tags}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <VirtualizingStackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type infrastructure:Tag}">
+                                            <Ellipse Width="20" Height="20"
+                                                     ToolTip="{Binding Text}"
+                                                     Stroke="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
+                                                     Fill="{Binding Color, Converter={StaticResource ColorToBrushConverter}}"
+                                                     Margin="0,0,3,0"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn x:Name="typeColumn" Header="{x:Static app:Resources.DataGridColumnName_Type}" Width="Auto" MinWidth="60"
                                     Binding="{Binding Extension, Mode=OneWay}" />
                 <DataGridTemplateColumn x:Name="totalSizeColumn" Header="{x:Static app:Resources.DataGridColumnName_Size}" Width="Auto" MinWidth="90"
@@ -167,7 +219,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn x:Name="creationDateColumn" Header="{x:Static app:Resources.DataGridColumnName_CreationDate}" Width="100" CanUserResize="False"
+                <DataGridTextColumn x:Name="creationDateColumn" Header="{x:Static app:Resources.DataGridColumnName_CreationDate}" Width="120" CanUserResize="False"
                                     Binding="{Binding Created, Mode=OneWay, StringFormat='dd.MM.yyyy HH:mm:ss'}" />
             </DataGrid.Columns>
         </controls:CustomDataGrid>

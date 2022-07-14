@@ -10,6 +10,19 @@ public enum FileOrFolder
     File = 1
 }
 
+public static class FileSystemEntryDescriptorExtensions
+{
+    public static bool Exists(this FileSystemEntryDescriptor descriptor, IFileSystemProvider fileSystemProvider)
+    {
+        if (descriptor.IsFile)
+        {
+            return fileSystemProvider.IsFileExists(descriptor.Path);
+        }
+
+        return fileSystemProvider.IsDirectoryExists(descriptor.Path);
+    }
+}
+
 public class FileSystemEntryDescriptor
 {
     public FileOrFolder FileOrFolder { get; set; }

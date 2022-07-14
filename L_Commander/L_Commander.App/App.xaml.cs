@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows;
 using L_Commander.App.Infrastructure;
+using L_Commander.App.Infrastructure.Db;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.OperatingSystem.Operations;
 using L_Commander.App.ViewModels;
@@ -11,6 +12,7 @@ using L_Commander.App.ViewModels.Settings;
 using L_Commander.App.Views;
 using L_Commander.UI.Commands;
 using L_Commander.UI.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -74,11 +76,16 @@ namespace L_Commander.App
                 .AddSingleton(_configuration)
                 .AddSingleton<IConfiguration>(_configuration)
 
+                //DB
+                .AddDbContext<LCommanderDbContext>((app, opt) =>
+                { })
+
                 // Infrastructure
                 .AddSingleton<IDispatcher>(dispatcherAdapter)
                 .AddSingleton<IWindowManager, WindowManager>()
                 .AddSingleton<IExceptionHandler, ExceptionHandler>()
                 .AddSingleton<ISettingsProvider, ClientSettingsProvider>()
+                .AddSingleton<ITagRepository, TagRepository>()
                 .AddSingleton<IClipBoardProvider, ClipBoardProvider>()
                 .AddLogging(x =>
                 {

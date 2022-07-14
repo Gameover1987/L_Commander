@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 
 namespace L_Commander.App.Infrastructure;
 
@@ -35,18 +35,6 @@ public class FileManagerSettings
 
     public string SelectedPath { get; set; }
 
-}
-
-/// <summary>
-/// Tag for file system entry
-/// </summary>
-public class Tag
-{
-    public Guid Guid { get; set; }
-
-    public string Text { get; set; }
-
-    public int Color { get; set; }    
 }
 
 /// <summary>

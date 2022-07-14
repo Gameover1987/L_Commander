@@ -35,11 +35,14 @@
                                 </Style.Triggers>
                             </Style>
                         </Grid.Style>
-                        <Border CornerRadius="5" Margin="5"
-                                Background="{Binding Color, Converter={StaticResource ColorToBrushConverter}, Mode=OneWay}">
-                            <TextBlock Text="{Binding Name}" Margin="3"
-                                       Foreground="{Binding Color, Converter={StaticResource ReadableColorConverter}}"/>
-                        </Border>                       
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Ellipse Width="20" Height="20" 
+                                 Fill="{Binding Color, Converter={StaticResource ColorToBrushConverter}, Mode=OneWay}"></Ellipse>
+
+                        <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="3" VerticalAlignment="Center"/>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
@@ -52,7 +55,7 @@
             <Button Content="Edit tag" Width="100" Margin="6,0,0,0"
                     Command="{Binding EditTagCommand}"/>
             <Button Content="Delete tag" Width="100" Margin="6,0,0,0"
-                    Command="{Binding AddTagCommand}"/>
+                    Command="{Binding DeleteCommand}"/>
         </StackPanel>
     </Grid>
 </UserControl>

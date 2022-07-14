@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using L_Commander.App.ViewModels;
 using MahApps.Metro.Controls;
 
@@ -64,6 +65,13 @@ namespace L_Commander.App.Views.Controls
                 var mainViewModel = (IMainViewModel)window.DataContext;
                 mainViewModel.DeleteCommand.TryExecute();
             }
+        }
+
+        private void DataGridRow_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            var row = (DataGridRow)sender;
+            var entry = (IFileSystemEntryViewModel)row.DataContext;
+            entry.LoadTags();
         }
     }
 }

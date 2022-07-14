@@ -15,18 +15,24 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
     private readonly IFileSystemProvider _fileSystemProvider;
     private readonly IExceptionHandler _exceptionHandler;
     private readonly IContextMenuItemProvider _contextMenuItemProvider;
+    private readonly ITagRepository _tagRepository;
 
     private string _fullPath;
     private FileSystemEntryDescriptor _descriptor;
     private bool _isBusy;
     private long _totalSize;
 
-    public FileSystemEntryViewModel(string fullPath, IFileSystemProvider fileSystemProvider, IExceptionHandler exceptionHandler, IContextMenuItemProvider contextMenuItemProvider)
+    public FileSystemEntryViewModel(string fullPath,
+        IFileSystemProvider fileSystemProvider,
+        IExceptionHandler exceptionHandler, 
+        IContextMenuItemProvider contextMenuItemProvider,
+        ITagRepository tagRepository)
     {
         _fullPath = fullPath;
         _fileSystemProvider = fileSystemProvider;
         _exceptionHandler = exceptionHandler;
         _contextMenuItemProvider = contextMenuItemProvider;
+        _tagRepository = tagRepository;
     }
 
     public ImageSource Icon { get; private set; }
@@ -73,7 +79,16 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
 
     public DateTime Created { get; private set; }
 
-    public ObservableCollection<ContextMenuItemViewModel> ContextMenuItems { get; } = new ObservableCollection<ContextMenuItemViewModel>();
+    public ObservableCollection<Tag> Tags { get; } = new ObservableCollection<Tag>();
+
+    public ObservableCollection<ContextMenuItemViewModel> ContextMenuItems
+    {
+        get
+        {
+            var menuItems = new ObservableCollection<ContextMenuItemViewModel>(_contextMenuItemProvider.GetMenuItems(_descriptor));
+            return menuItems;
+        }
+    }
 
     public void Initialize()
     {
@@ -104,9 +119,30 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
         }
     }
 
+    public void LoadTags()
+    {
+        Tags.Clear();
+        var tags = _tagRepository.GetTags(_descriptor);
+        if (tags.Length == 0)
+            return;
+
+        foreach (var tag in tags)
+        {
+            Tags.Add(tag);
+        }
+    }
+
     public FileSystemEntryDescriptor GetDescriptor()
     {
         return _descriptor;
+    }
+
+
+    public void Rename(string newPath)
+    {
+        _fullPath = newPath;
+
+        InitializeImpl();
     }
 
     protected virtual void InitializeImpl()
@@ -119,12 +155,6 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
         Name = _descriptor.Name;
         Created = _descriptor.Created;
 
-        ContextMenuItems.Clear();
-        foreach (var menuItemViewModel in _contextMenuItemProvider.GetMenuItems(_descriptor))
-        {
-            ContextMenuItems.Add(menuItemViewModel);
-        }
-
         if (_descriptor.IsFile)
         {
             Extension = _descriptor.Extension;
@@ -136,15 +166,9 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
             TotalSize = -1;
         }
 
+
         IsInitialized = true;
 
         OnPropertyChanged();
-    }
-
-    public void Rename(string newPath)
-    {
-        _fullPath = newPath;
-
-        InitializeImpl();
     }
 }
