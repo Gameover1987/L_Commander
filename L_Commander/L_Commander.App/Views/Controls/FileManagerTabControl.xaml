@@ -198,11 +198,14 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate DataType="{x:Type infrastructure:Tag}">
-                                            <Rectangle Width="5"
-                                                     ToolTip="{Binding Text}"
-                                                     Stroke="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
-                                                     Fill="{Binding Color, Converter={StaticResource ColorToBrushConverter}}"
-                                                     Margin="0,0,1,0"/>
+                                            <Rectangle Width="7" 
+                                                       ToolTip="{Binding Text}"
+                                                       Fill="{Binding Color, Converter={StaticResource ColorToBrushConverter}}"
+                                                       Margin="0,0,1,0">
+                                                <Rectangle.RenderTransform>
+                                                    <SkewTransform AngleX="-10"/>
+                                                </Rectangle.RenderTransform>
+                                            </Rectangle>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
