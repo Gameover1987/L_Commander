@@ -188,9 +188,12 @@ namespace L_Commander.App.ViewModels
             }
             finally
             {
-                await _progressDialogController.CloseAsync();
                 if (_progressDialogController != null)
+                {
+                    if (_progressDialogController.IsOpen)
+                        await _progressDialogController.CloseAsync();
                     _progressDialogController.Canceled -= ProgressDialogControllerOnCanceled;
+                }
             }
         }
 
@@ -223,7 +226,7 @@ namespace L_Commander.App.ViewModels
                 _moveOperation.Initialize(sourceEntries, AnotherFileManager.SelectedTab.FullPath);
                 await _moveOperation.Execute();
 
-                ActiveFileManager.SelectedTab.ReLoad();
+                ActiveFileManager?.SelectedTab.ReLoad();
             }
             catch (Exception exception)
             {
@@ -231,9 +234,12 @@ namespace L_Commander.App.ViewModels
             }
             finally
             {
-                await _progressDialogController.CloseAsync();
                 if (_progressDialogController != null)
+                {
+                    if (_progressDialogController.IsOpen)
+                        await _progressDialogController.CloseAsync();
                     _progressDialogController.Canceled -= ProgressDialogControllerOnCanceled;
+                }
             }
         }
 
@@ -269,7 +275,7 @@ namespace L_Commander.App.ViewModels
                 _deleteOperation.Initialize(selectedEntries.Select(x => x.GetDescriptor()).ToArray());
                 await _deleteOperation.Execute();
 
-                ActiveFileManager.SelectedTab.ReLoad();
+                ActiveFileManager?.SelectedTab.ReLoad();
             }
             catch (Exception exception)
             {
@@ -277,9 +283,12 @@ namespace L_Commander.App.ViewModels
             }
             finally
             {
-                await _progressDialogController.CloseAsync();
                 if (_progressDialogController != null)
+                {
+                    if (_progressDialogController.IsOpen)
+                        await _progressDialogController.CloseAsync();
                     _progressDialogController.Canceled -= ProgressDialogControllerOnCanceled;
+                }
             }
         }       
 
