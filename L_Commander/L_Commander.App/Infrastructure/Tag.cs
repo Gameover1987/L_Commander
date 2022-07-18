@@ -43,7 +43,7 @@ public static class TagExtensions
     {
         return new TagEntity
         {
-            Id = tag.Guid,
+            TagGuid = tag.Guid,
             Color = tag.Color,
             Text = tag.Text
         };
@@ -53,7 +53,7 @@ public static class TagExtensions
     {
         return new Tag
         {
-            Guid = tagEntity.Id,
+            Guid = tagEntity.TagGuid,
             Text = tagEntity.Text,
             Color = tagEntity.Color,
         };
