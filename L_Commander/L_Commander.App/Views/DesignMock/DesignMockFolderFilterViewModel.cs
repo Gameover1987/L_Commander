@@ -30,13 +30,33 @@ namespace L_Commander.App.Views.DesignMock
             
         }
 
-        public Tag[] GetTags(FileSystemEntryDescriptor descriptor)
+        public void AddOrUpdateTag(Tag tag)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveTag(Guid tagGuid)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Tag[] GetAllTags()
+        {
+            return _tags;
+        }
+
+        public FileWithTags[] GetAllFilesWithTags()
+        {
+            return new FileWithTags[0];
+        }
+
+        public Tag[] GetTagsByPath(FileSystemEntryDescriptor descriptor)
         {
             var random = new Random(DateTime.Now.Millisecond);
             return _tags.Take(random.Next(1, _tags.Length)).ToArray();
         }
 
-        public void SetTags(string path, Tag[] tags)
+        public void SetTagsForPath(string path, Tag[] tags)
         {
             
         }
@@ -44,7 +64,8 @@ namespace L_Commander.App.Views.DesignMock
 
     internal sealed class DesignMockFolderFilterViewModel : FolderFilterViewModel
     {
-        public DesignMockFolderFilterViewModel()
+        public DesignMockFolderFilterViewModel() 
+            : base(new DesignMockTagRepository())
         {
             var fileSystemProvider = new FileSystemProvider(new IconCache());
 

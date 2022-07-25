@@ -178,6 +178,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
     private void CloseTabCommandHandler(object obj)
     {
         var tab = (IFileManagerTabViewModel)obj;
+        tab.Unload();
 
         Tabs.Remove(tab);
     }
@@ -199,6 +200,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
 
         foreach (var tab in tabsToRemove)
         {
+            tab.Unload();
             Tabs.Remove(tab);
         }
     }

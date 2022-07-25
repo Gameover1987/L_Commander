@@ -1,7 +1,9 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using L_Commander.App.ViewModels;
@@ -67,11 +69,19 @@ namespace L_Commander.App.Views.Controls
             }
         }
 
-        private void DataGridRow_OnLoaded(object sender, RoutedEventArgs e)
+        private void DataGridRow_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
-            var row = (DataGridRow)sender;
-            var entry = (IFileSystemEntryViewModel)row.DataContext;
-            entry.LoadTags();
+            var dataGridRow = (DataGridRow)sender;
+            var fileSystemEntryViewModel = (IFileSystemEntryViewModel)dataGridRow.DataContext;
+            
+            if (dataGridRow.ContextMenu != null)
+                dataGridRow.ContextMenu.ItemsSource = fileSystemEntryViewModel.ContextMenuItems;
+        }
+
+        private void DataGridRow_ContextMenuClosing(object sender, ContextMenuEventArgs e)
+        {
+            tagsColumn.Width = 0;
+            tagsColumn.Width = DataGridLength.Auto;
         }
     }
 }

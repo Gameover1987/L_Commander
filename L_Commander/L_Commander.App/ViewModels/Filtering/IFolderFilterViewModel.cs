@@ -13,7 +13,7 @@ namespace L_Commander.App.ViewModels.Filtering
 
         bool HasFilters { get; }
 
-        IDelegateCommand ResetFiltersCommand { get; }
+        IDelegateCommand SelectAllFiltersCommand { get; }
 
         event EventHandler<EventArgs> Changed;
 

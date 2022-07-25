@@ -11,21 +11,22 @@ namespace L_Commander.App.ViewModels.Settings
 {
     public class TagSettingsItemViewModel : ViewModelBase, ISettingsItemViewModel
     {
-        private readonly TagSettings _tagSettings;
+        private readonly ITagRepository _tagRepository;
         private readonly IAddTagViewModel _addTagViewModel;
         private readonly IWindowManager _windowManager;
-        private bool _isEnabled;
+        
         private TagViewModel _selectedTag;
+        private Tag[] _sourceTags;
 
-        public TagSettingsItemViewModel(TagSettings tagSettings, IAddTagViewModel addTagViewModel, IWindowManager windowManager)
+        public TagSettingsItemViewModel(ITagRepository tagRepository, IAddTagViewModel addTagViewModel, IWindowManager windowManager)
         {
-            _tagSettings = tagSettings ?? new TagSettings { Tags = Array.Empty<Tag>() };
+            _tagRepository = tagRepository;
             _addTagViewModel = addTagViewModel;
             _windowManager = windowManager;
 
             Tags.Clear();
-            _isEnabled = _tagSettings.IsEnabled;
-            foreach (var tag in _tagSettings.Tags)
+            _sourceTags = _tagRepository.GetAllTags();
+            foreach (var tag in _sourceTags)
             {
                 Tags.Add(new TagViewModel(tag));
             }
@@ -35,43 +36,28 @@ namespace L_Commander.App.ViewModels.Settings
             DeleteCommand = new DelegateCommand(DeleteCommandHandler, CanDeleteCommandHandler);
         }
 
-        public bool IsEnabled
-        {
-            get { return _isEnabled; }
-            set
-            {
-                if (_isEnabled == value)
-                    return;
-
-                _isEnabled = value;
-                OnPropertyChanged(() => IsEnabled);
-            }
-        }
-
         public string DisplayName => "Tag settings";
 
         public bool IsChanged
         {
             get
             {
-                if (_tagSettings.IsEnabled != IsEnabled)
+                if (_sourceTags.Length != Tags.Count)
                     return true;
 
-                if (_tagSettings.Tags.Length != Tags.Count)
-                    return true;
-
-                var sourceJson = JsonConvert.SerializeObject(_tagSettings.Tags, Formatting.Indented);
+                var sourceJson = JsonConvert.SerializeObject(_sourceTags, Formatting.Indented);
                 var currentJson = JsonConvert.SerializeObject(Tags.Select(x => x.GetTag()).ToArray());
 
                 return sourceJson != currentJson;
             }
         }
 
-        public void Save(ClientSettings settings)
+        public void Save()
         {
-            settings.TagSettings = new TagSettings();
-            settings.TagSettings.IsEnabled = IsEnabled;
-            settings.TagSettings.Tags = Tags.Select(x => x.GetTag()).ToArray();
+            foreach (var tagViewModel in Tags)
+            {
+                _tagRepository.AddOrUpdateTag(tagViewModel.GetTag());
+            }
         }
 
         public ObservableCollection<TagViewModel> Tags { get; } = new ObservableCollection<TagViewModel>();

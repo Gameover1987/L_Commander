@@ -30,11 +30,11 @@ public interface IFileSystemEntryViewModel
 
     bool IsHidden { get; }
 
-    void Initialize();
+    void Initialize(Tag[] tags = null);
+
+    void UpdateTags();
 
     void CalculateFolderSize();
-
-    void LoadTags();
 
     void Rename(string newPath);
 
@@ -42,5 +42,5 @@ public interface IFileSystemEntryViewModel
 
     ObservableCollection<Tag> Tags { get; }
 
-    ObservableCollection<ContextMenuItemViewModel> ContextMenuItems { get; }
+    ContextMenuItemViewModel[] ContextMenuItems { get; }
 }

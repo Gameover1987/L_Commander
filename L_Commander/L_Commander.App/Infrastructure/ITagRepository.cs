@@ -12,9 +12,17 @@ namespace L_Commander.App.Infrastructure
     {
         void Initialize();
 
-        Tag[] GetTags(FileSystemEntryDescriptor descriptor);
+        void AddOrUpdateTag(Tag tag);
 
-        void SetTags(string path, Tag[] tags);
+        void RemoveTag(Guid tagGuid);
+
+        Tag[] GetAllTags();
+
+        FileWithTags[] GetAllFilesWithTags();
+
+        Tag[] GetTagsByPath(FileSystemEntryDescriptor descriptor);
+
+        void SetTagsForPath(string path, Tag[] tags);
     }
 
     public sealed class TagRepository : ITagRepository
@@ -40,7 +48,61 @@ namespace L_Commander.App.Infrastructure
             _dbContext.SaveChanges();
         }
 
-        public Tag[] GetTags(FileSystemEntryDescriptor descriptor)
+        public void AddOrUpdateTag(Tag tag)
+        {
+            var tagToUpdate = _dbContext.Tags.Find(tag.Guid);
+            if (tagToUpdate != null)
+            {
+                tagToUpdate.Color = tag.Color;
+                tagToUpdate.Text = tag.Text;
+            }
+            else
+            {
+                _dbContext.Tags.Add(tag.ToEntity());
+            }
+
+            _dbContext.SaveChanges();
+        }
+
+        public void RemoveTag(Guid tagGuid)
+        {
+            var tagToRemove = _dbContext.Tags.Find(tagGuid);
+            if (tagToRemove == null)
+                return;
+
+            _dbContext.Tags.Remove(tagToRemove);
+        }
+
+        public Tag[] GetAllTags()
+        {
+            return _dbContext.Tags.Select(x => new Tag
+            {
+                Guid = x.TagGuid,
+                Color = x.Color, 
+                Text = x.Text,
+            }).ToArray();
+        }
+
+        public FileWithTags[] GetAllFilesWithTags()
+        {
+            lock (_dbContext)
+            {
+                var filesWithTags = _dbContext
+                    .Files
+                    .Include(x => x.Tags)
+                    .ThenInclude(x => x.TagEntity)
+                    .Where(x => x.Tags != null)
+                    .Select(x => new FileWithTags
+                    {
+                        FilePath = x.Path,
+                        Tags = x.Tags.Select(t => t.FromEntity()).ToArray()
+                    })
+                    .ToArray();
+                return filesWithTags;
+            }
+        }
+
+        public Tag[] GetTagsByPath(FileSystemEntryDescriptor descriptor)
         {
             if (!Exists(descriptor))
                 return Array.Empty<Tag>();
@@ -53,8 +115,9 @@ namespace L_Commander.App.Infrastructure
                 var file = _dbContext.Files
                     .Where(x => x.Path == descriptor.Path)
                     .Include(x => x.Tags)
+                    .ThenInclude(x => x.TagEntity)
                     .FirstOrDefault();
-
+                Debug.WriteLine(descriptor.Path);
                 if (file == null)
                     return Array.Empty<Tag>();
 
@@ -62,33 +125,26 @@ namespace L_Commander.App.Infrastructure
             }
         }
 
-        public void SetTags(string path, Tag[] tags)
+        public void SetTagsForPath(string path, Tag[] tags)
         {
-            var fileWithTags = _dbContext.Files.Find(path);
+            var fileWithTags = _dbContext.Files.FirstOrDefault(x => x.Path == path);
             if (fileWithTags != null)
             {
-                foreach (var tag in tags)
+                fileWithTags.Tags = tags.Select(x => new FileTagEntity
                 {
-                    var tagEntity = _dbContext.Tags.Find(tag.Guid);
-                    if (tagEntity != null)
-                    {
-                        tagEntity.Text = tag.Text;
-                        tagEntity.Color = tag.Color;
-                    }
-                    else
-                    {
-                        tagEntity = tag.ToEntity();
-                        fileWithTags.Tags.Add(tagEntity);
-
-                        _dbContext.Tags.Add(tagEntity);
-                    }
-                }
+                    FileEntity = fileWithTags,
+                    TagEntity = _dbContext.Tags.First(t => t.TagGuid == x.Guid),
+                }).ToList();
             }
             else
             {
                 fileWithTags = new FileEntity { Path = path };
+                fileWithTags.Tags = tags.Select(x => new FileTagEntity
+                {
+                    FileEntity = fileWithTags, 
+                    TagEntity = _dbContext.Tags.First(t => t.TagGuid == x.Guid),
+                }).ToList();
 
-                fileWithTags.Tags = tags.Select(x => x.ToEntity()).ToList();
                 _dbContext.Add(fileWithTags);
             }
 

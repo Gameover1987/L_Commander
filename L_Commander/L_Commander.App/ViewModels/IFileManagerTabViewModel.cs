@@ -23,6 +23,7 @@ public interface IFileManagerTabViewModel
     IDelegateCommand MakeDirCommand { get; }    
 
     void Initialize(string rootPath);
+    void Unload();
 
     void ReLoad();
 }

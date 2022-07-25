@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
 using L_Commander.UI.Commands;
@@ -7,79 +8,93 @@ namespace L_Commander.App.ViewModels;
 
 public interface IContextMenuItemProvider
 {
-    public ContextMenuItemViewModel[] GetMenuItems(FileSystemEntryDescriptor descriptor);
+    public ContextMenuItemViewModel[] GetMenuItems(IFileSystemEntryViewModel fileSystemEntry);
 }
 
 public class ContextMenuItemProvider : IContextMenuItemProvider
 {
-    private readonly ISettingsProvider _settingsProvider;
     private readonly ITagRepository _tagRepository;
 
-    public ContextMenuItemProvider(ISettingsProvider settingsProvider, ITagRepository tagRepository)
+    public ContextMenuItemProvider(ITagRepository tagRepository)
     {
-        _settingsProvider = settingsProvider;
         _tagRepository = tagRepository;
     }
 
-    public ContextMenuItemViewModel[] GetMenuItems(FileSystemEntryDescriptor descriptor)
+    public ContextMenuItemViewModel[] GetMenuItems(IFileSystemEntryViewModel fileSystemEntry)
     {
-        var tagSettings = _settingsProvider.Get().TagSettings;
+        var allTags = _tagRepository.GetAllTags();
 
-        var tagsByDescriptor = _tagRepository.GetTags(descriptor);
+        var tagsByDescriptor = _tagRepository.GetTagsByPath(fileSystemEntry.GetDescriptor());
 
         var tagsSubMenu = new ContextMenuItemViewModel
         {
-            DisplayName = "Tags",
-            IsEnabled = tagSettings.IsEnabled,
+            Header = "Tags"
         };
-        foreach (var tag in tagSettings.Tags)
+        foreach (var tag in allTags)
         {
             tagsSubMenu.Children.Add(new ContextMenuItemViewModel
             {
-                Data = tag,
+                Header = tag,
                 IsCheckable = true,
                 IsChecked = tagsByDescriptor.Contains(tag, TagEqualityComparer.Instance),
                 Command = new DelegateCommand(obj =>
                 {
                     var item = (ContextMenuItemViewModel)obj;
                     item.IsChecked = !item.IsChecked;
-                    _tagRepository.SetTags(descriptor.Path, tagsSubMenu.Children
+                    _tagRepository.SetTagsForPath(fileSystemEntry.FullPath, tagsSubMenu.Children
                         .Where(x => x.IsChecked)
-                        .Select(x => (Tag)x.Data).ToArray());
+                        .Select(x => (Tag)x.Header).ToArray());
+                    fileSystemEntry.UpdateTags();
                 })
             });
         }
 
-        if (descriptor.IsFile)
+        tagsSubMenu.Children.Add(new SeparatorContextMenuItemViewModel());
+        tagsSubMenu.Children.Add(new ContextMenuItemViewModel
+        {
+            Header = "Remove all tags",
+            IsCheckable = false,
+            IsChecked = false,
+            Command = new DelegateCommand(obj =>
+            {
+                _tagRepository.SetTagsForPath(fileSystemEntry.FullPath, Array.Empty<Tag>());
+                fileSystemEntry.UpdateTags();
+            }, obj =>
+            {
+                return tagsByDescriptor.Any();
+            })
+        });
+
+        if (fileSystemEntry.IsFile)
         {
             return new ContextMenuItemViewModel[]
             {
-                new ContextMenuItemViewModel { DisplayName = "Open", IsDefault = true, GestureText = "Enter" },
-                new ContextMenuItemViewModel { DisplayName = "Open with" },
+                new ContextMenuItemViewModel { Header = "Open", IsDefault = true, GestureText = "Enter" },
+                new ContextMenuItemViewModel { Header = "Open with" },
                 new SeparatorContextMenuItemViewModel(),
                 tagsSubMenu,
                 new SeparatorContextMenuItemViewModel(),
-                new ContextMenuItemViewModel { DisplayName = "Copy", GestureText = "Ctrl+C" },
-                new ContextMenuItemViewModel { DisplayName = "Move", GestureText = "Ctrl+V" },
+                new ContextMenuItemViewModel { Header = "Copy", GestureText = "Ctrl+C" },
+                new ContextMenuItemViewModel { Header = "Move", GestureText = "Ctrl+V" },
                 new SeparatorContextMenuItemViewModel(),
-                new ContextMenuItemViewModel { DisplayName = "Delete", GestureText = "Del" },
+                new ContextMenuItemViewModel { Header = "Delete", GestureText = "Del" },
                 new SeparatorContextMenuItemViewModel(),
-                new ContextMenuItemViewModel { DisplayName = "Properties", GestureText = "Alt+Enter" },
+                new ContextMenuItemViewModel { Header = "Properties", GestureText = "Alt+Enter" },
             };
         }
 
         return new ContextMenuItemViewModel[]
         {
-            new ContextMenuItemViewModel { DisplayName = "Open", IsDefault = true, GestureText = "Enter"},
+            new ContextMenuItemViewModel { Header = "Open", IsDefault = true, GestureText = "Enter"},
             new SeparatorContextMenuItemViewModel(),
             tagsSubMenu,
             new SeparatorContextMenuItemViewModel(),
-            new ContextMenuItemViewModel { DisplayName = "Copy", GestureText = "Ctrl+C"},
-            new ContextMenuItemViewModel { DisplayName = "Move", GestureText = "Ctrl+V"},
+            new ContextMenuItemViewModel { Header = "Copy", GestureText = "Ctrl+C"},
+            new ContextMenuItemViewModel { Header = "Move", GestureText = "Ctrl+V"},
             new SeparatorContextMenuItemViewModel(),
-            new ContextMenuItemViewModel { DisplayName = "Delete", GestureText = "Del"},
+            new ContextMenuItemViewModel { Header = "Delete", GestureText = "Del"},
             new SeparatorContextMenuItemViewModel(),
-            new ContextMenuItemViewModel { DisplayName = "Properties", GestureText = "Alt+Enter"},
+            new ContextMenuItemViewModel { Header = "Properties", GestureText = "Alt+Enter"},
         };
     }
 }

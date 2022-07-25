@@ -12,15 +12,11 @@
              d:DataContext="{d:DesignInstance Type={x:Type designMock:DesignMockTagSettingsItemViewModel}, IsDesignTimeCreatable=True}">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-
-        <CheckBox Grid.Row="0" Content="Use file system tags"
-                  IsChecked="{Binding IsEnabled}"/>
-        <ListBox Grid.Row="1" Margin="0,6,0,0"
-                 IsEnabled="{Binding IsEnabled}"
+        
+        <ListBox Grid.Row="0" Margin="0,6,0,0"
                  ItemsSource="{Binding Tags}"
                  SelectedItem="{Binding SelectedTag}"                 >
             <ListBox.ItemTemplate>
@@ -48,7 +44,7 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,6,0,0"
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,6,0,0"
                     IsEnabled="{Binding IsEnabled}">
             <Button Content="Add tag" Width="100"
                     Command="{Binding AddTagCommand}"/>

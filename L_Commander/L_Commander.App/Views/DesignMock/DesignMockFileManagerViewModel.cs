@@ -48,14 +48,15 @@ internal sealed class DesignMockWindowManager : IWindowManager
 internal sealed class DesignMockFileManagerTabViewModel : FileManagerTabViewModel
 {
     public DesignMockFileManagerTabViewModel()
-        : base(new FolderFilterViewModel(),
+        : base(new FolderFilterViewModel(new DesignMockTagRepository()),
             new FileSystemProvider(new IconCache()), 
             new DesignMockWindowManager(), 
             new OperatingSystemProvider(),
             new DesignMockExceptionHandler(), 
             new FolderWatcher(), 
             new UiTimer(),
-            new FileSystemEntryViewModelFactory(new FileSystemProvider(new IconCache()), new DesignMockExceptionHandler(), new DesignMockContextMenuItemProvider(), new DesignMockTagRepository()))
+            new FileSystemEntryViewModelFactory(new FileSystemProvider(new IconCache()), new DesignMockExceptionHandler(), new DesignMockContextMenuItemProvider(), new DesignMockTagRepository()),
+            new DesignMockTagRepository())
     {
         ThreadTaskExtensions.IsSyncRun = true;
         Initialize("E:\\Download");
@@ -63,7 +64,6 @@ internal sealed class DesignMockFileManagerTabViewModel : FileManagerTabViewMode
         foreach (var fileSystemEntryViewModel in FileSystemEntries)
         {
             fileSystemEntryViewModel.Initialize();
-            fileSystemEntryViewModel.LoadTags();
         }
 
         SelectedFileSystemEntry = FileSystemEntries.FirstOrDefault();
@@ -90,7 +90,8 @@ internal sealed class DesignMockFileManagerTabViewModelFactory : FileManagerTabV
             new DesignMockWindowManager(), 
             new OperatingSystemProvider(), 
             new DesignMockExceptionHandler(), 
-            new FileSystemEntryViewModelFactory(new FileSystemProvider(new IconCache()), new DesignMockExceptionHandler(), new DesignMockContextMenuItemProvider(), new DesignMockTagRepository()))
+            new FileSystemEntryViewModelFactory(new FileSystemProvider(new IconCache()), new DesignMockExceptionHandler(), new DesignMockContextMenuItemProvider(), new DesignMockTagRepository()), 
+            new DesignMockTagRepository())
     {
 
     }

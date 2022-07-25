@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
@@ -81,18 +82,28 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
 
     public ObservableCollection<Tag> Tags { get; } = new ObservableCollection<Tag>();
 
-    public ObservableCollection<ContextMenuItemViewModel> ContextMenuItems
+    public string TagsDescription
     {
         get
         {
-            var menuItems = new ObservableCollection<ContextMenuItemViewModel>(_contextMenuItemProvider.GetMenuItems(_descriptor));
-            return menuItems;
+            if (Tags == null)
+                return null;
+
+            return string.Join(", ", Tags.Select(x => x.Text));
         }
     }
 
-    public void Initialize()
+    public ContextMenuItemViewModel[] ContextMenuItems
     {
-        InitializeImpl();
+        get
+        {
+            return _contextMenuItemProvider.GetMenuItems(this);
+        }
+    }
+
+    public void Initialize(Tag[] tags = null)
+    {
+        InitializeImpl(tags);
     }
 
     public async void CalculateFolderSize()
@@ -119,10 +130,10 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
         }
     }
 
-    public void LoadTags()
+    public void UpdateTags()
     {
         Tags.Clear();
-        var tags = _tagRepository.GetTags(_descriptor);
+        var tags = _tagRepository.GetTagsByPath(_descriptor);
         if (tags.Length == 0)
             return;
 
@@ -137,7 +148,6 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
         return _descriptor;
     }
 
-
     public void Rename(string newPath)
     {
         _fullPath = newPath;
@@ -145,7 +155,7 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
         InitializeImpl();
     }
 
-    protected virtual void InitializeImpl()
+    protected virtual void InitializeImpl(Tag[] tags = null)
     {
         _descriptor = _fileSystemProvider.GetFileSystemDescriptor(_fullPath);
 
@@ -166,6 +176,14 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
             TotalSize = -1;
         }
 
+        Tags.Clear();
+        if (tags != null)
+        {
+            foreach (var tag in tags)
+            {
+                Tags.Add(tag);
+            }
+        }
 
         IsInitialized = true;
 

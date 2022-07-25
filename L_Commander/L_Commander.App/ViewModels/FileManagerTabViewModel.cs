@@ -24,7 +24,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 {
     private const int TimerInterval = 1000;
 
-    private readonly IFolderFilterViewModel _folderFolderFilter;
+    private readonly IFolderFilterViewModel _folderFilter;
     private readonly IFileSystemProvider _fileSystemProvider;
     private readonly IWindowManager _windowManager;
     private readonly IOperatingSystemProvider _operatingSystemProvider;
@@ -32,6 +32,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private readonly IFolderWatcher _folderWatcher;
     private readonly IUiTimer _timer;
     private readonly IFileSystemEntryViewModelFactory _fileSystemEntryViewModelFactory;
+    private readonly ITagRepository _tagRepository;
     private string _fullPath;
 
     private IFileSystemEntryViewModel _selectedFileSystemEntry;
@@ -45,17 +46,18 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private bool _isBusy;
     private bool _isLocked;
 
-    public FileManagerTabViewModel(IFolderFilterViewModel folderFolderFilter,
+    public FileManagerTabViewModel(IFolderFilterViewModel folderFilter,
         IFileSystemProvider fileSystemProvider,
         IWindowManager windowManager,
         IOperatingSystemProvider operatingSystemProvider,
         IExceptionHandler exceptionHandler,
         IFolderWatcher folderWatcher,
         IUiTimer timer,
-        IFileSystemEntryViewModelFactory fileSystemEntryViewModelFactory)
+        IFileSystemEntryViewModelFactory fileSystemEntryViewModelFactory,
+        ITagRepository tagRepository)
     {
-        _folderFolderFilter = folderFolderFilter;
-        _folderFolderFilter.Changed += FolderFolderFilterOnChanged;
+        _folderFilter = folderFilter;
+        _folderFilter.Changed += FolderFilterOnChanged;
         _fileSystemProvider = fileSystemProvider;
         _windowManager = windowManager;
         _operatingSystemProvider = operatingSystemProvider;
@@ -63,6 +65,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _folderWatcher = folderWatcher;
         _timer = timer;
         _fileSystemEntryViewModelFactory = fileSystemEntryViewModelFactory;
+        _tagRepository = tagRepository;
         _timer.Initialize(TimeSpan.FromMilliseconds(TimerInterval));
         _timer.Tick += TimerOnTick;
         _folderWatcher.Changed += FolderWatcherOnChanged;
@@ -142,7 +145,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         }
     }
 
-    public IFolderFilterViewModel FolderFilter => _folderFolderFilter;
+    public IFolderFilterViewModel FolderFilter => _folderFilter;
 
     public IDelegateCommand RenameCommand { get; }
 
@@ -169,17 +172,22 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         SetPath(rootPath);
     }
 
+    public void Unload()
+    {
+        _folderWatcher.EndWatch();
+    }
+
     private async void SetPath(string rootPath)
     {
         if (rootPath != null)
-            _folderWatcher.EndWatch(_fullPath);
+            _folderWatcher.EndWatch();
 
         _fullPath = rootPath;
         _folderWatcher.BeginWatch(_fullPath);
 
         IsBusy = true;
         FileSystemEntries.Clear();
-        _folderFolderFilter.Clear();
+        _folderFilter.Clear();
         try
         {
             await ThreadTaskExtensions.Run(() =>
@@ -187,14 +195,16 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
                 var items = _fileSystemProvider
                     .GetFileSystemEntries(rootPath)
                     .Select(_fileSystemEntryViewModelFactory.CreateEntryViewModel);
+                var filesWithTags = _tagRepository.GetAllFilesWithTags();
                 foreach (var fileSystemEntryViewModel in items)
                 {
-                    fileSystemEntryViewModel.Initialize();
+                    var fileWithTags = filesWithTags.FirstOrDefault(x => x.FilePath == fileSystemEntryViewModel.FullPath);
+                    fileSystemEntryViewModel.Initialize(fileWithTags?.Tags);
                     FileSystemEntries.Add(fileSystemEntryViewModel);
                 }
             });
 
-            _folderFolderFilter.Refresh(FileSystemEntries);
+            _folderFilter.Refresh(FileSystemEntries);
 
             SelectedFileSystemEntry = FileSystemEntries.FirstOrDefault(FileSystemEntryFilter);
         }
@@ -343,7 +353,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _navigationIndex++;
     }
 
-    private void FolderFolderFilterOnChanged(object sender, EventArgs e)
+    private void FolderFilterOnChanged(object sender, EventArgs e)
     {
         _folderView.Refresh();
     }
@@ -390,6 +400,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     {
         _timer.Stop();
         IsBusy = false;
+        
         FolderFilter.Refresh(FileSystemEntries);
         FolderView.Refresh();
     }
@@ -406,7 +417,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         if (entry.IsSystem)
             return false;
 
-        if (!_folderFolderFilter.IsCorrespondsByFilter(entry))
+        if (!_folderFilter.IsCorrespondsByFilter(entry))
         {
             return false;
         }

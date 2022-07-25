@@ -7,7 +7,7 @@
              xmlns:filtering="clr-namespace:L_Commander.App.ViewModels.Filtering"
              xmlns:designMock="clr-namespace:L_Commander.App.Views.DesignMock"
              mc:Ignorable="d" 
-             d:DesignHeight="1000" d:DesignWidth="500"
+             d:DesignHeight="1000" d:DesignWidth="300"
              d:DataContext="{d:DesignInstance Type={x:Type designMock:DesignMockFolderFilterViewModel}, IsDesignTimeCreatable=True}">
     <Grid>
         <Grid.RowDefinitions>
@@ -20,7 +20,7 @@
             <ScrollViewer.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Reset filters"
-                              Command="{Binding ResetFiltersCommand}"/>
+                              Command="{Binding SelectAllFiltersCommand}"/>
                 </ContextMenu>
             </ScrollViewer.ContextMenu>
             <ItemsControl ItemsSource="{Binding Filters}">
@@ -43,47 +43,16 @@
                                     <Setter.Value>
                                         <ControlTemplate>
                                             <Grid>
-                                                <Grid.Style>
-                                                    <Style TargetType="{x:Type Grid}">
-                                                        <Style.Triggers>
-                                                            <MultiDataTrigger>
-                                                                <MultiDataTrigger.Conditions>
-                                                                    <Condition Binding="{Binding ItemCount, Converter={StaticResource NonZeroToBoolConverter}}" Value="True"/>
-                                                                    <Condition Binding="{Binding Items[0].IsChecked}" Value="False"/>
-                                                                </MultiDataTrigger.Conditions>
-                                                                <Setter Property="Opacity" Value="0.4"/>
-                                                                <MultiDataTrigger.EnterActions>
-                                                                    <BeginStoryboard>
-                                                                        <Storyboard TargetProperty="Opacity" >
-                                                                            <DoubleAnimation From="1.0" To="0.4" Duration="0:0:0.3"/>
-                                                                        </Storyboard>
-                                                                    </BeginStoryboard>
-                                                                </MultiDataTrigger.EnterActions>
-                                                                <MultiDataTrigger.ExitActions>
-                                                                    <BeginStoryboard>
-                                                                        <Storyboard TargetProperty="Opacity">
-                                                                            <DoubleAnimation From="0.4" To="1.0" Duration="0:0:0.3"/>
-                                                                        </Storyboard>
-                                                                    </BeginStoryboard>
-                                                                </MultiDataTrigger.ExitActions>
-                                                            </MultiDataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Grid.Style>
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="Auto"/>
                                                     <RowDefinition Height="*"/>
                                                 </Grid.RowDefinitions>
 
-                                                <TextBlock Grid.Row="0" FontSize="22">
-                                                    <Hyperlink Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}, Path=DataContext.CheckOrUncheckGroupCommand}"
-                                                               CommandParameter="{Binding Name}"
-                                                               Click="Hyperlink_OnClick">
-                                                        <TextBlock Text="{Binding Name, Mode=OneWay}"/>
-                                                    </Hyperlink>
-                                                </TextBlock>
+                                                <Button Content="{Binding Name}"
+                                                        Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}, Path=DataContext.CheckOrUncheckGroupCommand}"
+                                                        CommandParameter="{Binding Name}"/>
 
-                                                <ItemsPresenter Grid.Row="1" Margin="0,0,0,0"/>
+                                                <ItemsPresenter Grid.Row="1" Margin="0,0,0,6"/>
                                             </Grid>
                                         </ControlTemplate>
                                     </Setter.Value>
@@ -95,7 +64,11 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <Button Grid.Row="1" Content="Reset filters" Margin="6"
-                Command="{Binding ResetFiltersCommand}"/>
+        <StackPanel Grid.Row="1" Margin="6,6,0,0">
+            <Button Content="Clear all filters" Margin="0,0,0,0"
+                    Command="{Binding ClearAllFiltersCommand}"/>
+            <Button Content="Select all filters" Margin="0,6,0,0"
+                    Command="{Binding SelectAllFiltersCommand}"/>
+        </StackPanel>
     </Grid>
 </UserControl>

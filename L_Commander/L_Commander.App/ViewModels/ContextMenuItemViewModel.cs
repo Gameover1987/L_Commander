@@ -14,8 +14,6 @@ public class ContextMenuItemViewModel : ViewModelBase
         IsEnabled = true;
     }
 
-    public string DisplayName { get; set; }
-
     public IDelegateCommand Command { get; set; }
 
     public string GestureText { get; set; }
@@ -40,7 +38,7 @@ public class ContextMenuItemViewModel : ViewModelBase
 
     public bool IsEnabled { get; set; }
 
-    public object Data { get; set; }
+    public object Header { get; set; }
 
     public ObservableCollection<ContextMenuItemViewModel> Children { get; } = new ObservableCollection<ContextMenuItemViewModel>();
 }

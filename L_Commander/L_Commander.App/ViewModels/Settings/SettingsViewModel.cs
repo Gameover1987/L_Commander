@@ -26,7 +26,7 @@ namespace L_Commander.App.ViewModels.Settings
 
         bool IsChanged { get; }
 
-        void Save(ClientSettings settings);
+        void Save();
     }
 
     public class SettingsViewModel : ViewModelBase, ISettingsViewModel
@@ -77,10 +77,8 @@ namespace L_Commander.App.ViewModels.Settings
         {
             foreach (var settingsItemViewModel in Items.Where(x => x.IsChanged))
             {
-                settingsItemViewModel.Save(_settings);
+                settingsItemViewModel.Save();
             }
-
-            _settingProvider.Save(_settings);
         }
 
         private bool CanOkCommandHandler()

@@ -58,6 +58,16 @@ public static class TagExtensions
             Color = tagEntity.Color,
         };
     }
+
+    public static Tag FromEntity(this FileTagEntity fileTagEntity)
+    {
+        return new Tag
+        {
+            Guid = fileTagEntity.TagEntity.TagGuid,
+            Text = fileTagEntity.TagEntity.Text,
+            Color = fileTagEntity.TagEntity.Color,
+        };
+    }
 }
 
 /// <summary>
@@ -70,4 +80,11 @@ public class Tag
     public string Text { get; set; }
 
     public int Color { get; set; }
+}
+
+public class FileWithTags
+{
+    public string FilePath { get; set; }
+
+    public Tag[] Tags { get; set; }
 }

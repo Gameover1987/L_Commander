@@ -1,4 +1,5 @@
 ﻿using System;
+using L_Commander.App.Infrastructure;
 using L_Commander.UI.ViewModels;
 
 namespace L_Commander.App.ViewModels.Filtering;
@@ -31,6 +32,8 @@ public class FilterItemViewModel : ViewModelBase
     public string Group { get; set; }
 
     public int Order { get; set; }
+
+    public Tag Tag { get; set; }
     
     public event EventHandler Checked;
 

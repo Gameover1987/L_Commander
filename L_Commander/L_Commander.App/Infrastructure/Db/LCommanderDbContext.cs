@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace L_Commander.App.Infrastructure.Db
@@ -13,9 +9,6 @@ namespace L_Commander.App.Infrastructure.Db
     public class FileEntity
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid FileGuid { get; set; }
-
         public string Path { get; set; }
 
         public List<FileTagEntity> Tags { get; set; }
@@ -28,14 +21,10 @@ namespace L_Commander.App.Infrastructure.Db
         public int Id { get; set; }
 
         [Required]
-        public Guid FileGuid { get; set; }
+        public FileEntity FileEntity { get; set; }
 
         [Required]
-        public Guid TagGuid { get; set; }
-
-        public virtual FileEntity FileEntity { get; set; }
-
-        public virtual TagEntity TagEntity { get; set; }
+        public TagEntity TagEntity { get; set; }
     }
 
     public class TagEntity
@@ -78,26 +67,19 @@ namespace L_Commander.App.Infrastructure.Db
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite(@"Data Source=Tags.db");
+            optionsBuilder.UseSqlite(@"Data Source=FileSystemTags.db");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<FileEntity>(entity =>
-                {
-                    entity.HasKey(x => x.FileGuid);
-                    entity.Property(x => x.FileGuid).ValueGeneratedOnAdd();
-                });
-            modelBuilder.Entity<FileTagEntity>(entity =>
-            {
-                entity.HasKey(x => x.Id);
-                entity.Property(x => x.Id).ValueGeneratedOnAdd();
-            });
-            modelBuilder.Entity<TagEntity>(entity =>
-            {
-                entity.HasKey(x => x.TagGuid);
-                entity.Property(x => x.TagGuid).ValueGeneratedOnAdd();
-            });
+            modelBuilder.Entity<FileTagEntity>()
+                .HasKey(x => x.Id);
+            modelBuilder.Entity<FileTagEntity>()
+                .HasOne(x => x.FileEntity);
+            modelBuilder.Entity<FileTagEntity>()
+                .HasOne(x => x.TagEntity);
+
+
         }
     }
 }

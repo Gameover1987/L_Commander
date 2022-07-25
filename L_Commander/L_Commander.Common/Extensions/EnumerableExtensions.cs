@@ -23,5 +23,10 @@ namespace L_Commander.Common.Extensions
 
             return !enumerable.Any();
         }
+
+        public static bool IntersectsWith<T>(this IEnumerable<T> enumerableA, IEnumerable<T> enumerableB)
+        {
+            return enumerableA.Any(enumerableB.Contains);
+        }
     }
 }

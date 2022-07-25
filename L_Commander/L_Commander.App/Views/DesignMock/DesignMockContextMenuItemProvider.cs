@@ -10,9 +10,9 @@ namespace L_Commander.App.Views.DesignMock
 {
     internal sealed class DesignMockContextMenuItemProvider : IContextMenuItemProvider
     {
-        public ContextMenuItemViewModel[] GetMenuItems(FileSystemEntryDescriptor descriptor)
+        public ContextMenuItemViewModel[] GetMenuItems(IFileSystemEntryViewModel fileSystemEntry)
         {
-            return new ContextMenuItemViewModel[0];
+            throw new NotImplementedException();
         }
     }
 }

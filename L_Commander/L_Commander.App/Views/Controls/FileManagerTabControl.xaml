@@ -28,6 +28,88 @@
                     <TextBlock Grid.Column="1" Text="{Binding Text}" Margin="6,0,0,0"/>
                 </Grid>
             </DataTemplate>
+
+            <ContextMenu x:Key="entryContextMenu" 
+                         ItemsSource="{Binding ContextMenuItems}"
+                         d:DataContext="{d:DesignInstance Type=viewModels:FileSystemEntryViewModel, IsDesignTimeCreatable=False}">
+                <ContextMenu.ItemContainerStyle>
+                    <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MahApps.Styles.MenuItem}">
+                        <Setter Property="Header" Value="{Binding Header, Mode=OneWay}"/>
+                        <Setter Property="IsChecked" Value="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Setter Property="IsCheckable" Value="{Binding IsCheckable}"/>
+                        <Setter Property="Command" Value="{Binding Command}"/>
+                        <Setter Property="InputGestureText" Value="{Binding GestureText}"/>
+                        <Setter Property="IsEnabled" Value="{Binding IsEnabled}"/>
+                        <Setter Property="ItemsSource" Value="{Binding Children}"/>
+                        <Setter Property="ItemContainerStyle">
+                            <Setter.Value>
+                                <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MahApps.Styles.MenuItem}">
+                                    <Setter Property="Header" Value="{Binding Header}"/>
+                                    <Setter Property="Command" Value="{Binding Command}"/>
+                                    <Setter Property="CommandParameter" Value="{Binding}"/>
+                                    <Setter Property="IsChecked" Value="{Binding IsChecked, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <Setter Property="IsCheckable" Value="True"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsSeparator}" Value="True">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="{x:Type MenuItem}">
+                                                        <Separator>
+                                                            <Separator.Template>
+                                                                <ControlTemplate TargetType="{x:Type Separator}">
+                                                                    <Grid Margin="0 6 0 4" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                                                                        <Rectangle Height="1" Margin="20 0 1 1" 
+                                                                            Fill="{DynamicResource MahApps.Brushes.Gray7}"
+                                                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                                            UseLayoutRounding="True" />
+                                                                        <Rectangle Height="1" Margin="20 1 1 0"
+                                                                            Fill="{DynamicResource MahApps.Brushes.ThemeBackground}"
+                                                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                                            UseLayoutRounding="True" />
+                                                                    </Grid>
+                                                                </ControlTemplate>
+                                                            </Separator.Template>
+                                                        </Separator>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsDefault}" Value="True">
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsSeparator}" Value="True">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type MenuItem}">
+                                            <Separator>
+                                                <Separator.Template>
+                                                    <ControlTemplate TargetType="{x:Type Separator}">
+                                                        <Grid Margin="0 6 0 4" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                                                            <Rectangle Height="1" Margin="20 0 1 1"
+                                                                                Fill="{DynamicResource MahApps.Brushes.Gray7}"
+                                                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                                                UseLayoutRounding="True" />
+                                                            <Rectangle Height="1" Margin="20 1 1 0"
+                                                                                Fill="{DynamicResource MahApps.Brushes.ThemeBackground}"
+                                                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                                                UseLayoutRounding="True" />
+                                                        </Grid>
+                                                    </ControlTemplate>
+                                                </Separator.Template>
+                                            </Separator>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContextMenu.ItemContainerStyle>
+            </ContextMenu>
         </ResourceDictionary>
     </UserControl.Resources>
     <UserControl.InputBindings>
@@ -96,66 +178,10 @@
             <DataGrid.RowStyle>
                 <Style TargetType="{x:Type DataGridRow}"
                        BasedOn="{StaticResource MahApps.Styles.DataGridRow}">
-                    <Setter Property="ContextMenu">
-                        <Setter.Value>
-                            <ContextMenu ItemsSource="{Binding ContextMenuItems}"
-                                         d:DataContext="{d:DesignInstance Type=viewModels:FileSystemEntryViewModel, IsDesignTimeCreatable=False}">
-                                <ContextMenu.ItemContainerStyle>
-                                    <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MahApps.Styles.MenuItem}">
-                                        <Setter Property="Header" Value="{Binding DisplayName, Mode=OneWay}"/>
-                                        <Setter Property="IsChecked" Value="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                        <Setter Property="IsCheckable" Value="{Binding IsCheckable}"/>
-                                        <Setter Property="Command" Value="{Binding Command}"/>
-                                        <Setter Property="InputGestureText" Value="{Binding GestureText}"/>
-                                        <Setter Property="IsEnabled" Value="{Binding IsEnabled}"/>
-                                        <Setter Property="ItemsSource" Value="{Binding Children}"/>
-                                        <Setter Property="ItemContainerStyle">
-                                            <Setter.Value>
-                                                <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MahApps.Styles.MenuItem}">
-                                                    <Setter Property="Header" Value="{Binding Data}"/>
-                                                    <Setter Property="Command" Value="{Binding Command}"/>
-                                                    <Setter Property="CommandParameter" Value="{Binding}"/>
-                                                    <Setter Property="IsChecked" Value="{Binding IsChecked, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                                    <Setter Property="IsCheckable" Value="True"/>
-                                                </Style>
-                                            </Setter.Value>
-                                        </Setter>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsDefault}" Value="True">
-                                                <Setter Property="FontWeight" Value="SemiBold"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding IsSeparator}" Value="True">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate TargetType="{x:Type MenuItem}">
-                                                            <Separator>
-                                                                <Separator.Template>
-                                                                    <ControlTemplate TargetType="{x:Type Separator}">
-                                                                        <Grid Margin="0 6 0 4" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
-                                                                            <Rectangle Height="1" Margin="20 0 1 1"
-                                                                                Fill="{DynamicResource MahApps.Brushes.Gray7}"
-                                                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                                                                                UseLayoutRounding="True" />
-                                                                            <Rectangle Height="1" Margin="20 1 1 0"
-                                                                                Fill="{DynamicResource MahApps.Brushes.ThemeBackground}"
-                                                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                                                                                UseLayoutRounding="True" />
-                                                                        </Grid>
-                                                                    </ControlTemplate>
-                                                                </Separator.Template>
-                                                            </Separator>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ContextMenu.ItemContainerStyle>
-                            </ContextMenu>
-                        </Setter.Value>
-                    </Setter>
+                    <Setter Property="ContextMenu" Value="{StaticResource entryContextMenu}"/>
                     <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick"/>
-                    <EventSetter Event="Loaded" Handler="DataGridRow_OnLoaded"></EventSetter>
+                    <EventSetter Event="ContextMenuOpening" Handler="DataGridRow_ContextMenuOpening"/>
+                    <EventSetter Event="ContextMenuClosing" Handler="DataGridRow_ContextMenuClosing"/>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsHidden}" Value="True">
                             <Setter Property="Opacity" Value="0.6"/>
@@ -164,33 +190,12 @@
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>
-                <DataGridTemplateColumn>
+                <DataGridTemplateColumn x:Name="tagsColumn" MaxWidth="100" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Grid>
-                                <iconPacks:PackIconMaterial Kind="Folder" Margin="2,0,0,0"
-                                                            Visibility="{Binding IsFile, Converter={StaticResource BoolToInvisibilityConverter}}"/>
-                                <Image Width="16" Height="16" Source="{Binding Icon}"
-                                       Visibility="{Binding IsFile, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                            </Grid>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn x:Name="fileNameColumn" Header="{x:Static app:Resources.DataGridColumnName_Path}" Width="*">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock Grid.Column="0" Text="{Binding Name}"
-                                           TextTrimming="CharacterEllipsis"
-                                           helpers:TextBlockToolTipHelper.ShowTooltipWhenTrimming="True"/>
-
-                                <ItemsControl Grid.Column="1" MaxWidth="100" HorizontalAlignment="Right"
-                                              ItemsSource="{Binding Tags}">
+                            <Grid Height="16" Margin="2,0,0,0" Background="Transparent"
+                                  ToolTip="{Binding TagsDescription}">
+                                <ItemsControl ItemsSource="{Binding Tags}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <VirtualizingStackPanel Orientation="Horizontal"/>
@@ -199,7 +204,6 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate DataType="{x:Type infrastructure:Tag}">
                                             <Rectangle Width="7" 
-                                                       ToolTip="{Binding Text}"
                                                        Fill="{Binding Color, Converter={StaticResource ColorToBrushConverter}}"
                                                        Margin="0,0,1,0">
                                                 <Rectangle.RenderTransform>
@@ -213,6 +217,27 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <iconPacks:PackIconMaterial Kind="Folder" Margin="2,0,0,0"
+                                                            Visibility="{Binding IsFile, Converter={StaticResource BoolToInvisibilityConverter}}"/>
+                                <Image Width="16" Height="16" Source="{Binding Icon}"
+                                       Visibility="{Binding IsFile, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn x:Name="fileNameColumn" Header="{x:Static app:Resources.DataGridColumnName_Path}" Width="*"
+                                    Binding="{Binding Name}">
+                    <DataGridTextColumn.ElementStyle>
+                       <Style TargetType="{x:Type TextBlock}">
+                           <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                           <Setter Property="helpers:TextBlockToolTipHelper.ShowTooltipWhenTrimming" Value="True"/>
+                       </Style>   
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
                 <DataGridTextColumn x:Name="typeColumn" Header="{x:Static app:Resources.DataGridColumnName_Type}" Width="Auto" MinWidth="60"
                                     Binding="{Binding Extension, Mode=OneWay}" />
                 <DataGridTemplateColumn x:Name="totalSizeColumn" Header="{x:Static app:Resources.DataGridColumnName_Size}" Width="Auto" MinWidth="90"

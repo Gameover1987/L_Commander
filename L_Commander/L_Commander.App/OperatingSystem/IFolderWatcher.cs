@@ -37,7 +37,7 @@ namespace L_Commander.App.OperatingSystem
 
         void BeginWatch(string path);
 
-        void EndWatch(string path);
+        void EndWatch();
     }
 
     public sealed class FolderWatcher : IFolderWatcher
@@ -64,7 +64,7 @@ namespace L_Commander.App.OperatingSystem
             _fileSystemWatcher.EnableRaisingEvents = true;
         }
 
-        public void EndWatch(string path)
+        public void EndWatch()
         {
             _fileSystemWatcher.Changed -= FileSystemWatcherOnChanged;
             _fileSystemWatcher.Created -= FileSystemWatcherOnCreated;
