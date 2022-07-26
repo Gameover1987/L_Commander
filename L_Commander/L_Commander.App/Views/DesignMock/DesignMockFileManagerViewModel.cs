@@ -24,7 +24,7 @@ internal sealed class DesignMockWindowManager : IWindowManager
         throw new NotImplementedException();
     }
 
-    public Task<MessageDialogResult> ShowMessage(string title, string message)
+    public Task<MessageDialogResult> ShowMessage(string title, string message, MetroDialogSettings settings = null)
     {
         throw new NotImplementedException();
     }

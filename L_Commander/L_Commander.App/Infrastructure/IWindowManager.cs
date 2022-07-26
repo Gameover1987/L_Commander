@@ -15,7 +15,7 @@ namespace L_Commander.App.Infrastructure
 
         Task<string> ShowInputBox(string title, string message, MetroDialogSettings settings = null);
 
-        Task<MessageDialogResult> ShowMessage(string title, string message);
+        Task<MessageDialogResult> ShowMessage(string title, string message, MetroDialogSettings settings = null);
 
         Task<MessageDialogResult> ShowQuestion(string title, string message, MetroDialogSettings settings = null);
 
@@ -36,9 +36,9 @@ namespace L_Commander.App.Infrastructure
             return DialogManager.ShowInputAsync(MainWindow, title, message, settings);
         }
 
-        public Task<MessageDialogResult> ShowMessage(string title, string message)
+        public Task<MessageDialogResult> ShowMessage(string title, string message, MetroDialogSettings settings = null)
         {
-            return DialogManager.ShowMessageAsync(MainWindow, title, message, MessageDialogStyle.Affirmative);
+            return DialogManager.ShowMessageAsync(MainWindow, title, message, MessageDialogStyle.Affirmative, settings);
         }
 
         public Task<MessageDialogResult> ShowQuestion(string title, string message, MetroDialogSettings settings = null)

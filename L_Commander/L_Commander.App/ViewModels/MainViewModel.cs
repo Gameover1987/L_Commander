@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.OperatingSystem.Operations;
@@ -160,6 +161,7 @@ namespace L_Commander.App.ViewModels
             if (AnotherFileManager?.SelectedTab == null)
                 return false;
 
+
             return !_copyOperation.IsStarted;
         }
 
@@ -170,6 +172,10 @@ namespace L_Commander.App.ViewModels
                 var sourceEntries = ActiveFileManager?.SelectedTab.SelectedEntries
                     .Select(x => x.GetDescriptor())
                     .ToArray();
+                if (await CheckSourceAndDestPath("Copy operation", sourceEntries, AnotherFileManager.SelectedTab.FullPath) == false)
+                {
+                    return;
+                }
 
                 var questionSettings = new MetroDialogSettings { DefaultButtonFocus = MessageDialogResult.Affirmative };
                 var result = await _windowManager.ShowQuestion("Copy operation", $"Do you want copy files to '{AnotherFileManager.SelectedTab.FullPath}'?", questionSettings);
@@ -197,6 +203,33 @@ namespace L_Commander.App.ViewModels
             }
         }
 
+        private async Task<bool> CheckSourceAndDestPath(string operationName, FileSystemEntryDescriptor[] sourceEntries, string destPath)
+        {
+            var sourcePaths = sourceEntries.Select(x => new Uri(x.Path)).ToArray();
+            var destDir = new Uri(destPath);
+            var metroDialogSettings = new MetroDialogSettings
+            {
+                DefaultButtonFocus = MessageDialogResult.Affirmative,
+            };
+
+            foreach (var sourcePath in sourcePaths)
+            {
+                if (sourcePath == destDir)
+                {
+                    await _windowManager.ShowMessage(operationName, $"Source path '{sourcePath.AbsolutePath}' and destination path '{destDir.AbsolutePath}' are equal!", metroDialogSettings);
+                    return false;
+                }
+
+                if (sourcePath.IsBaseOf(destDir))
+                {
+                    await _windowManager.ShowMessage(operationName, $"Source path '{sourcePath.AbsolutePath}' is subpath of '{destDir.AbsolutePath}'!", metroDialogSettings);
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         private bool CanMoveCommandHandler()
         {
             if (ActiveFileManager?.SelectedTab?.SelectedEntries.Any() == false)
@@ -214,6 +247,11 @@ namespace L_Commander.App.ViewModels
                 var sourceEntries = ActiveFileManager?.SelectedTab.SelectedEntries
                    .Select(x => x.GetDescriptor())
                    .ToArray();
+
+                if (await CheckSourceAndDestPath("Move operation", sourceEntries, AnotherFileManager.SelectedTab.FullPath) == false)
+                {
+                    return;
+                }
 
                 var questionSettings = new MetroDialogSettings { DefaultButtonFocus = MessageDialogResult.Affirmative };
                 var result = await _windowManager.ShowQuestion("Move operation", $"Do you want move files to '{AnotherFileManager.SelectedTab.FullPath}'?", questionSettings);
@@ -290,7 +328,7 @@ namespace L_Commander.App.ViewModels
                     _progressDialogController.Canceled -= ProgressDialogControllerOnCanceled;
                 }
             }
-        }       
+        }
 
         private bool CanMakeDirCommandHandler()
         {
@@ -300,7 +338,7 @@ namespace L_Commander.App.ViewModels
         private void MakeDirCommandHandler()
         {
             ActiveFileManager?.SelectedTab?.MakeDirCommand.TryExecute();
-        }        
+        }
 
         private void ShowSettingsCommandHandler()
         {
