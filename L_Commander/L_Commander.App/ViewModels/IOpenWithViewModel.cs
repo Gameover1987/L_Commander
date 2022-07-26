@@ -29,6 +29,7 @@ namespace L_Commander.App.ViewModels
 
         private readonly ICollectionView _appsView;
         private ApplicationModel _selectedApp;
+        private bool _isDefaultApp;
 
         public OpenWithViewModel(IFileSystemProvider fileSystemProvider, IApplicationsProvider applicationsProvider)
         {
@@ -83,6 +84,18 @@ namespace L_Commander.App.ViewModels
                     return;
                 _selectedApp = value;
                 OnPropertyChanged(() => SelectedApp);
+            }
+        }
+
+        public bool IsDefaultApp
+        {
+            get { return _isDefaultApp; }
+            set
+            {
+                if (_isDefaultApp == value)
+                    return;
+                _isDefaultApp = value;
+                OnPropertyChanged(() => IsDefaultApp);
             }
         }
 

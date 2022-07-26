@@ -22,6 +22,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             
             <ListBox Grid.Row="0" Margin="0,6,0,0" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -78,6 +79,9 @@
                     </GroupStyle>
                 </ListBox.GroupStyle>
             </ListBox>
+
+            <mah:ToggleSwitch Grid.Row="2" Content="Default application" Margin="0,6,0,0"
+                              IsOn="{Binding IsDefaultApp}"/>
         </Grid>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">

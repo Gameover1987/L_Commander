@@ -72,6 +72,16 @@ public class ApplicationsProvider : IApplicationsProvider
         return installedApplications.Values.ToArray();
     }
 
+    public ApplicationModel GetSelectedApplication(string fileExtension)
+    {
+        return null;
+    }
+
+    public void SaveSelectedApplication(string fileExtension, ApplicationModel selectedApplication)
+    {
+        
+    }
+
     private void TryAddApplications(string s, IDictionary<string, ApplicationModel> associatedApplications)
     {
         foreach (var applicationFile in GetOpenWithList(s, RootRegistryKey.CurrentUser, FileExtensionsX32RegistryKeyName))

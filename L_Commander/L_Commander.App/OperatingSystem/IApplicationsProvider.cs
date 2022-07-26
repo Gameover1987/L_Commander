@@ -10,5 +10,9 @@ namespace L_Commander.App.OperatingSystem
         ApplicationModel[] GetAssociatedApplications(string fileExtension);
 
         ApplicationModel[] GetInstalledApplications();
+
+        ApplicationModel GetSelectedApplication(string fileExtension);
+
+        void SaveSelectedApplication(string fileExtension, ApplicationModel selectedApplication);
     }
 }
