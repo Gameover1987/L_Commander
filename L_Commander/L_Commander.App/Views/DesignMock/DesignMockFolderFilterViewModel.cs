@@ -71,7 +71,7 @@ namespace L_Commander.App.Views.DesignMock
 
             var entries = fileSystemProvider
                 .GetFileSystemEntries("E:\\Download")
-                .Select(x => new FileSystemEntryViewModel(x, fileSystemProvider, new DesignMockExceptionHandler(), new DesignMockContextMenuItemProvider(), new DesignMockTagRepository()))
+                .Select(x => new FileSystemEntryViewModel(x, fileSystemProvider, new DesignMockExceptionHandler(), new DesignMockTagRepository()))
                 .Take(100)
                 .ToArray()
                 .ForEach(x => x.Initialize())

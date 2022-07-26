@@ -85,6 +85,11 @@ public sealed class FileSystemProvider : IFileSystemProvider
         return Path.GetFileName(path);
     }
 
+    public string GetFileExtension(string path)
+    {
+        return Path.GetExtension(path);
+    }
+
     public string GetDirectoryName(string path)
     {
         var info = new DirectoryInfo(path);

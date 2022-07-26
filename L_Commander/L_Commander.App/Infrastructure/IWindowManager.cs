@@ -21,15 +21,14 @@ namespace L_Commander.App.Infrastructure
 
         Task<ProgressDialogController> ShowProgressDialog(string title, string message);
 
+        Task ShowDialogAsync<T>(object dataContext) where T : BaseMetroDialog, new();
+
         bool ShowDialogWindow<T>(object viewModel) where T : Window;
     }
 
     public sealed class WindowManager : IWindowManager
     {
-        public MetroWindow MainWindow
-        {
-            get { return (MetroWindow)Application.Current.MainWindow; }
-        }
+        public MetroWindow MainWindow => (MetroWindow)Application.Current.MainWindow;
 
         public Task<string> ShowInputBox(string title, string message, MetroDialogSettings settings = null)
         {
@@ -50,6 +49,14 @@ namespace L_Commander.App.Infrastructure
         {
             return DialogManager.ShowProgressAsync(MainWindow, title, message, isCancelable: true);
         }
+
+        public async Task ShowDialogAsync<T>(object dataContext) where T : BaseMetroDialog, new()
+        {
+            var dialog = await DialogManager.ShowMetroDialogAsync<T>(MainWindow);
+            dialog.DataContext = dataContext;
+            await dialog.WaitUntilUnloadedAsync();
+        }
+
 
         public bool ShowDialogWindow<T>(object viewModel) where T : Window
         {

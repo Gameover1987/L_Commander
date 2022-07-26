@@ -59,8 +59,10 @@
         <Menu Grid.Row="0">
             <MenuItem Header="Files">
                 <MenuItem Header="Open"
+                          Command="{Binding ActiveFileManager.SelectedTab.OpenCommand}"
                           InputGestureText="Enter"/>
-                <MenuItem Header="Open with" IsEnabled="False"/>
+                <MenuItem Header="Open with" IsEnabled="False"
+                          Command="{Binding ActiveFileManager.SelectedTab.OpenWithCommand}"/>
                 <Separator/>
                 <MenuItem Header="Archive" IsEnabled="False"/>
                 <MenuItem Header="Unarchive" IsEnabled="False"/>

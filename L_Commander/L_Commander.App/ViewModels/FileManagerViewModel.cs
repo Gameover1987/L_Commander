@@ -15,17 +15,17 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
     private readonly IFileSystemProvider _fileSystemProvider;
     private readonly IClipBoardProvider _clipBoardHelper;
     private readonly IFileManagerTabViewModelFactory _fileManagerTabViewModelFactory;
-    private readonly IOperatingSystemProvider _operatingSystemProvider;
+    private readonly IProcessProvider _processProvider;
 
     private IFileManagerTabViewModel _selectedTab;
 
-    public FileManagerViewModel(IFileSystemProvider fileSystemProvider, IClipBoardProvider clipBoardHelper, IFileManagerTabViewModelFactory fileManagerTabViewModelFactory, IOperatingSystemProvider operatingSystemProvider)
+    public FileManagerViewModel(IFileSystemProvider fileSystemProvider, IClipBoardProvider clipBoardHelper, IFileManagerTabViewModelFactory fileManagerTabViewModelFactory, IProcessProvider processProvider)
     {
         _fileSystemProvider = fileSystemProvider;
         _fileSystemProvider.DrivesChanged += FileSystemProviderOnDrivesChanged;
         _clipBoardHelper = clipBoardHelper;
         _fileManagerTabViewModelFactory = fileManagerTabViewModelFactory;
-        _operatingSystemProvider = operatingSystemProvider;
+        _processProvider = processProvider;
 
         ChangeDriveCommand = new DelegateCommand(ChangeDriveCommandHandler, CanChangeDriveCommandHandler);
         NewTabCommand = new DelegateCommand(NewTabCommandHandler, CanNewTabCommandHandler);
@@ -230,13 +230,13 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
     {
         var tab = (IFileManagerTabViewModel)obj;
 
-        _operatingSystemProvider.OpenExplorer(tab.FullPath);
+        _processProvider.OpenExplorer(tab.FullPath);
     }
 
     private void OpenInTerminalCommandHandler(object obj)
     {
         var tab = (IFileManagerTabViewModel)obj;
-        _operatingSystemProvider.OpenTerminal(tab.FullPath);
+        _processProvider.OpenTerminal(tab.FullPath);
     }
 
     private void FileSystemProviderOnDrivesChanged(object sender, EventArgs e)

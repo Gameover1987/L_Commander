@@ -20,6 +20,8 @@ namespace L_Commander.App.OperatingSystem
 
         string GetFileName(string path);
 
+        string GetFileExtension(string path);
+
         string GetDirectoryName(string path);
 
         void Rename(FileOrFolder fileOrFolder, string oldName, string newName);

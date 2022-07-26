@@ -117,7 +117,7 @@ namespace L_Commander.App.Infrastructure
                     .Include(x => x.Tags)
                     .ThenInclude(x => x.TagEntity)
                     .FirstOrDefault();
-                Debug.WriteLine(descriptor.Path);
+                
                 if (file == null)
                     return Array.Empty<Tag>();
 

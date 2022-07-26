@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using L_Commander.App.ViewModels;
 using MahApps.Metro.Controls;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace L_Commander.App.Views.Controls
 {
@@ -73,9 +74,11 @@ namespace L_Commander.App.Views.Controls
         {
             var dataGridRow = (DataGridRow)sender;
             var fileSystemEntryViewModel = (IFileSystemEntryViewModel)dataGridRow.DataContext;
-            
+
+            var contextMenuItemProvider = App.ServiceProvider.GetService<IContextMenuItemProvider>();
+
             if (dataGridRow.ContextMenu != null)
-                dataGridRow.ContextMenu.ItemsSource = fileSystemEntryViewModel.ContextMenuItems;
+                dataGridRow.ContextMenu.ItemsSource = contextMenuItemProvider.GetMenuItems(fileSystemEntryViewModel); ;
         }
 
         private void DataGridRow_ContextMenuClosing(object sender, ContextMenuEventArgs e)

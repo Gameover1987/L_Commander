@@ -14,24 +14,27 @@ namespace L_Commander.App.ViewModels.Factories
     {
         private readonly IFileSystemProvider _fileSystemProvider;
         private readonly IWindowManager _windowManager;
-        private readonly IOperatingSystemProvider _operatingSystemProvider;
+        private readonly IProcessProvider _processProvider;
         private readonly IExceptionHandler _exceptionHandler;
         private readonly IFileSystemEntryViewModelFactory _fileSystemEntryViewModelFactory;
         private readonly ITagRepository _tagRepository;
+        private readonly IOpenWithViewModel _openWithViewModel;
 
         public FileManagerTabViewModelFactory(IFileSystemProvider fileSystemProvider,
             IWindowManager windowManager,
-            IOperatingSystemProvider operatingSystemProvider, 
+            IProcessProvider processProvider, 
             IExceptionHandler exceptionHandler,
             IFileSystemEntryViewModelFactory fileSystemEntryViewModelFactory,
-            ITagRepository tagRepository)
+            ITagRepository tagRepository,
+            IOpenWithViewModel openWithViewModel)
         {
             _fileSystemProvider = fileSystemProvider;
             _windowManager = windowManager;
-            _operatingSystemProvider = operatingSystemProvider;
+            _processProvider = processProvider;
             _exceptionHandler = exceptionHandler;
             _fileSystemEntryViewModelFactory = fileSystemEntryViewModelFactory;
             _tagRepository = tagRepository;
+            _openWithViewModel = openWithViewModel;
         }
 
         public IFileManagerTabViewModel CreateFileManagerTab()
@@ -39,12 +42,13 @@ namespace L_Commander.App.ViewModels.Factories
             var tab = new FileManagerTabViewModel(new FolderFilterViewModel(_tagRepository),
                 _fileSystemProvider, 
                 _windowManager, 
-                _operatingSystemProvider,
+                _processProvider,
                 _exceptionHandler, 
                 new FolderWatcher(_fileSystemProvider), 
                 new UiTimer(), 
                 _fileSystemEntryViewModelFactory,
-                _tagRepository);
+                _tagRepository,
+                _openWithViewModel);
             return tab;
         }
     }

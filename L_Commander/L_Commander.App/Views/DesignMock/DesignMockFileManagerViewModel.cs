@@ -18,7 +18,6 @@ namespace L_Commander.App.Views.DesignMock;
 internal sealed class DesignMockWindowManager : IWindowManager
 {
     public MetroWindow MainWindow { get; }
-
     public Task<string> ShowInputBox(string title, string message, MetroDialogSettings settings = null)
     {
         throw new NotImplementedException();
@@ -39,6 +38,11 @@ internal sealed class DesignMockWindowManager : IWindowManager
         throw new NotImplementedException();
     }
 
+    public Task ShowDialogAsync<T>(object dataContext) where T : BaseMetroDialog, new()
+    {
+        throw new NotImplementedException();
+    }
+
     public bool ShowDialogWindow<T>(object viewModel) where T : Window
     {
         throw new NotImplementedException();
@@ -51,12 +55,13 @@ internal sealed class DesignMockFileManagerTabViewModel : FileManagerTabViewMode
         : base(new FolderFilterViewModel(new DesignMockTagRepository()),
             new FileSystemProvider(new IconCache()), 
             new DesignMockWindowManager(), 
-            new OperatingSystemProvider(),
+            new ProcessProvider(),
             new DesignMockExceptionHandler(), 
             new FolderWatcher(new FileSystemProvider(new IconCache())), 
             new UiTimer(),
-            new FileSystemEntryViewModelFactory(new FileSystemProvider(new IconCache()), new DesignMockExceptionHandler(), new DesignMockContextMenuItemProvider(), new DesignMockTagRepository()),
-            new DesignMockTagRepository())
+            new FileSystemEntryViewModelFactory(new FileSystemProvider(new IconCache()), new DesignMockExceptionHandler(), new DesignMockTagRepository()),
+            new DesignMockTagRepository(),
+            new DesignMockOpenWithViewModel())
     {
         ThreadTaskExtensions.IsSyncRun = true;
         Initialize("E:\\Download");
@@ -88,10 +93,11 @@ internal sealed class DesignMockFileManagerTabViewModelFactory : FileManagerTabV
     public DesignMockFileManagerTabViewModelFactory()
         : base(new FileSystemProvider(new IconCache()),
             new DesignMockWindowManager(), 
-            new OperatingSystemProvider(), 
-            new DesignMockExceptionHandler(), 
-            new FileSystemEntryViewModelFactory(new FileSystemProvider(new IconCache()), new DesignMockExceptionHandler(), new DesignMockContextMenuItemProvider(), new DesignMockTagRepository()), 
-            new DesignMockTagRepository())
+            new ProcessProvider(), 
+            new DesignMockExceptionHandler(),
+            new FileSystemEntryViewModelFactory(new FileSystemProvider(new IconCache()), new DesignMockExceptionHandler(), new DesignMockTagRepository()), 
+            new DesignMockTagRepository(),
+            new DesignMockOpenWithViewModel())
     {
 
     }
@@ -100,7 +106,7 @@ internal sealed class DesignMockFileManagerTabViewModelFactory : FileManagerTabV
 internal sealed class DesignMockFileManagerViewModel : FileManagerViewModel
 {
     public DesignMockFileManagerViewModel()
-        : base(new FileSystemProvider(new IconCache()), new ClipBoardProvider(), new DesignMockFileManagerTabViewModelFactory(), new OperatingSystemProvider())
+        : base(new FileSystemProvider(new IconCache()), new ClipBoardProvider(), new DesignMockFileManagerTabViewModelFactory(), new ProcessProvider())
     {
         Initialize(new FileManagerSettings
         {
@@ -111,12 +117,13 @@ internal sealed class DesignMockFileManagerViewModel : FileManagerViewModel
                     Path = @"C:\", 
                     IsLocked = true 
                 },
-                 new TabSettings
+                new TabSettings
                 {
                     Path = @"E:\Download",
                     IsLocked = false
                 }
-            },SelectedPath = @"C:\"
+            }, 
+            SelectedPath = @"C:\"
         });
     }
 }

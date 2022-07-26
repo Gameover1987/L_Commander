@@ -24,19 +24,6 @@ namespace L_Commander.Common.Extensions
                 imageSource.Freeze();
 
                 return imageSource;
-
-                //using (var bitmap = icon.ToBitmap())
-                //{
-                //    IntPtr hBitmap = bitmap.GetHbitmap();
-
-                //    ImageSource wpfBitmap = Imaging.CreateBitmapSourceFromHBitmap(
-                //        hBitmap,
-                //        IntPtr.Zero,
-                //        Int32Rect.Empty,
-                //        BitmapSizeOptions.FromEmptyOptions());
-
-                //    return wpfBitmap;
-                //}
             }
         }
     }

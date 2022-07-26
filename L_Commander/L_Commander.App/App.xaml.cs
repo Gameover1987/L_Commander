@@ -5,6 +5,7 @@ using L_Commander.App.Infrastructure;
 using L_Commander.App.Infrastructure.Db;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.OperatingSystem.Operations;
+using L_Commander.App.OperatingSystem.Registry;
 using L_Commander.App.ViewModels;
 using L_Commander.App.ViewModels.Factories;
 using L_Commander.App.ViewModels.Filtering;
@@ -25,7 +26,7 @@ namespace L_Commander.App
     /// </summary>
     public partial class App : Application
     {
-        private ServiceProvider _serviceProvider;
+        private static ServiceProvider _serviceProvider;
         private IConfiguration _configuration;
 
         private void App_OnStartup(object sender, StartupEventArgs e)
@@ -39,6 +40,8 @@ namespace L_Commander.App
             MainWindow.DataContext = _serviceProvider.GetService<IMainViewModel>();
             MainWindow.Show();
         }
+
+        public static ServiceProvider ServiceProvider => _serviceProvider;
 
         private void CommandException(object? sender, ExceptionEventArgs e)
         {
@@ -76,7 +79,7 @@ namespace L_Commander.App
                 .AddSingleton(_configuration)
                 .AddSingleton<IConfiguration>(_configuration)
 
-                //DB
+                // Database
                 .AddDbContext<LCommanderDbContext>((app, opt) =>
                 { })
 
@@ -94,9 +97,11 @@ namespace L_Commander.App
                 })
 
                 // System
-                .AddSingleton<IOperatingSystemProvider, OperatingSystemProvider>()
+                .AddSingleton<IProcessProvider, ProcessProvider>()
                 .AddSingleton<IIconCache, IconCache>()
                 .AddSingleton<IFileSystemProvider, FileSystemProvider>()
+                .AddSingleton<IRegistryProvider, WindowsRegistryProvider>()
+                .AddSingleton<IApplicationsProvider, ApplicationsProvider>()
                 .AddTransient<IFolderWatcher, FolderWatcher>()
                 .AddSingleton<ICopyOperation, CopyOperation>()
                 .AddSingleton<IMoveOperation, MoveOperation>()
@@ -113,7 +118,9 @@ namespace L_Commander.App
                 .AddSingleton<IMainViewModel, MainViewModel>()
                 .AddSingleton<ISettingsViewModel, SettingsViewModel>()
                 .AddSingleton<IContextMenuItemProvider, ContextMenuItemProvider>()
+                .AddSingleton<IOpenWithViewModel, OpenWithViewModel>()
                 .AddTransient<IFileManagerViewModel, FileManagerViewModel>();
+
 
             return serviceCollection.BuildServiceProvider();
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using ControlzEx.Standard;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.OperatingSystem.Operations;
@@ -17,6 +18,7 @@ namespace L_Commander.App.ViewModels
         private readonly ISettingsProvider _settingsProvider;
         private readonly IFileManagerViewModel _leftFileManager;
         private readonly IFileManagerViewModel _rightFileManager;
+        private IFileManagerViewModel _activeFileManager;
         private readonly ICopyOperation _copyOperation;
         private readonly IMoveOperation _moveOperation;
         private readonly IDeleteOperation _deleteOperation;
@@ -66,7 +68,18 @@ namespace L_Commander.App.ViewModels
 
         public IFileManagerViewModel RightFileManager => _rightFileManager;
 
-        public IFileManagerViewModel ActiveFileManager { get; set; }
+        public IFileManagerViewModel ActiveFileManager
+        {
+            get { return _activeFileManager; }
+            set
+            {
+                if (_activeFileManager == value)
+                    return;
+                _activeFileManager = value;
+                OnPropertyChanged(() => ActiveFileManager);
+                OnPropertyChanged(() => AnotherFileManager);
+            }
+        }
 
         public IFileManagerViewModel AnotherFileManager
         {

@@ -42,5 +42,5 @@ public interface IFileSystemEntryViewModel
 
     ObservableCollection<Tag> Tags { get; }
 
-    ContextMenuItemViewModel[] ContextMenuItems { get; }
+    string TagsDescription { get; }
 }

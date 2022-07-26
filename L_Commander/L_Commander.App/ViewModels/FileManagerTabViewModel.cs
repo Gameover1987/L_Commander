@@ -8,6 +8,7 @@ using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.ViewModels.Factories;
 using L_Commander.App.ViewModels.Filtering;
+using L_Commander.App.Views.Controls;
 using L_Commander.Common.Extensions;
 using L_Commander.UI.Commands;
 using L_Commander.UI.Infrastructure;
@@ -23,12 +24,13 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private readonly IFolderFilterViewModel _folderFilter;
     private readonly IFileSystemProvider _fileSystemProvider;
     private readonly IWindowManager _windowManager;
-    private readonly IOperatingSystemProvider _operatingSystemProvider;
+    private readonly IProcessProvider _processProvider;
     private readonly IExceptionHandler _exceptionHandler;
     private readonly IFolderWatcher _folderWatcher;
     private readonly IUiTimer _timer;
     private readonly IFileSystemEntryViewModelFactory _fileSystemEntryViewModelFactory;
     private readonly ITagRepository _tagRepository;
+    private readonly IOpenWithViewModel _openWithViewModel;
     private string _fullPath;
 
     private IFileSystemEntryViewModel _selectedFileSystemEntry;
@@ -45,29 +47,32 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     public FileManagerTabViewModel(IFolderFilterViewModel folderFilter,
         IFileSystemProvider fileSystemProvider,
         IWindowManager windowManager,
-        IOperatingSystemProvider operatingSystemProvider,
+        IProcessProvider processProvider,
         IExceptionHandler exceptionHandler,
         IFolderWatcher folderWatcher,
         IUiTimer timer,
         IFileSystemEntryViewModelFactory fileSystemEntryViewModelFactory,
-        ITagRepository tagRepository)
+        ITagRepository tagRepository,
+        IOpenWithViewModel openWithViewModel)
     {
         _folderFilter = folderFilter;
         _folderFilter.Changed += FolderFilterOnChanged;
         _fileSystemProvider = fileSystemProvider;
         _windowManager = windowManager;
-        _operatingSystemProvider = operatingSystemProvider;
+        _processProvider = processProvider;
         _exceptionHandler = exceptionHandler;
         _folderWatcher = folderWatcher;
         _folderWatcher.Changed += FolderWatcherOnChanged;
         _timer = timer;
         _fileSystemEntryViewModelFactory = fileSystemEntryViewModelFactory;
         _tagRepository = tagRepository;
+        _openWithViewModel = openWithViewModel;
         _timer.Initialize(TimeSpan.FromMilliseconds(TimerInterval));
         _timer.Tick += TimerOnTick;
 
         RenameCommand = new DelegateCommand(RenameCommandHandler, CanRenameCommandHandler);
         OpenCommand = new DelegateCommand(OpenCommandHandler, CanOpenCommandHandler);
+        OpenWithCommand = new DelegateCommand(OpenWithCommandHandler, CanOpenWithCommandHandler);
         MakeDirCommand = new DelegateCommand(MakeDirCommandHandler, CanMakeDirCommandHandler);
         CalculateFolderSizeCommand = new DelegateCommand(CalculateFolderSizeCommandHandler, CanCalculateFolderSizeCommandHandler);
 
@@ -149,6 +154,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     public IDelegateCommand OpenCommand { get; }
 
+    public IDelegateCommand OpenWithCommand { get; }
+
     public IDelegateCommand MakeDirCommand { get; }
 
     public IDelegateCommand CalculateFolderSizeCommand { get; }
@@ -193,7 +200,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
             {
                 var items = _fileSystemProvider
                     .GetFileSystemEntries(rootPath)
-                    .Select(_fileSystemEntryViewModelFactory.CreateEntryViewModel);
+                    .Select(x =>_fileSystemEntryViewModelFactory.CreateEntryViewModel(x, this));
                 var filesWithTags = _tagRepository.GetAllFilesWithTags();
                 foreach (var fileSystemEntryViewModel in items)
                 {
@@ -250,7 +257,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     {
         if (SelectedFileSystemEntry.IsFile)
         {
-            _operatingSystemProvider.OpenFile(SelectedFileSystemEntry.FullPath);
+            _processProvider.OpenFile(SelectedFileSystemEntry.FullPath);
         }
         else
         {
@@ -259,6 +266,23 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
             _navigationHistory.Add(NavigationHistoryItem.Create(path));
             _navigationIndex++;
         }
+    }
+
+    private bool CanOpenWithCommandHandler()
+    {
+        return SelectedFileSystemEntry.IsFile;
+    }
+
+    private async void OpenWithCommandHandler()
+    {
+        var fullPath = SelectedFileSystemEntry.FullPath;
+        _openWithViewModel.Initialize(fullPath);
+
+        await _windowManager.ShowDialogAsync<OpenWithDialog>(_openWithViewModel);
+        if (_openWithViewModel.IsCancelled)
+            return;
+
+        _processProvider.OpenFileWith(fullPath, _openWithViewModel.SelectedApp);
     }
 
     private bool CanMakeDirCommandHandler()
@@ -377,7 +401,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
                 switch (e.Change)
                 {
                     case FileChangeType.Create:
-                        var newEntry = _fileSystemEntryViewModelFactory.CreateEntryViewModel(e.CurrentPath);
+                        var newEntry = _fileSystemEntryViewModelFactory.CreateEntryViewModel(e.CurrentPath, this);
                         newEntry.Initialize();
                         FileSystemEntries.Add(newEntry);
                         break;

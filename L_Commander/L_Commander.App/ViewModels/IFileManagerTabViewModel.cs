@@ -23,6 +23,7 @@ public interface IFileManagerTabViewModel : IDisposable
 
     IDelegateCommand RenameCommand { get; }
     IDelegateCommand OpenCommand { get; }
+    IDelegateCommand OpenWithCommand { get; }
     IDelegateCommand MakeDirCommand { get; }    
 
     void Initialize(string rootPath);

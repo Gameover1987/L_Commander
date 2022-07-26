@@ -15,7 +15,6 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
 {
     private readonly IFileSystemProvider _fileSystemProvider;
     private readonly IExceptionHandler _exceptionHandler;
-    private readonly IContextMenuItemProvider _contextMenuItemProvider;
     private readonly ITagRepository _tagRepository;
 
     private string _fullPath;
@@ -25,14 +24,12 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
 
     public FileSystemEntryViewModel(string fullPath,
         IFileSystemProvider fileSystemProvider,
-        IExceptionHandler exceptionHandler, 
-        IContextMenuItemProvider contextMenuItemProvider,
+        IExceptionHandler exceptionHandler,
         ITagRepository tagRepository)
     {
         _fullPath = fullPath;
         _fileSystemProvider = fileSystemProvider;
         _exceptionHandler = exceptionHandler;
-        _contextMenuItemProvider = contextMenuItemProvider;
         _tagRepository = tagRepository;
     }
 
@@ -90,14 +87,6 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
                 return null;
 
             return string.Join(", ", Tags.Select(x => x.Text));
-        }
-    }
-
-    public ContextMenuItemViewModel[] ContextMenuItems
-    {
-        get
-        {
-            return _contextMenuItemProvider.GetMenuItems(this);
         }
     }
 
