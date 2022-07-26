@@ -41,7 +41,7 @@ namespace L_Commander.App.ViewModels.Factories
                 _windowManager, 
                 _operatingSystemProvider,
                 _exceptionHandler, 
-                new FolderWatcher(), 
+                new FolderWatcher(_fileSystemProvider), 
                 new UiTimer(), 
                 _fileSystemEntryViewModelFactory,
                 _tagRepository);

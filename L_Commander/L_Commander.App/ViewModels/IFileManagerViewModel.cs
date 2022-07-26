@@ -1,8 +1,9 @@
-﻿using L_Commander.App.Infrastructure;
+﻿using System;
+using L_Commander.App.Infrastructure;
 
 namespace L_Commander.App.ViewModels
 {
-    public interface IFileManagerViewModel
+    public interface IFileManagerViewModel : IDisposable
     {
         IFileManagerTabViewModel SelectedTab { get; }
 

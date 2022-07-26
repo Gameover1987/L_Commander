@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Data;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.ViewModels.Factories;
 using L_Commander.App.ViewModels.Filtering;
-using L_Commander.Common;
 using L_Commander.Common.Extensions;
 using L_Commander.UI.Commands;
 using L_Commander.UI.Infrastructure;
@@ -63,12 +59,12 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _operatingSystemProvider = operatingSystemProvider;
         _exceptionHandler = exceptionHandler;
         _folderWatcher = folderWatcher;
+        _folderWatcher.Changed += FolderWatcherOnChanged;
         _timer = timer;
         _fileSystemEntryViewModelFactory = fileSystemEntryViewModelFactory;
         _tagRepository = tagRepository;
         _timer.Initialize(TimeSpan.FromMilliseconds(TimerInterval));
         _timer.Tick += TimerOnTick;
-        _folderWatcher.Changed += FolderWatcherOnChanged;
 
         RenameCommand = new DelegateCommand(RenameCommandHandler, CanRenameCommandHandler);
         OpenCommand = new DelegateCommand(OpenCommandHandler, CanOpenCommandHandler);
@@ -147,6 +143,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     public IFolderFilterViewModel FolderFilter => _folderFilter;
 
+    public event EventHandler DeletedExternally;
+
     public IDelegateCommand RenameCommand { get; }
 
     public IDelegateCommand OpenCommand { get; }
@@ -172,9 +170,10 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         SetPath(rootPath);
     }
 
-    public void Unload()
+    public void Dispose()
     {
         _folderWatcher.EndWatch();
+        _folderWatcher.Dispose();
     }
 
     private async void SetPath(string rootPath)
@@ -362,19 +361,28 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     {
         ExecuteInUIThread(() =>
         {
-            IsBusy = true;
-            _timer.Stop();
             try
             {
+                if (e.Change == FileChangeType.Delete && e.CurrentPath == FullPath)
+                {
+                    IsBusy = false;
+                    _timer.Stop();
+                    FileSystemEntries.Clear();
+                    DeletedExternally?.Invoke(this, EventArgs.Empty);
+                }
+
+                IsBusy = true;
+                _timer.Stop();
+
                 switch (e.Change)
                 {
-                    case FileChnageType.Create:
+                    case FileChangeType.Create:
                         var newEntry = _fileSystemEntryViewModelFactory.CreateEntryViewModel(e.CurrentPath);
                         newEntry.Initialize();
                         FileSystemEntries.Add(newEntry);
                         break;
 
-                    case FileChnageType.Delete:
+                    case FileChangeType.Delete:
                         var deletedEntry = FileSystemEntries.FirstOrDefault(x => x.FullPath == e.CurrentPath);
                         if (deletedEntry != null)
                         {
@@ -382,7 +390,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
                         }
                         break;
 
-                    case FileChnageType.Rename:
+                    case FileChangeType.Rename:
                         var renamedEntry = FileSystemEntries.FirstOrDefault(x => x.FullPath == e.OldPath);
                         renamedEntry?.Rename(e.CurrentPath);
                         break;
@@ -400,7 +408,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     {
         _timer.Stop();
         IsBusy = false;
-        
+
         FolderFilter.Refresh(FileSystemEntries);
         FolderView.Refresh();
     }

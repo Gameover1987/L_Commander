@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace L_Commander.App.OperatingSystem
 {
-    public enum FileChnageType
+    public enum FileChangeType
     {
         Create,
         Rename,
@@ -17,21 +14,21 @@ namespace L_Commander.App.OperatingSystem
 
     public class FileChangedEventArgs
     {
-        public FileChangedEventArgs(FileChnageType change, string currentPath, string oldPath = null)
+        public FileChangedEventArgs(FileChangeType change, string currentPath, string oldPath = null)
         {
             Change = change;
             OldPath = oldPath;
             CurrentPath = currentPath;
         }
 
-        public FileChnageType Change { get; }
+        public FileChangeType Change { get; }
 
         public string OldPath { get; }
 
         public string CurrentPath { get; }
     }
 
-    public interface IFolderWatcher
+    public interface IFolderWatcher : IDisposable
     {
         event EventHandler<FileChangedEventArgs> Changed;
 
@@ -42,14 +39,33 @@ namespace L_Commander.App.OperatingSystem
 
     public sealed class FolderWatcher : IFolderWatcher
     {
+        private readonly IFileSystemProvider _fileSystemProvider;
         private readonly FileSystemWatcher _fileSystemWatcher = new FileSystemWatcher();
+        
+        private volatile bool _isDisposing;
+        private readonly Thread _monitoringThread;
 
-        public FolderWatcher()
+        public FolderWatcher(IFileSystemProvider fileSystemProvider)
         {
-            _fileSystemWatcher.Changed += FileSystemWatcherOnChanged;
+            _fileSystemProvider = fileSystemProvider;
             _fileSystemWatcher.Created += FileSystemWatcherOnCreated;
             _fileSystemWatcher.Deleted += FileSystemWatcherOnDeleted;
             _fileSystemWatcher.Renamed += FileSystemWatcherOnRenamed;
+
+            _monitoringThread = new Thread(() =>
+            {
+                while (!_isDisposing)
+                {
+                    if (!_fileSystemWatcher.EnableRaisingEvents && !_isDisposing)
+                        Thread.Sleep(100);
+
+                    if (!_fileSystemProvider.IsDirectoryExists(_fileSystemWatcher.Path))
+                        Changed?.Invoke(this, new FileChangedEventArgs(FileChangeType.Delete, _fileSystemWatcher.Path));
+
+                    Thread.Sleep(100);
+                }
+            }){IsBackground = true};
+            _monitoringThread.Start();
         }
 
         public event EventHandler<FileChangedEventArgs> Changed;
@@ -57,7 +73,6 @@ namespace L_Commander.App.OperatingSystem
         public void BeginWatch(string path)
         {
             _fileSystemWatcher.Path = path;
-            _fileSystemWatcher.Changed += FileSystemWatcherOnChanged;
             _fileSystemWatcher.Created += FileSystemWatcherOnCreated;
             _fileSystemWatcher.Deleted += FileSystemWatcherOnDeleted;
             _fileSystemWatcher.Renamed += FileSystemWatcherOnRenamed;
@@ -66,31 +81,35 @@ namespace L_Commander.App.OperatingSystem
 
         public void EndWatch()
         {
-            _fileSystemWatcher.Changed -= FileSystemWatcherOnChanged;
             _fileSystemWatcher.Created -= FileSystemWatcherOnCreated;
             _fileSystemWatcher.Deleted -= FileSystemWatcherOnDeleted;
             _fileSystemWatcher.Renamed -= FileSystemWatcherOnRenamed;
             _fileSystemWatcher.EnableRaisingEvents = false;
         }
 
-        private void FileSystemWatcherOnChanged(object sender, FileSystemEventArgs e)
-        {
-            
-        }
-
         private void FileSystemWatcherOnCreated(object sender, FileSystemEventArgs e)
         {
-            Changed?.Invoke(this, new FileChangedEventArgs(FileChnageType.Create, e.FullPath));
+            Changed?.Invoke(this, new FileChangedEventArgs(FileChangeType.Create, e.FullPath));
         }
 
         private void FileSystemWatcherOnDeleted(object sender, FileSystemEventArgs e)
         {
-            Changed?.Invoke(this, new FileChangedEventArgs(FileChnageType.Delete, e.FullPath));
+            Changed?.Invoke(this, new FileChangedEventArgs(FileChangeType.Delete, e.FullPath));
         }
 
         private void FileSystemWatcherOnRenamed(object sender, RenamedEventArgs e)
         {
-            Changed?.Invoke(this, new FileChangedEventArgs(FileChnageType.Rename, e.FullPath, e.OldFullPath));
+            Changed?.Invoke(this, new FileChangedEventArgs(FileChangeType.Rename, e.FullPath, e.OldFullPath));
+        }
+
+        public void Dispose()
+        {
+            if (_isDisposing)
+                return;
+
+            _isDisposing = true;
+            _fileSystemWatcher.EnableRaisingEvents = false;
+            _fileSystemWatcher.Dispose();
         }
     }
 }

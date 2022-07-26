@@ -4,7 +4,6 @@ using System.Linq;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.ViewModels.Factories;
-using L_Commander.App.ViewModels.Filtering;
 using L_Commander.Common.Extensions;
 using L_Commander.UI.Commands;
 using L_Commander.UI.ViewModels;
@@ -28,10 +27,10 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
         _fileManagerTabViewModelFactory = fileManagerTabViewModelFactory;
         _operatingSystemProvider = operatingSystemProvider;
 
-        ChangeDriveCommand = new DelegateCommand(ChangeDriveCommandHandler, x => CanChangeDriveCommandHandler(x));
+        ChangeDriveCommand = new DelegateCommand(ChangeDriveCommandHandler, CanChangeDriveCommandHandler);
         NewTabCommand = new DelegateCommand(NewTabCommandHandler, CanNewTabCommandHandler);
-        CloseTabCommand = new DelegateCommand(CloseTabCommandHandler, x => CanCloseTabCommandHandler(x));
-        CloseAllButThisTabCommand = new DelegateCommand(CloseAllButThisTabCommandHandler, x => CanCloseAllButThisTabCommandHandler(x));
+        CloseTabCommand = new DelegateCommand(CloseTabCommandHandler, CanCloseTabCommandHandler);
+        CloseAllButThisTabCommand = new DelegateCommand(CloseAllButThisTabCommandHandler, CanCloseAllButThisTabCommandHandler);
         LockTabCommand = new DelegateCommand(LockTabCommandHandler);
         CopyPathCommand = new DelegateCommand(CopyPathCommandHandler);
         OpenInExplorerCommand = new DelegateCommand(OpenInExplorerCommandHandler);
@@ -72,6 +71,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
             Drives.Add(new DriveViewModel(driveInfo));
         }
 
+        Tabs.ForEach(x => x.DeletedExternally -= TabOnDeletedExternally);
         Tabs.Clear();
         if (settings != null && settings.Tabs?.Any() == true)
         {
@@ -96,8 +96,8 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
         }
         else
         {
-            var fileManagerTabViewModel = CreateFileManagerTabViewModel(Drives.First().RootPath);
-            Tabs.Add(fileManagerTabViewModel);
+            var tab = CreateFileManagerTabViewModel(Drives.First().RootPath);
+            Tabs.Add(tab);
 
             SelectedTab = Tabs.First();
         }
@@ -128,12 +128,21 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
         SelectedTab = sourceTab;
     }
 
+    public void Dispose()
+    {
+        foreach (var tab in Tabs)
+        {
+            tab.Dispose();
+        }
+    }
+
     protected virtual IFileManagerTabViewModel CreateFileManagerTabViewModel(string path)
     {
-        var fileManagerTabViewModel = _fileManagerTabViewModelFactory.CreateFileManagerTab();
-        fileManagerTabViewModel.Initialize(path);
+        var tab = _fileManagerTabViewModelFactory.CreateFileManagerTab();
+        tab.DeletedExternally += TabOnDeletedExternally;
+        tab.Initialize(path);
 
-        return fileManagerTabViewModel;
+        return tab;
     }
 
     private bool CanChangeDriveCommandHandler(object obj)
@@ -178,7 +187,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
     private void CloseTabCommandHandler(object obj)
     {
         var tab = (IFileManagerTabViewModel)obj;
-        tab.Unload();
+        tab.Dispose();
 
         Tabs.Remove(tab);
     }
@@ -200,7 +209,7 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
 
         foreach (var tab in tabsToRemove)
         {
-            tab.Unload();
+            tab.Dispose();
             Tabs.Remove(tab);
         }
     }
@@ -239,5 +248,12 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
         {
             Drives.Add(new DriveViewModel(driveInfo));
         }
+    }
+
+    private void TabOnDeletedExternally(object sender, EventArgs e)
+    {
+        var tab = (IFileManagerTabViewModel)sender;
+        tab.Dispose();
+        Tabs.Remove(tab);
     }
 }

@@ -53,7 +53,7 @@ internal sealed class DesignMockFileManagerTabViewModel : FileManagerTabViewMode
             new DesignMockWindowManager(), 
             new OperatingSystemProvider(),
             new DesignMockExceptionHandler(), 
-            new FolderWatcher(), 
+            new FolderWatcher(new FileSystemProvider(new IconCache())), 
             new UiTimer(),
             new FileSystemEntryViewModelFactory(new FileSystemProvider(new IconCache()), new DesignMockExceptionHandler(), new DesignMockContextMenuItemProvider(), new DesignMockTagRepository()),
             new DesignMockTagRepository())
