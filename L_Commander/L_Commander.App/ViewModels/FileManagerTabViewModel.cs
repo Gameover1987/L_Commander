@@ -32,6 +32,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private readonly IFileSystemEntryViewModelFactory _fileSystemEntryViewModelFactory;
     private readonly ITagRepository _tagRepository;
     private readonly IOpenWithViewModel _openWithViewModel;
+    private readonly ITabStatusBarViewModel _statusBarViewModel;
     private string _fullPath;
 
     private IFileSystemEntryViewModel _selectedFileSystemEntry;
@@ -54,7 +55,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         IUiTimer timer,
         IFileSystemEntryViewModelFactory fileSystemEntryViewModelFactory,
         ITagRepository tagRepository,
-        IOpenWithViewModel openWithViewModel)
+        IOpenWithViewModel openWithViewModel,
+        ITabStatusBarViewModel statusBarViewModel)
     {
         _folderFilter = folderFilter;
         _folderFilter.Changed += FolderFilterOnChanged;
@@ -68,6 +70,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _fileSystemEntryViewModelFactory = fileSystemEntryViewModelFactory;
         _tagRepository = tagRepository;
         _openWithViewModel = openWithViewModel;
+        _statusBarViewModel = statusBarViewModel;
         _timer.Initialize(TimeSpan.FromMilliseconds(TimerInterval));
         _timer.Tick += TimerOnTick;
 
@@ -81,7 +84,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         BackCommand = new DelegateCommand(BackCommandHandler, CanBackCommandHandler);
         NextCommand = new DelegateCommand(NextCommandHandler, CanNextCommandHandler);
         TopCommand = new DelegateCommand(TopCommandHandler, CanTopCommandHandler);
-        NavigateCommand = new DelegateCommand(NavigateCommandHandler, x => CanNavigateCommandHandler());
+        NavigateCommand = new DelegateCommand(NavigateCommandHandler, x => CanNavigateCommandHandler(x));
 
         BindingOperations.EnableCollectionSynchronization(FileSystemEntries, _lock);
 
@@ -162,8 +165,12 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         {
             _selectedFileSystemEntries = value;
             OnPropertyChanged(() => SelectedEntries);
+            
+            _statusBarViewModel.Update(this);
         }
     }
+
+    public ITabStatusBarViewModel StatusBar => _statusBarViewModel;
 
     public IFolderFilterViewModel FolderFilter => _folderFilter;
 
@@ -252,11 +259,11 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
                         FileSystemEntries.Add(fileSystemEntry);
                     }
                 }
+
+                SelectedFileSystemEntry = FileSystemEntries.FirstOrDefault(FileSystemEntryFilter);
             });
 
             _folderFilter.Refresh(FileSystemEntries);
-
-            SelectedFileSystemEntry = FileSystemEntries.FirstOrDefault(FileSystemEntryFilter);
         }
         finally
         {
@@ -433,7 +440,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _navigationIndex++;
     }
 
-    private bool CanNavigateCommandHandler()
+    private bool CanNavigateCommandHandler(object obj)
     {
         return true;
     }
@@ -441,6 +448,9 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private void NavigateCommandHandler(object obj)
     {
         var pathPartViewModel = (FileSystemPathPartViewModel)obj;
+        if (pathPartViewModel.Path == FullPath)
+            return;
+
         SetPath(pathPartViewModel.Path);
         _navigationHistory.Add(NavigationHistoryItem.Create(pathPartViewModel.Path));
         _navigationIndex++;

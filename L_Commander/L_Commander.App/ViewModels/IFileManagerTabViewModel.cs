@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using L_Commander.UI.Commands;
 using System.Windows.Data;
 using L_Commander.App.ViewModels.Filtering;
@@ -12,6 +13,8 @@ public interface IFileManagerTabViewModel : IDisposable
     string ShortPath { get; }
 
     bool IsLocked { get; set; }
+
+    ObservableCollection<IFileSystemEntryViewModel> FileSystemEntries { get; }
 
     IFileSystemEntryViewModel[] SelectedEntries { get; set; }
 

@@ -61,7 +61,8 @@ internal sealed class DesignMockFileManagerTabViewModel : FileManagerTabViewMode
             new UiTimer(),
             new FileSystemEntryViewModelFactory(new FileSystemProvider(new IconCache()), new DesignMockExceptionHandler(), new DesignMockTagRepository()),
             new DesignMockTagRepository(),
-            new DesignMockOpenWithViewModel())
+            new DesignMockOpenWithViewModel(),
+            new TabStatusBarViewModel())
     {
         ThreadTaskExtensions.IsSyncRun = true;
         Initialize("E:\\Download");

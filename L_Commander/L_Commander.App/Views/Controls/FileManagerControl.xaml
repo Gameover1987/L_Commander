@@ -42,7 +42,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" >
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" Margin="6,0,0,0">
             <ItemsControl ItemsSource="{Binding Drives}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>

@@ -127,6 +127,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
@@ -285,5 +286,30 @@
         <mah:MetroProgressBar Grid.Row="2"
                               Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}"
                               IsIndeterminate="{Binding IsBusy, Mode=OneWay}"/>
+
+        <StatusBar Grid.Row="3" DataContext="{Binding StatusBar}">
+            <StatusBarItem >
+                <TextBlock>
+                    <Run Text="Total:"/>
+                    <Run Text="{Binding TotalCount, Mode=OneWay}"/>
+                </TextBlock>
+            </StatusBarItem>
+           
+            <Separator Style="{StaticResource MahApps.Styles.Separator.StatusBar}" />
+
+            <StatusBarItem >
+                <TextBlock>
+                    <Run Text="Selected:"/>
+                    <Run Text="{Binding SelectedCount, Mode=OneWay}"/>
+                </TextBlock>
+            </StatusBarItem>
+            <Separator Style="{StaticResource MahApps.Styles.Separator.StatusBar}" />
+
+            <StatusBarItem >
+                <TextBlock>
+                    <Run Text="{Binding SelectionInfo, Mode=OneWay}"/>
+                </TextBlock>
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
 </UserControl>

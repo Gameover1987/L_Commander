@@ -48,7 +48,8 @@ namespace L_Commander.App.ViewModels.Factories
                 new UiTimer(), 
                 _fileSystemEntryViewModelFactory,
                 _tagRepository,
-                _openWithViewModel);
+                _openWithViewModel,
+                new TabStatusBarViewModel());
             return tab;
         }
     }
