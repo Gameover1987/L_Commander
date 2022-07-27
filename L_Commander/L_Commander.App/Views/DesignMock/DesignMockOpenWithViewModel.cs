@@ -12,7 +12,7 @@ namespace L_Commander.App.Views.DesignMock
     internal sealed class DesignMockOpenWithViewModel : OpenWithViewModel
     {
         public DesignMockOpenWithViewModel() 
-            : base(new FileSystemProvider(new IconCache()), new ApplicationsProvider(new WindowsRegistryProvider()))
+            : base(new FileSystemProvider(new IconCache()), new ApplicationsProvider(new RegistryProvider()))
         {
             Initialize("123.jpg");
             SelectedApp = Apps.FirstOrDefault();

@@ -176,6 +176,6 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
 
         IsInitialized = true;
 
-        OnPropertyChanged();
+        //OnPropertyChanged();
     }
 }

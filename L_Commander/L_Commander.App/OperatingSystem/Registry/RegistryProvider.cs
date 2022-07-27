@@ -4,7 +4,7 @@ using Microsoft.Win32;
 
 namespace L_Commander.App.OperatingSystem.Registry;
 
-public class WindowsRegistryProvider : IRegistryProvider
+public class RegistryProvider : IRegistryProvider
 {
     public IRegistryKey GetRegistryKey(RootRegistryKey rootRegistryKey)
     {

@@ -41,7 +41,7 @@ namespace L_Commander.App.OperatingSystem
     {
         private readonly IFileSystemProvider _fileSystemProvider;
         private readonly FileSystemWatcher _fileSystemWatcher = new FileSystemWatcher();
-        
+
         private volatile bool _isDisposing;
         private readonly Thread _monitoringThread;
 
@@ -57,14 +57,18 @@ namespace L_Commander.App.OperatingSystem
                 while (!_isDisposing)
                 {
                     if (!_fileSystemWatcher.EnableRaisingEvents && !_isDisposing)
-                        Thread.Sleep(100);
+                        Thread.Sleep(1 * 1000);
 
                     if (!_fileSystemProvider.IsDirectoryExists(_fileSystemWatcher.Path))
                         Changed?.Invoke(this, new FileChangedEventArgs(FileChangeType.Delete, _fileSystemWatcher.Path));
 
-                    Thread.Sleep(100);
+                    Thread.Sleep(1*1000);
                 }
-            }){IsBackground = true};
+            })
+            {
+                IsBackground = true,
+                Priority = ThreadPriority.Lowest,
+            };
             _monitoringThread.Start();
         }
 
@@ -72,6 +76,8 @@ namespace L_Commander.App.OperatingSystem
 
         public void BeginWatch(string path)
         {
+            _monitoringThread.Name = $"Monitoring thread - {path}";
+
             _fileSystemWatcher.Path = path;
             _fileSystemWatcher.Created += FileSystemWatcherOnCreated;
             _fileSystemWatcher.Deleted += FileSystemWatcherOnDeleted;
@@ -81,6 +87,8 @@ namespace L_Commander.App.OperatingSystem
 
         public void EndWatch()
         {
+            _monitoringThread.Name = $"Monitoring thread - EMPTY";
+
             _fileSystemWatcher.Created -= FileSystemWatcherOnCreated;
             _fileSystemWatcher.Deleted -= FileSystemWatcherOnDeleted;
             _fileSystemWatcher.Renamed -= FileSystemWatcherOnRenamed;

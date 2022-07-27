@@ -75,12 +75,15 @@ namespace L_Commander.App.Infrastructure
 
         public Tag[] GetAllTags()
         {
-            return _dbContext.Tags.Select(x => new Tag
+            lock (_dbContext)
             {
-                Guid = x.TagGuid,
-                Color = x.Color, 
-                Text = x.Text,
-            }).ToArray();
+                return _dbContext.Tags.Select(x => new Tag
+                {
+                    Guid = x.TagGuid,
+                    Color = x.Color,
+                    Text = x.Text,
+                }).ToArray();
+            }
         }
 
         public FileWithTags[] GetAllFilesWithTags()
@@ -117,7 +120,7 @@ namespace L_Commander.App.Infrastructure
                     .Include(x => x.Tags)
                     .ThenInclude(x => x.TagEntity)
                     .FirstOrDefault();
-                
+
                 if (file == null)
                     return Array.Empty<Tag>();
 
@@ -141,7 +144,7 @@ namespace L_Commander.App.Infrastructure
                 fileWithTags = new FileEntity { Path = path };
                 fileWithTags.Tags = tags.Select(x => new FileTagEntity
                 {
-                    FileEntity = fileWithTags, 
+                    FileEntity = fileWithTags,
                     TagEntity = _dbContext.Tags.First(t => t.TagGuid == x.Guid),
                 }).ToList();
 

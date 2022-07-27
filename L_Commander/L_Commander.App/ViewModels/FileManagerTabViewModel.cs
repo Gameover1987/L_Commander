@@ -19,6 +19,7 @@ namespace L_Commander.App.ViewModels;
 
 public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 {
+    private const int FileSystemEntriesPageSize = 20;
     private const int TimerInterval = 1000;
 
     private readonly IFolderFilterViewModel _folderFilter;
@@ -193,20 +194,40 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
         IsBusy = true;
         FileSystemEntries.Clear();
+        
         _folderFilter.Clear();
         try
         {
+            var fileSystemEntries = new List<IFileSystemEntryViewModel>();
             await ThreadTaskExtensions.Run(() =>
             {
                 var items = _fileSystemProvider
                     .GetFileSystemEntries(rootPath)
-                    .Select(x =>_fileSystemEntryViewModelFactory.CreateEntryViewModel(x, this));
+                    .Select(x => _fileSystemEntryViewModelFactory.CreateEntryViewModel(x, this));
                 var filesWithTags = _tagRepository.GetAllFilesWithTags();
                 foreach (var fileSystemEntryViewModel in items)
                 {
                     var fileWithTags = filesWithTags.FirstOrDefault(x => x.FilePath == fileSystemEntryViewModel.FullPath);
                     fileSystemEntryViewModel.Initialize(fileWithTags?.Tags);
-                    FileSystemEntries.Add(fileSystemEntryViewModel);
+                    fileSystemEntries.Add(fileSystemEntryViewModel);
+
+                    if (fileSystemEntries.Count > FileSystemEntriesPageSize)
+                    {
+                        foreach (var fileSystemEntry in fileSystemEntries)
+                        {
+                            FileSystemEntries.Add(fileSystemEntry);
+                        }
+
+                        fileSystemEntries.Clear();
+                    }
+                }
+
+                if (fileSystemEntries.Any())
+                {
+                    foreach (var fileSystemEntry in fileSystemEntries)
+                    {
+                        FileSystemEntries.Add(fileSystemEntry);
+                    }
                 }
             });
 
@@ -270,6 +291,9 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     private bool CanOpenWithCommandHandler()
     {
+        if (SelectedFileSystemEntry == null)
+            return false;
+
         return SelectedFileSystemEntry.IsFile;
     }
 

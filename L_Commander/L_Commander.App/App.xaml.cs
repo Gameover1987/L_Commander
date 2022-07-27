@@ -100,7 +100,7 @@ namespace L_Commander.App
                 .AddSingleton<IProcessProvider, ProcessProvider>()
                 .AddSingleton<IIconCache, IconCache>()
                 .AddSingleton<IFileSystemProvider, FileSystemProvider>()
-                .AddSingleton<IRegistryProvider, WindowsRegistryProvider>()
+                .AddSingleton<IRegistryProvider, RegistryProvider>()
                 .AddSingleton<IApplicationsProvider, ApplicationsProvider>()
                 .AddTransient<IFolderWatcher, FolderWatcher>()
                 .AddSingleton<ICopyOperation, CopyOperation>()
