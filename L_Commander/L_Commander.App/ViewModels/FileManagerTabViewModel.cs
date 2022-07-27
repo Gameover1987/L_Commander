@@ -81,6 +81,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         BackCommand = new DelegateCommand(BackCommandHandler, CanBackCommandHandler);
         NextCommand = new DelegateCommand(NextCommandHandler, CanNextCommandHandler);
         TopCommand = new DelegateCommand(TopCommandHandler, CanTopCommandHandler);
+        NavigateCommand = new DelegateCommand(NavigateCommandHandler, x => CanNavigateCommandHandler());
 
         BindingOperations.EnableCollectionSynchronization(FileSystemEntries, _lock);
 
@@ -91,7 +92,24 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _folderView.SortDescriptions.Add(new SortDescription(nameof(IFileSystemEntryViewModel.Name), ListSortDirection.Ascending));
     }
 
-    public string FullPath => _fullPath;
+    public string FullPath
+    {
+        get { return _fullPath; }
+        set
+        {
+            if (_fullPath == value)
+                return;
+            _fullPath = value;
+            OnPropertyChanged(() => FullPath);
+
+            if (_fileSystemProvider.IsDirectoryExists(_fullPath))
+            {
+                SetPath(_fullPath);
+            }
+        }
+    }
+
+    public ObservableCollection<FileSystemPathPartViewModel> PathByParts { get; } = new ObservableCollection<FileSystemPathPartViewModel>();
 
     public string ShortPath => _fileSystemProvider.GetDirectoryName(_fullPath);
 
@@ -169,6 +187,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     public IDelegateCommand TopCommand { get; }
 
+    public IDelegateCommand NavigateCommand { get; }
+
     public void Initialize(string rootPath)
     {
         _navigationHistory.Clear();
@@ -186,18 +206,21 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     private async void SetPath(string rootPath)
     {
-        if (rootPath != null)
-            _folderWatcher.EndWatch();
-
-        _fullPath = rootPath;
-        _folderWatcher.BeginWatch(_fullPath);
-
-        IsBusy = true;
-        FileSystemEntries.Clear();
-        
-        _folderFilter.Clear();
         try
         {
+            if (rootPath != null)
+                _folderWatcher.EndWatch();
+
+            _fullPath = rootPath;
+            _folderWatcher.BeginWatch(_fullPath);
+
+            FillPathByParts(_fullPath);
+
+            IsBusy = true;
+            FileSystemEntries.Clear();
+
+            _folderFilter.Clear();
+
             var fileSystemEntries = new List<IFileSystemEntryViewModel>();
             await ThreadTaskExtensions.Run(() =>
             {
@@ -242,6 +265,16 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         }
 
         OnPropertyChanged();
+    }
+
+    private void FillPathByParts(string path)
+    {
+        var parts = _fileSystemProvider.GetPathByParts(path);
+        PathByParts.Clear();
+        foreach (var fileSystemEntryDescriptor in parts)
+        {
+            PathByParts.Add(new FileSystemPathPartViewModel(fileSystemEntryDescriptor, NavigateCommand));
+        }
     }
 
     private bool CanRenameCommandHandler()
@@ -397,6 +430,19 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         var topLevelPath = _fileSystemProvider.GetTopLevelPath(FullPath);
         SetPath(topLevelPath);
         _navigationHistory.Add(NavigationHistoryItem.Create(topLevelPath));
+        _navigationIndex++;
+    }
+
+    private bool CanNavigateCommandHandler()
+    {
+        return true;
+    }
+
+    private void NavigateCommandHandler(object obj)
+    {
+        var pathPartViewModel = (FileSystemPathPartViewModel)obj;
+        SetPath(pathPartViewModel.Path);
+        _navigationHistory.Add(NavigationHistoryItem.Create(pathPartViewModel.Path));
         _navigationIndex++;
     }
 

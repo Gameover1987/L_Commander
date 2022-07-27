@@ -7,7 +7,7 @@ namespace L_Commander.App.ViewModels;
 
 public interface IFileManagerTabViewModel : IDisposable
 {
-    string FullPath { get; }
+    string FullPath { get; set; }
 
     string ShortPath { get; }
 

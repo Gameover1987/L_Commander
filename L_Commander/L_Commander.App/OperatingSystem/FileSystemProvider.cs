@@ -68,6 +68,21 @@ public sealed class FileSystemProvider : IFileSystemProvider
         return descriptor;
     }
 
+    public FileSystemEntryDescriptor[] GetPathByParts(string path)
+    {
+        var directory = new DirectoryInfo(path);
+        var parts = new List<FileSystemEntryDescriptor>();
+
+        do
+        {
+            parts.Add(GetFileSystemDescriptor(directory.FullName));
+            directory = directory.Parent;
+        } while (directory != null);
+
+        parts.Reverse();
+        return parts.ToArray();
+    }
+
     public string GetTopLevelPath(string path)
     {
         var parent = Directory.GetParent(path);

@@ -14,6 +14,8 @@ namespace L_Commander.App.OperatingSystem
 
         FileSystemEntryDescriptor GetFileSystemDescriptor(string path);
 
+        FileSystemEntryDescriptor[] GetPathByParts(string path);
+
         string GetTopLevelPath(string path);
 
         bool IsDriveRoot(string path);

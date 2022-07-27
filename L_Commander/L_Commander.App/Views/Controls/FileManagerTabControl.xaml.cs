@@ -86,5 +86,28 @@ namespace L_Commander.App.Views.Controls
             tagsColumn.Width = 0;
             tagsColumn.Width = DataGridLength.Auto;
         }
+
+        private void PathTextBox_OnLostFocus(object sender, RoutedEventArgs e)
+        {
+            var bindingExpression = pathTextBox.GetBindingExpression(TextBox.TextProperty);
+            bindingExpression?.UpdateTarget();
+
+            pathPartItemsControl.Visibility = Visibility.Visible;
+        }
+
+        private void PathTextBox_OnPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter)
+                return;
+
+            var bindingExpression = pathTextBox.GetBindingExpression(TextBox.TextProperty);
+            bindingExpression?.UpdateSource();
+        }
+
+        private void PathPartsItemControl_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            pathPartItemsControl.Visibility = Visibility.Collapsed;
+            pathTextBox.Focus();
+        }
     }
 }

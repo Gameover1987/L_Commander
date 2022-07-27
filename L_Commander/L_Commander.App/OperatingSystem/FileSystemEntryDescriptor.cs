@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Windows.Media;
 
@@ -23,6 +24,7 @@ public static class FileSystemEntryDescriptorExtensions
     }
 }
 
+[DebuggerDisplay("{FileOrFolder}, {Path}")]
 public class FileSystemEntryDescriptor
 {
     public FileOrFolder FileOrFolder { get; set; }

@@ -151,7 +151,7 @@
                 <Button Style="{StaticResource MahApps.Styles.Button.Circle}" Margin="6,0,0,0"
                         Command="{Binding TopCommand}">
                     <Button.LayoutTransform>
-                        <RotateTransform Angle="-90"></RotateTransform>
+                        <RotateTransform Angle="-90"/>
                     </Button.LayoutTransform>
                     <iconPacks:PackIconMaterial Margin="6" Kind="ArrowRight"/>
                 </Button>
@@ -162,10 +162,34 @@
                 </Button>
             </StackPanel>
 
-            <TextBox Grid.Column="1" Margin="6,0,6,0" VerticalAlignment="Center"
+            <TextBox x:Name="pathTextBox" Grid.Column="1" Margin="6,0,6,0" VerticalAlignment="Center" 
                      mah:TextBoxHelper.SelectAllOnFocus="True"
-                     IsReadOnly="True" IsReadOnlyCaretVisible="True"
-                     Text="{Binding FullPath, Mode=OneWay}"/>
+                     Text="{Binding FullPath, Mode=TwoWay, UpdateSourceTrigger=Explicit}"
+                     LostFocus="PathTextBox_OnLostFocus"
+                     PreviewKeyDown="PathTextBox_OnPreviewKeyDown"/>
+
+            <ItemsControl x:Name="pathPartItemsControl" Grid.Column="1" Margin="7,0,6,0" VerticalAlignment="Center" Height="24"
+                          BorderThickness="0"
+                          BorderBrush="{StaticResource MahApps.Brushes.Control.Border}"
+                          Background="Transparent"
+                          ItemsSource="{Binding PathByParts}"
+                          MouseLeftButtonDown="PathPartsItemControl_OnMouseLeftButtonDown">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type viewModels:FileSystemPathPartViewModel}">
+                        <Grid Margin="0,0,0,0">
+                            <Button Content="{Binding Name}" MinHeight="0" Padding="10 2 10 2"
+                                    Command="{Binding Command}"
+                                    CommandParameter="{Binding}"
+                                    Style="{StaticResource MahApps.Styles.Button.Flat}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </Grid>
 
         <controls:CustomDataGrid x:Name="dataGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="0,6,0,0"
