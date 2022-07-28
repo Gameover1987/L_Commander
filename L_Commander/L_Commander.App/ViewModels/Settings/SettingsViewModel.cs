@@ -1,23 +1,15 @@
 ﻿using L_Commander.App.Infrastructure;
-using L_Commander.Common.Extensions;
 using L_Commander.UI.Commands;
 using L_Commander.UI.ViewModels;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
 using L_Commander.App.ViewModels.Factories;
 
 namespace L_Commander.App.ViewModels.Settings
 {
-    public interface ISettingsViewModel
+    public interface ISettingsViewModel : ISettingsFiller
     {
         void Initialize();
-
-        void Save();
     }
 
     public interface ISettingsItemViewModel
@@ -26,19 +18,19 @@ namespace L_Commander.App.ViewModels.Settings
 
         bool IsChanged { get; }
 
-        void Save();
+        void Save(ClientSettings settings);
     }
 
     public class SettingsViewModel : ViewModelBase, ISettingsViewModel
     {
-        private readonly ISettingsProvider _settingProvider;
+        private readonly ISettingsManager _settingManager;
         private readonly ISettingsItemsViewModelFactory _factory;
         private ISettingsItemViewModel _selectedSettingsItem;
         private ClientSettings _settings;
 
-        public SettingsViewModel(ISettingsProvider settingProvider, ISettingsItemsViewModelFactory factory)
+        public SettingsViewModel(ISettingsManager settingManager, ISettingsItemsViewModelFactory factory)
         {
-            _settingProvider = settingProvider;
+            _settingManager = settingManager;
             _factory = factory;
 
             OkCommand = new DelegateCommand(x => { }, x => CanOkCommandHandler());
@@ -62,7 +54,7 @@ namespace L_Commander.App.ViewModels.Settings
 
         public void Initialize()
         {
-            _settings = _settingProvider.Get();
+            _settings = _settingManager.Get();
 
             Items.Clear();
             foreach (var item in _factory.CreateSettingsItems(_settings))
@@ -73,18 +65,17 @@ namespace L_Commander.App.ViewModels.Settings
             SelectedItem = Items.FirstOrDefault();
         }
 
-        public void Save()
-        {
-            foreach (var settingsItemViewModel in Items.Where(x => x.IsChanged))
-            {
-                settingsItemViewModel.Save();
-            }
-        }
-
         private bool CanOkCommandHandler()
         {
             return Items.Any(x => x.IsChanged);
         }
-       
+
+        public void FillSettings(ClientSettings settings)
+        {
+            foreach (var settingsItemViewModel in Items)
+            {
+                settingsItemViewModel.Save(settings);
+            }
+        }
     }
 }

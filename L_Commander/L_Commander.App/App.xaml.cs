@@ -87,7 +87,7 @@ namespace L_Commander.App
                 .AddSingleton<IDispatcher>(dispatcherAdapter)
                 .AddSingleton<IWindowManager, WindowManager>()
                 .AddSingleton<IExceptionHandler, ExceptionHandler>()
-                .AddSingleton<ISettingsProvider, ClientSettingsProvider>()
+                .AddSingleton<ISettingsManager, SettingsManager>()
                 .AddSingleton<ITagRepository, TagRepository>()
                 .AddSingleton<IClipBoardProvider, ClipBoardProvider>()
                 .AddLogging(x =>
@@ -106,6 +106,9 @@ namespace L_Commander.App
                 .AddSingleton<ICopyOperation, CopyOperation>()
                 .AddSingleton<IMoveOperation, MoveOperation>()
                 .AddSingleton<IDeleteOperation, DeleteOperation>()
+
+                .AddSingleton<ISettingsFiller, MainViewModel>(x => (MainViewModel)x.GetService<IMainViewModel>())
+                .AddSingleton<ISettingsFiller, SettingsViewModel>(x => (SettingsViewModel)x.GetService<ISettingsViewModel>())
 
                 // Factories
                 .AddSingleton<IFileManagerTabViewModelFactory, FileManagerTabViewModelFactory>()

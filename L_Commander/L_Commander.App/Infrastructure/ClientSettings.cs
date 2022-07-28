@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace L_Commander.App.Infrastructure;
+﻿namespace L_Commander.App.Infrastructure;
 
 /// <summary>
 /// Main window settings
@@ -38,13 +36,13 @@ public class FileManagerSettings
 }
 
 /// <summary>
-/// Tag settings
+/// FileSystem view settings
 /// </summary>
-public class TagSettings
+public class FilesAndFoldersAppearanceSettings
 {
-    public bool IsEnabled { get; set; }
+    public bool ShowSystemFilesAndFolders { get; set; }
 
-    public Tag[] Tags { get; set; }
+    public bool ShowHiddenFilesAndFolders { get; set; }
 }
 
 /// <summary>
@@ -52,11 +50,16 @@ public class TagSettings
 /// </summary>
 public class ClientSettings
 {
+    public ClientSettings()
+    {
+        FilesAndFoldersAppearanceSettings = new FilesAndFoldersAppearanceSettings();
+    }
+
     public MainWindowSettings MainWindowSettings { get; set; }
 
     public FileManagerSettings LeftFileManagerSettings { get; set; }
 
     public FileManagerSettings RightFileManagerSettings { get; set; }
 
-    public TagSettings TagSettings { get; set; }
+    public FilesAndFoldersAppearanceSettings FilesAndFoldersAppearanceSettings { get; set; }
 }

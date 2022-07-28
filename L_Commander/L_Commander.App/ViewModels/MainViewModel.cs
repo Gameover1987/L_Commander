@@ -15,7 +15,7 @@ namespace L_Commander.App.ViewModels
 {
     public class MainViewModel : ViewModelBase, IMainViewModel
     {
-        private readonly ISettingsProvider _settingsProvider;
+        private readonly ISettingsManager _settingsManager;
         private readonly IFileManagerViewModel _leftFileManager;
         private readonly IFileManagerViewModel _rightFileManager;
         private IFileManagerViewModel _activeFileManager;
@@ -28,7 +28,7 @@ namespace L_Commander.App.ViewModels
         private readonly IFileSystemProvider _fileSystemProvider;
         private ProgressDialogController _progressDialogController;
 
-        public MainViewModel(ISettingsProvider settingsProvider,
+        public MainViewModel(ISettingsManager settingsManager,
             IFileManagerViewModel leftFileManager,
             IFileManagerViewModel rightFileManager,
             ICopyOperation copyOperation,
@@ -39,7 +39,7 @@ namespace L_Commander.App.ViewModels
             ISettingsViewModel settingsViewModel,
             IFileSystemProvider fileSystemProvider)
         {
-            _settingsProvider = settingsProvider;
+            _settingsManager = settingsManager;
             _leftFileManager = leftFileManager;
             _rightFileManager = rightFileManager;
             _copyOperation = copyOperation;
@@ -111,40 +111,29 @@ namespace L_Commander.App.ViewModels
 
         public void Initialize()
         {
-            var settings = _settingsProvider.Get();
+            var settings = _settingsManager.Get();
             _leftFileManager.Initialize(settings?.LeftFileManagerSettings);
             _rightFileManager.Initialize(settings?.RightFileManagerSettings);
 
             _fileSystemProvider.Initialize();
         }
 
-        public void SaveSettings()
+        public void FillSettings(ClientSettings settings)
         {
-            var oldSettings = _settingsProvider.Get();
-
-            if (oldSettings == null)
-                oldSettings = new ClientSettings();
-
-            var currentSettings = new ClientSettings
+            settings.MainWindowSettings = new MainWindowSettings
             {
-                MainWindowSettings = new MainWindowSettings
-                {
-                    Left = _windowManager.MainWindow.Left,
-                    Top = _windowManager.MainWindow.Top,
-                    Width = _windowManager.MainWindow.Width,
-                    Height = _windowManager.MainWindow.Height
-                },
-                LeftFileManagerSettings = LeftFileManager.CollectSettings(),
-                RightFileManagerSettings = RightFileManager.CollectSettings(),
-                TagSettings = oldSettings.TagSettings
+                Left = _windowManager.MainWindow.Left,
+                Top = _windowManager.MainWindow.Top,
+                Width = _windowManager.MainWindow.Width,
+                Height = _windowManager.MainWindow.Height
             };
-
-            _settingsProvider.Save(currentSettings);
+            settings.LeftFileManagerSettings = LeftFileManager.CollectSettings();
+            settings.RightFileManagerSettings = RightFileManager.CollectSettings();
         }
 
         public MainWindowSettings GetMainWindowSettings()
         {
-            return _settingsProvider.Get()?.MainWindowSettings;
+            return _settingsManager.Get()?.MainWindowSettings;
         }
 
         private bool CanRenameCommandHandler()
@@ -361,7 +350,7 @@ namespace L_Commander.App.ViewModels
                 return;
             }
 
-            _settingsViewModel.Save();
+            _settingsManager.Save();
         }
 
         private void ProgressDialogControllerOnCanceled(object sender, EventArgs e)

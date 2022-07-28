@@ -28,8 +28,6 @@ public class FolderFilterViewModel : ViewModelBase, IFolderFilterViewModel
         filtersView.SortDescriptions.Add(new SortDescription(nameof(FilterItemViewModel.Order), ListSortDirection.Ascending));
         filtersView.SortDescriptions.Add(new SortDescription(nameof(FilterItemViewModel.Group), ListSortDirection.Ascending));
 
-        _withoutTagFilterItemViewModel = CreateWithoutTagFilterItemViewModel();
-
         SelectAllFiltersCommand = new DelegateCommand(SelectAllFiltersCommandHandler, CanSelectAllFiltersCommandHandler);
         ClearAllFiltersCommand = new DelegateCommand(ClearAllFiltersCommandHandler, CanClearAllFiltersCommandHandler);
         CheckOrUncheckGroupCommand = new DelegateCommand(CheckOrUncheckGroupCommandHandler);
@@ -73,7 +71,9 @@ public class FolderFilterViewModel : ViewModelBase, IFolderFilterViewModel
         }
 
         Filters.Clear();
-        
+
+        _withoutTagFilterItemViewModel = CreateWithoutTagFilterItemViewModel();
+
         Filters.Add(_withoutTagFilterItemViewModel);
         foreach (var tag in _tagRepository.GetAllTags())
         {

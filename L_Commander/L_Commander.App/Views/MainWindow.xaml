@@ -86,16 +86,16 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <controls:FileManagerControl Grid.Column="0" Margin="6,6,0,0" 
+            <controls:FileManagerControl Grid.Column="0" Margin="0,6,0,0" 
                                          Background="Transparent"
                                          DataContext="{Binding LeftFileManager}"
                                          PreviewGotKeyboardFocus="LeftFileManager_OnPreviewGotKeyboardFocus"
                                          PreviewMouseDown="LeftFileManager_OnPreviewMouseDown"/>
 
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch"
-                          Background="LightGray" ShowsPreview="True" Width="3" />
+                          Background="LightGray" ShowsPreview="True" Width="1" />
 
-            <controls:FileManagerControl Grid.Column="2" Margin="6,6,0,0" 
+            <controls:FileManagerControl Grid.Column="2" Margin="0,6,0,0" 
                                          Background="Transparent"
                                          DataContext="{Binding RightFileManager}"
                                          PreviewGotKeyboardFocus="RightFileManager_OnPreviewGotKeyboardFocus"

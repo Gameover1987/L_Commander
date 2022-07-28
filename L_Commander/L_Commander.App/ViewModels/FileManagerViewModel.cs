@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
@@ -35,6 +36,13 @@ public class FileManagerViewModel : ViewModelBase, IFileManagerViewModel
         CopyPathCommand = new DelegateCommand(CopyPathCommandHandler);
         OpenInExplorerCommand = new DelegateCommand(OpenInExplorerCommandHandler);
         OpenInTerminalCommand = new DelegateCommand(OpenInTerminalCommandHandler);
+
+        Tabs.CollectionChanged += TabsOnCollectionChanged;
+    }
+
+    private void TabsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
+        
     }
 
     public ObservableCollection<DriveViewModel> Drives { get; } = new ObservableCollection<DriveViewModel>();

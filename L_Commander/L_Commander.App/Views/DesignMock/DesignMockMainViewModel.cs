@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,37 +9,28 @@ using L_Commander.App.ViewModels;
 
 namespace L_Commander.App.Views.DesignMock
 {
-    internal sealed class DesignMockSettingsProvider : ISettingsProvider
+    internal sealed class DesignMockSettingsManager : ISettingsManager
     {
-        public void Save(ClientSettings settings)
+        public void Save()
         {
-
+            
         }
 
         public ClientSettings Get()
         {
             return new ClientSettings
             {
-                TagSettings = new TagSettings
-                {
-                    IsEnabled = true,
-                    Tags = new Tag[]
-                    {
-                        new Tag
-                        {
-                            Text = "Important",
-                            Color = 1,
-                        },
-                    }
-                }
+                
             };
         }
+
+        public event EventHandler<SettingsChangedEventArgs> SettingsChanged;
     }
 
     internal sealed class DesignMockMainViewModel : MainViewModel
     {
         public DesignMockMainViewModel()
-            : base(new DesignMockSettingsProvider(),
+            : base(new DesignMockSettingsManager(),
                   new DesignMockFileManagerViewModel(),
                   new DesignMockFileManagerViewModel(),
                   new DesignMockCopyOperation(),

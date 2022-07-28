@@ -5,7 +5,7 @@ using L_Commander.UI.Commands;
 
 namespace L_Commander.App.ViewModels;
 
-public interface IMainViewModel
+public interface IMainViewModel : ISettingsFiller
 {
     IFileManagerViewModel ActiveFileManager { get; set; }
 
@@ -16,8 +16,4 @@ public interface IMainViewModel
     IDelegateCommand DeleteCommand { get; }
 
     void Initialize();
-
-    void SaveSettings();
-
-    MainWindowSettings GetMainWindowSettings();
 }

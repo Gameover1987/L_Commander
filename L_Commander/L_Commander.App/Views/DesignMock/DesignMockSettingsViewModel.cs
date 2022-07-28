@@ -14,7 +14,7 @@ namespace L_Commander.App.Views.DesignMock
     internal sealed class DesignMockSettingsViewModel : SettingsViewModel
     {
         public DesignMockSettingsViewModel()
-            : base(new DesignMockSettingsProvider(), new DesignMockSettingsItemsViewModelFactory() )
+            : base(new DesignMockSettingsManager(), new DesignMockSettingsItemsViewModelFactory() )
         {
             Initialize();
         }

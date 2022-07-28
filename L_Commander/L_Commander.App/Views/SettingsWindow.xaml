@@ -26,6 +26,10 @@
             <DataTemplate DataType="{x:Type settingsViewModels:TagSettingsItemViewModel}">
                 <controls:TagsSettingControl/>
             </DataTemplate>
+
+            <DataTemplate DataType="{x:Type settingsViewModels:FilesAndFoldersAppearanceSettingsItemViewModel}">
+                <controls:FilesAndFoldersAppearanceSettingsControl/>
+            </DataTemplate>
         </ResourceDictionary>
     </mah:MetroWindow.Resources>
     <Grid>

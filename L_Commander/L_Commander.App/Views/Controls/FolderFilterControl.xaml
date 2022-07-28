@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:L_Commander.App.Views.Controls"
              xmlns:filtering="clr-namespace:L_Commander.App.ViewModels.Filtering"
              xmlns:designMock="clr-namespace:L_Commander.App.Views.DesignMock"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              mc:Ignorable="d" 
              d:DesignHeight="1000" d:DesignWidth="300"
              d:DataContext="{d:DesignInstance Type={x:Type designMock:DesignMockFolderFilterViewModel}, IsDesignTimeCreatable=True}">
@@ -31,8 +32,8 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type filtering:FilterItemViewModel}">
-                        <CheckBox Content="{Binding Extension}"
-                                  IsChecked="{Binding IsChecked}" Margin="0,0,0,6"/>
+                        <mah:ToggleSwitch Content="{Binding Extension}"
+                                  IsOn="{Binding IsChecked}" Margin="0,0,0,0"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
                 <ItemsControl.GroupStyle>

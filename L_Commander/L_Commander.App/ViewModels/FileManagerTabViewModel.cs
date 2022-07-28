@@ -33,6 +33,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private readonly ITagRepository _tagRepository;
     private readonly IOpenWithViewModel _openWithViewModel;
     private readonly ITabStatusBarViewModel _statusBarViewModel;
+    private readonly ISettingsManager _settingsManager;
     private string _fullPath;
 
     private IFileSystemEntryViewModel _selectedFileSystemEntry;
@@ -45,6 +46,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     private bool _isBusy;
     private bool _isLocked;
+    private FilesAndFoldersAppearanceSettings _settings;
 
     public FileManagerTabViewModel(IFolderFilterViewModel folderFilter,
         IFileSystemProvider fileSystemProvider,
@@ -56,7 +58,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         IFileSystemEntryViewModelFactory fileSystemEntryViewModelFactory,
         ITagRepository tagRepository,
         IOpenWithViewModel openWithViewModel,
-        ITabStatusBarViewModel statusBarViewModel)
+        ITabStatusBarViewModel statusBarViewModel,
+        ISettingsManager settingsManager)
     {
         _folderFilter = folderFilter;
         _folderFilter.Changed += FolderFilterOnChanged;
@@ -71,6 +74,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _tagRepository = tagRepository;
         _openWithViewModel = openWithViewModel;
         _statusBarViewModel = statusBarViewModel;
+        _settingsManager = settingsManager;
+        _settingsManager.SettingsChanged += SettingsManagerOnSettingsChanged;
         _timer.Initialize(TimeSpan.FromMilliseconds(TimerInterval));
         _timer.Tick += TimerOnTick;
 
@@ -102,12 +107,15 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         {
             if (_fullPath == value)
                 return;
-            _fullPath = value;
-            OnPropertyChanged(() => FullPath);
 
-            if (_fileSystemProvider.IsDirectoryExists(_fullPath))
+            if (_fileSystemProvider.IsDirectoryExists(value))
             {
+                _fullPath = value;
+                OnPropertyChanged(() => FullPath);
+
                 SetPath(_fullPath);
+                _navigationHistory.Add(NavigationHistoryItem.Create(FullPath));
+                _navigationIndex++;
             }
         }
     }
@@ -165,7 +173,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         {
             _selectedFileSystemEntries = value;
             OnPropertyChanged(() => SelectedEntries);
-            
+
             _statusBarViewModel.Update(this);
         }
     }
@@ -202,6 +210,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _navigationIndex = 0;
         _navigationHistory.Add(NavigationHistoryItem.Create(rootPath));
 
+        _settings = _settingsManager.Get().FilesAndFoldersAppearanceSettings;
+
         SetPath(rootPath);
     }
 
@@ -209,6 +219,11 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     {
         _folderWatcher.EndWatch();
         _folderWatcher.Dispose();
+    }
+
+    public void ReLoad()
+    {
+        SetPath(FullPath);
     }
 
     private async void SetPath(string rootPath)
@@ -448,9 +463,6 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private void NavigateCommandHandler(object obj)
     {
         var pathPartViewModel = (FileSystemPathPartViewModel)obj;
-        if (pathPartViewModel.Path == FullPath)
-            return;
-
         SetPath(pathPartViewModel.Path);
         _navigationHistory.Add(NavigationHistoryItem.Create(pathPartViewModel.Path));
         _navigationIndex++;
@@ -523,10 +535,10 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         if (entry == null)
             return false;
 
-        if (entry.IsHidden)
+        if (entry.IsHidden && !_settings.ShowHiddenFilesAndFolders)
             return false;
 
-        if (entry.IsSystem)
+        if (entry.IsSystem && !_settings.ShowSystemFilesAndFolders)
             return false;
 
         if (!_folderFilter.IsCorrespondsByFilter(entry))
@@ -537,9 +549,13 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         return true;
     }
 
-    public void ReLoad()
+    private void SettingsManagerOnSettingsChanged(object sender, SettingsChangedEventArgs e)
     {
-        SetPath(FullPath);
+        _settings = e.Settings.FilesAndFoldersAppearanceSettings;
+        if (IsBusy)
+            return;
+
+        _folderView.Refresh();
     }
 
     private class NavigationHistoryItem

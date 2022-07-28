@@ -62,7 +62,8 @@ internal sealed class DesignMockFileManagerTabViewModel : FileManagerTabViewMode
             new FileSystemEntryViewModelFactory(new FileSystemProvider(new IconCache()), new DesignMockExceptionHandler(), new DesignMockTagRepository()),
             new DesignMockTagRepository(),
             new DesignMockOpenWithViewModel(),
-            new TabStatusBarViewModel())
+            new TabStatusBarViewModel(),
+            new DesignMockSettingsManager())
     {
         ThreadTaskExtensions.IsSyncRun = true;
         Initialize("E:\\Download");
@@ -98,7 +99,8 @@ internal sealed class DesignMockFileManagerTabViewModelFactory : FileManagerTabV
             new DesignMockExceptionHandler(),
             new FileSystemEntryViewModelFactory(new FileSystemProvider(new IconCache()), new DesignMockExceptionHandler(), new DesignMockTagRepository()), 
             new DesignMockTagRepository(),
-            new DesignMockOpenWithViewModel())
+            new DesignMockOpenWithViewModel(),
+            new DesignMockSettingsManager())
     {
 
     }

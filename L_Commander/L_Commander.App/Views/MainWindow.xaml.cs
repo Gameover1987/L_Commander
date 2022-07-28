@@ -1,10 +1,10 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Interop;
+using L_Commander.App.Infrastructure;
 using L_Commander.App.ViewModels;
 using MahApps.Metro.Controls;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace L_Commander.App.Views
 {
@@ -14,6 +14,7 @@ namespace L_Commander.App.Views
     public partial class MainWindow : MetroWindow, IWindow
     {
         private IMainViewModel _mainViewModel;
+        private ISettingsManager _settingsManager;
 
         public const string LeftFlyoutTag = "Left";
         public const string RightFlyoutTag = "Right";
@@ -25,6 +26,8 @@ namespace L_Commander.App.Views
             DataContextChanged += OnDataContextChanged;
             Loaded += OnLoaded;
             Closing += OnClosing;
+
+            _settingsManager = App.ServiceProvider.GetService<ISettingsManager>();
         }
 
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -36,7 +39,7 @@ namespace L_Commander.App.Views
         {
             _mainViewModel.Initialize();
 
-            var mainWindowSettings = _mainViewModel.GetMainWindowSettings();
+            var mainWindowSettings = _settingsManager.Get().MainWindowSettings;
             if (mainWindowSettings == null)
                 return;
 
@@ -48,7 +51,7 @@ namespace L_Commander.App.Views
 
         private void OnClosing(object sender, CancelEventArgs e)
         {
-            _mainViewModel.SaveSettings();
+            _settingsManager.Save();
         }
 
         private void LeftFileManager_OnPreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)

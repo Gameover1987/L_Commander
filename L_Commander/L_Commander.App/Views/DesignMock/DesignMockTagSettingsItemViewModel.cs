@@ -12,4 +12,15 @@ namespace L_Commander.App.Views.DesignMock
             SelectedTag = Tags.FirstOrDefault();
         }
     }
+
+    internal sealed class DesignMockFilesAndFoldersAppearanceSettingsItemViewModel : FilesAndFoldersAppearanceSettingsItemViewModel
+    {
+        public DesignMockFilesAndFoldersAppearanceSettingsItemViewModel() : base(new FilesAndFoldersAppearanceSettings
+        {
+            ShowHiddenFilesAndFolders = true,
+            ShowSystemFilesAndFolders = true
+        })
+        {
+        }
+    }
 }

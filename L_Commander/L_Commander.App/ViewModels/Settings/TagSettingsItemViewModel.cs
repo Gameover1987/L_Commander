@@ -46,13 +46,13 @@ namespace L_Commander.App.ViewModels.Settings
                     return true;
 
                 var sourceJson = JsonConvert.SerializeObject(_sourceTags, Formatting.Indented);
-                var currentJson = JsonConvert.SerializeObject(Tags.Select(x => x.GetTag()).ToArray());
+                var currentJson = JsonConvert.SerializeObject(Tags.Select(x => x.GetTag()).ToArray(), Formatting.Indented);
 
                 return sourceJson != currentJson;
             }
         }
 
-        public void Save()
+        public void Save(ClientSettings settings)
         {
             foreach (var tagViewModel in Tags)
             {
