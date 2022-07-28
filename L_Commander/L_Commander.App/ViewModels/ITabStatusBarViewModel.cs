@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using L_Commander.Common.Extensions;
 using L_Commander.UI.ViewModels;
 
 namespace L_Commander.App.ViewModels
@@ -29,10 +30,10 @@ namespace L_Commander.App.ViewModels
             if (tab.SelectedEntries.Any(x => x.IsFile))
             {
                 var filesCount = tab.SelectedEntries.Count(x => x.IsFile);
-                var filesSize = GetFileSizeAsString(tab.SelectedEntries
+                var filesSize = tab.SelectedEntries
                     .Where(x => x.IsFile)
                     .Select(x => x.TotalSize)
-                    .Sum());
+                    .Sum().SizeAsString();
 
                 SelectionInfo = $"{filesCount} files ({filesSize}), folders {foldersCount}";
             }
@@ -49,23 +50,5 @@ namespace L_Commander.App.ViewModels
         public int SelectedCount { get; private set; }
 
         public string SelectionInfo { get; private set; }
-
-        private string GetFileSizeAsString(long totalSize)
-        {
-            if (totalSize < 1024)
-                return $"{totalSize}";
-
-            if (totalSize < 1024 * 1024)
-            {
-                return $"~{totalSize / 1024} Kb";
-            }
-
-            if (totalSize < 1024 * 1024 * 1024)
-            {
-                return $"~{totalSize / 1024 / 1024} Mb";
-            }
-
-            return $"~{totalSize / 1024 / 1024 / 1024} Gb";
-        }
     }
 }

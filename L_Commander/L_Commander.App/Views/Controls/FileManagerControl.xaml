@@ -51,9 +51,14 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Button Content="{Binding DisplayName}" Margin="0,0,3,0"
-                                Command="{Binding Source={StaticResource BindingProxy}, Path=Data.ChangeDriveCommand}"
-                                CommandParameter="{Binding}"/>
+                        <Grid Background="Transparent">
+                            <Grid.ToolTip>
+                                <local:DriveInfoControl Width="300"/>
+                            </Grid.ToolTip>
+                            <Button Content="{Binding DisplayName}" Margin="0,0,3,0"
+                                    Command="{Binding Source={StaticResource BindingProxy}, Path=Data.ChangeDriveCommand}"
+                                    CommandParameter="{Binding}"/>
+                        </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
@@ -67,7 +72,7 @@
                 <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource {x:Type TabItem}}">
                     <Setter Property="ToolTip" Value="{Binding FullPath}"/>
                     <Setter Property="AllowDrop" Value="True"/>
-                    <EventSetter Event="PreviewMouseMove" Handler="TabItem_PreviewMouseMove"/>                    
+                    <EventSetter Event="PreviewMouseMove" Handler="TabItem_PreviewMouseMove"/>
                     <EventSetter Event="Drop" Handler="TabItem_Drop"/>
                     <Setter Property="ContextMenu">
                         <Setter.Value>

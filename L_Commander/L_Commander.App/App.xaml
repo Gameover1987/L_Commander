@@ -33,7 +33,9 @@
             <converters:NonZeroToBoolConverter x:Key="NonZeroToBoolConverter"/>
             <converters:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
             <converters:ReadableColorConverter x:Key="ReadableColorConverter"/>
+
             <converters1:TotalSizeToStringConverter x:Key="TotalSizeToStringConverter"/>
+            <converters1:TotalSizeToStringWithUnitsConverter x:Key="TotalSizeToStringWithUnitsConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

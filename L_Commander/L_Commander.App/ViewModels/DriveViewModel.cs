@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using L_Commander.Common.Extensions;
 using L_Commander.UI.ViewModels;
 
@@ -27,13 +28,38 @@ public class DriveViewModel : ViewModelBase
         }
     }
 
-    public bool IsReady
+    public bool IsReady => _driveInfo.IsReady;
+
+    public DriveType DriveType => _driveInfo.DriveType;
+
+    public string RootPath => _driveInfo.RootDirectory.FullName;
+
+    public long TotalSize => _driveInfo.TotalSize;
+
+    public long FreeSpace => _driveInfo.TotalFreeSpace;
+
+    public long OccupiedSpace => TotalSize - FreeSpace;
+
+    public bool IsSystem
     {
-        get { return _driveInfo.IsReady; }
+        get
+        {
+            var winDriveName = Path.GetPathRoot(Environment.SystemDirectory);
+            if (winDriveName == null)
+                return false;
+            return _driveInfo.Name.ToLower() == winDriveName.ToLower();
+        }
     }
 
-    public string RootPath
+    public bool IsFreeSpaceLittle
     {
-        get { return _driveInfo.RootDirectory.FullName; }
+        get
+        {
+            var bytesPerOnePercent = TotalSize / 100.0;
+
+            var threshold = bytesPerOnePercent * 10;
+
+            return FreeSpace < threshold;
+        }
     }
 }
