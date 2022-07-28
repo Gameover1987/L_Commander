@@ -25,9 +25,14 @@ public interface IFileManagerTabViewModel : IDisposable
     event EventHandler DeletedExternally;
 
     IDelegateCommand RenameCommand { get; }
+
     IDelegateCommand OpenCommand { get; }
+
     IDelegateCommand OpenWithCommand { get; }
+
     IDelegateCommand MakeDirCommand { get; }    
+
+    IDelegateCommand ShowPropertiesCommand { get; }
 
     void Initialize(string rootPath);
 

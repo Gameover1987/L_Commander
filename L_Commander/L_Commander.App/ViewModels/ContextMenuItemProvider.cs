@@ -10,7 +10,7 @@ public class ContextMenuItemProvider : IContextMenuItemProvider
     private readonly ITagRepository _tagRepository;
     private readonly IMainViewModel _mainViewModel;
 
-    public ContextMenuItemProvider(ITagRepository tagRepository,IMainViewModel mainViewModel)
+    public ContextMenuItemProvider(ITagRepository tagRepository, IMainViewModel mainViewModel)
     {
         _tagRepository = tagRepository;
         _mainViewModel = mainViewModel;
@@ -70,12 +70,13 @@ public class ContextMenuItemProvider : IContextMenuItemProvider
                 new SeparatorContextMenuItemViewModel(),
                 tagsSubMenu,
                 new SeparatorContextMenuItemViewModel(),
+                new ContextMenuItemViewModel { Header = "Paste", GestureText = "Ctrl+V" },
                 new ContextMenuItemViewModel { Header = "Copy", GestureText = "Ctrl+C" },
-                new ContextMenuItemViewModel { Header = "Move", GestureText = "Ctrl+V" },
+                new ContextMenuItemViewModel { Header = "Move", GestureText = "Ctrl+X" },
                 new SeparatorContextMenuItemViewModel(),
                 new ContextMenuItemViewModel { Header = "Delete", GestureText = "Del" },
                 new SeparatorContextMenuItemViewModel(),
-                new ContextMenuItemViewModel { Header = "Properties", GestureText = "Alt+Enter" },
+                new ContextMenuItemViewModel { Header = "Properties", GestureText = "Alt+Enter", Command = _mainViewModel.ActiveFileManager.SelectedTab.ShowPropertiesCommand},
             };
         }
 
@@ -85,12 +86,13 @@ public class ContextMenuItemProvider : IContextMenuItemProvider
             new SeparatorContextMenuItemViewModel(),
             tagsSubMenu,
             new SeparatorContextMenuItemViewModel(),
+            new ContextMenuItemViewModel { Header = "Paste", GestureText = "Ctrl+V" },
             new ContextMenuItemViewModel { Header = "Copy", GestureText = "Ctrl+C"},
-            new ContextMenuItemViewModel { Header = "Move", GestureText = "Ctrl+V"},
+            new ContextMenuItemViewModel { Header = "Move", GestureText = "Ctrl+X"},
             new SeparatorContextMenuItemViewModel(),
             new ContextMenuItemViewModel { Header = "Delete", GestureText = "Del"},
             new SeparatorContextMenuItemViewModel(),
-            new ContextMenuItemViewModel { Header = "Properties", GestureText = "Alt+Enter"},
+            new ContextMenuItemViewModel { Header = "Properties", GestureText = "Alt+Enter", Command = _mainViewModel.ActiveFileManager.SelectedTab.ShowPropertiesCommand},
         };
     }
 }

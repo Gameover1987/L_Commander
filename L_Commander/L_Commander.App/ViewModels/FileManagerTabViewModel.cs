@@ -83,13 +83,14 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         OpenCommand = new DelegateCommand(OpenCommandHandler, CanOpenCommandHandler);
         OpenWithCommand = new DelegateCommand(OpenWithCommandHandler, CanOpenWithCommandHandler);
         MakeDirCommand = new DelegateCommand(MakeDirCommandHandler, CanMakeDirCommandHandler);
+        ShowPropertiesCommand = new DelegateCommand(ShowPropertiesCommandHandler);
         CalculateFolderSizeCommand = new DelegateCommand(CalculateFolderSizeCommandHandler, CanCalculateFolderSizeCommandHandler);
 
         RefreshCommand = new DelegateCommand(RefreshCommandHandler, CanRefreshCommandHandler);
         BackCommand = new DelegateCommand(BackCommandHandler, CanBackCommandHandler);
         NextCommand = new DelegateCommand(NextCommandHandler, CanNextCommandHandler);
         TopCommand = new DelegateCommand(TopCommandHandler, CanTopCommandHandler);
-        NavigateCommand = new DelegateCommand(NavigateCommandHandler, x => CanNavigateCommandHandler(x));
+        NavigateCommand = new DelegateCommand(NavigateCommandHandler, CanNavigateCommandHandler);
 
         BindingOperations.EnableCollectionSynchronization(FileSystemEntries, _lock);
 
@@ -191,6 +192,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     public IDelegateCommand OpenWithCommand { get; }
 
     public IDelegateCommand MakeDirCommand { get; }
+    public IDelegateCommand ShowPropertiesCommand { get; }
 
     public IDelegateCommand CalculateFolderSizeCommand { get; }
 
@@ -385,6 +387,11 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         {
             _exceptionHandler.HandleExceptionWithMessageBox(exception);
         }
+    }
+
+    private void ShowPropertiesCommandHandler()
+    {
+        _processProvider.ShowPropertiesByPath(SelectedFileSystemEntry.FullPath);
     }
 
     private bool CanCalculateFolderSizeCommandHandler()

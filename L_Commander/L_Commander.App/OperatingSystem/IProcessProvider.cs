@@ -9,5 +9,7 @@
         void OpenExplorer(string path);
 
         void OpenTerminal(string path);
+
+        void ShowPropertiesByPath(string path);
     }
 }

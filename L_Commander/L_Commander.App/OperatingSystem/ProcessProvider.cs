@@ -1,4 +1,10 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Windows;
 
 namespace L_Commander.App.OperatingSystem;
 
@@ -23,7 +29,7 @@ public sealed class ProcessProvider : IProcessProvider
         {
             UseShellExecute = false,
             CreateNoWindow = false,
-            Arguments = path
+            Arguments = $"\"{path}\""
         };
 
         var process = new Process { StartInfo = processStartInfo };
@@ -38,5 +44,10 @@ public sealed class ProcessProvider : IProcessProvider
     public void OpenTerminal(string path)
     {
         Process.Start(new ProcessStartInfo("cmd", $"/K \"cd /d {path}\""));
+    }
+
+    public void ShowPropertiesByPath(string path)
+    {
+     
     }
 }

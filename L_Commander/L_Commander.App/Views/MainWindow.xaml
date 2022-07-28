@@ -61,11 +61,11 @@
                 <MenuItem Header="Open"
                           Command="{Binding ActiveFileManager.SelectedTab.OpenCommand}"
                           InputGestureText="Enter"/>
-                <MenuItem Header="Open with" IsEnabled="False"
+                <MenuItem Header="Open with" 
                           Command="{Binding ActiveFileManager.SelectedTab.OpenWithCommand}"/>
                 <Separator/>
                 <MenuItem Header="Archive" IsEnabled="False"/>
-                <MenuItem Header="Unarchive" IsEnabled="False"/>
+                <MenuItem Header="UnArchive" IsEnabled="False"/>
                 <Separator/>
                 <MenuItem Header="Exit"
                           InputGestureText="Alt+F4"/>
@@ -73,9 +73,6 @@
             <MenuItem Header="Configuration">
                 <MenuItem Header="Settings"
                           Command="{Binding ShowSettingsCommand}"/>
-                <Separator/>
-                <MenuItem Header="Save settings"/>
-                <MenuItem Header="Load settings"/>
             </MenuItem>
         </Menu>
         
