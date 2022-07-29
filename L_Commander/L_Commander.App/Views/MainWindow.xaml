@@ -72,9 +72,10 @@
                 <MenuItem Header="Exit"
                           InputGestureText="Alt+F4"/>
             </MenuItem>
-            <MenuItem Header="Configuration">
+            <MenuItem Header="Options">
                 <MenuItem Header="Settings"
                           Command="{Binding ShowSettingsCommand}"/>
+                <MenuItem Header="History"/>
             </MenuItem>
         </Menu>
         
