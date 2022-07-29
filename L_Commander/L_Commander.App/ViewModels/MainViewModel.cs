@@ -180,7 +180,7 @@ namespace L_Commander.App.ViewModels
                 }
 
                 var questionSettings = new MetroDialogSettings { DefaultButtonFocus = MessageDialogResult.Affirmative };
-                var result = await _windowManager.ShowQuestion("Copy operation", $"Do you want copy files to '{AnotherFileManager.SelectedTab.FullPath}'?", questionSettings);
+                var result = await _windowManager.ShowQuestion("Copy operation", $"Do you want copy selected item(s) to '{AnotherFileManager.SelectedTab.FullPath}'?", questionSettings);
                 if (result != MessageDialogResult.Affirmative)
                     return;
 
@@ -256,7 +256,7 @@ namespace L_Commander.App.ViewModels
                 }
 
                 var questionSettings = new MetroDialogSettings { DefaultButtonFocus = MessageDialogResult.Affirmative };
-                var result = await _windowManager.ShowQuestion("Move operation", $"Do you want move files to '{AnotherFileManager.SelectedTab.FullPath}'?", questionSettings);
+                var result = await _windowManager.ShowQuestion("Move operation", $"Do you want move selected item(s) to '{AnotherFileManager.SelectedTab.FullPath}'?", questionSettings);
                 if (result != MessageDialogResult.Affirmative)
                     return;
 
