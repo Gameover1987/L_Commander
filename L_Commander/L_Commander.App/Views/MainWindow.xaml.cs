@@ -73,5 +73,34 @@ namespace L_Commander.App.Views
         {
             _mainViewModel.ActiveFileManager = _mainViewModel.RightFileManager;
         }
+
+        private void LeftFlyout_OnPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                var flyout = sender as Flyout;
+                if (flyout == null)
+                    return;
+
+                flyout.IsOpen = false;
+
+                leftFileManager.FocusTabControl();
+            }
+        }
+
+        private void RightFlyout_OnPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                var flyout = sender as Flyout;
+                if (flyout == null)
+                    return;
+
+                flyout.IsOpen = false;
+
+                rightFileManager.FocusTabControl();
+            }
+        }
+
     }
 }

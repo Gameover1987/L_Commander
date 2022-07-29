@@ -35,16 +35,18 @@
     </mah:MetroWindow.InputBindings>
     <mah:MetroWindow.Flyouts>
         <mah:FlyoutsControl x:Name="flyoutsControl">
-            <mah:Flyout Header="File filters" Theme="Adapt"
+            <mah:Flyout Header="File system filters" Theme="Adapt"
                         Tag="{x:Static views:MainWindow.LeftFlyoutTag}" 
                         DataContext="{Binding LeftFileManager.SelectedTab.FolderFilter}"
-                        Position="Left">
+                        Position="Left"
+                        PreviewKeyDown="LeftFlyout_OnPreviewKeyDown">
               <controls:FolderFilterControl />
             </mah:Flyout>
-            <mah:Flyout Header="File filters" Theme="Adapt"
+            <mah:Flyout Header="File system filters" Theme="Adapt"
                         Tag="{x:Static views:MainWindow.RightFlyoutTag}"
                         DataContext="{Binding RightFileManager.SelectedTab.FolderFilter}"
-                        Position="Right">
+                        Position="Right"
+                        PreviewKeyDown="RightFlyout_OnPreviewKeyDown">
                 <controls:FolderFilterControl/>
             </mah:Flyout>
         </mah:FlyoutsControl>
@@ -83,7 +85,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <controls:FileManagerControl Grid.Column="0" Margin="0,6,0,0" 
+            <controls:FileManagerControl x:Name="leftFileManager" Grid.Column="0" Margin="0,6,0,0" 
                                          Background="Transparent"
                                          DataContext="{Binding LeftFileManager}"
                                          PreviewGotKeyboardFocus="LeftFileManager_OnPreviewGotKeyboardFocus"
@@ -92,7 +94,7 @@
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch"
                           Background="LightGray" ShowsPreview="True" Width="1" />
 
-            <controls:FileManagerControl Grid.Column="2" Margin="0,6,0,0" 
+            <controls:FileManagerControl x:Name="rightFileManager" Grid.Column="2" Margin="0,6,0,0" 
                                          Background="Transparent"
                                          DataContext="{Binding RightFileManager}"
                                          PreviewGotKeyboardFocus="RightFileManager_OnPreviewGotKeyboardFocus"

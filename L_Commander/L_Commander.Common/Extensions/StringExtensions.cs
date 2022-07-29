@@ -10,6 +10,11 @@ namespace L_Commander.Common.Extensions
             return string.IsNullOrWhiteSpace(str);
         }
 
+        public static bool HasText(this string str)
+        {
+            return !string.IsNullOrWhiteSpace(str);
+        }
+
         public static bool ContainsIgnoreCase(this IEnumerable<string> strings, string item)
         {
             if (item.IsNullOrWhiteSpace())

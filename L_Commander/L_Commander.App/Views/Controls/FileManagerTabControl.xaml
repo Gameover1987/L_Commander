@@ -13,7 +13,8 @@
              xmlns:infrastructure="clr-namespace:L_Commander.App.Infrastructure"
              mc:Ignorable="d" 
              d:DesignHeight="1200" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance Type=designMock:DesignMockFileManagerTabViewModel, IsDesignTimeCreatable=True}">
+             d:DataContext="{d:DesignInstance Type=designMock:DesignMockFileManagerTabViewModel, IsDesignTimeCreatable=True}"
+             PreviewKeyDown="FileManagerTabControl_OnPreviewKeyDown">
     <UserControl.Resources>
         <ResourceDictionary>
             <DataTemplate DataType="{x:Type infrastructure:Tag}">
@@ -122,7 +123,7 @@
         <KeyBinding Key="Space"
                     Command="{Binding CalculateFolderSizeCommand}"/>
         <KeyBinding Key="Enter" Modifiers="Alt"
-                    Command="{Binding ShowPropertiesCommand}"/>
+                    Command="{Binding ShowPropertiesCommand}" />
     </UserControl.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
@@ -159,10 +160,24 @@
                     <iconPacks:PackIconMaterial Margin="6" Kind="ArrowRight"/>
                 </Button>
                 <Button Style="{StaticResource MahApps.Styles.Button.Circle}" Margin="18,0,0,0"
-                        IsEnabled="{Binding FolderFilter.HasFilters}"
+                        Background="Transparent"
+                        IsEnabled="{Binding FolderFilter.IsLoaded}"
                         Click="FilterButton_OnClick">
-                    <iconPacks:PackIconMaterial Margin="6" Kind="Filter"/>
+                    <iconPacks:PackIconMaterial Margin="6">
+                        <iconPacks:PackIconMaterial.Style>
+                            <Style TargetType="{x:Type iconPacks:PackIconMaterial}">
+                                <Setter Property="Kind" Value="Filter"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding FolderFilter.IsApplied}" Value="True">
+                                        <Setter Property="Kind" Value="FilterCheck"/>
+                                        <Setter Property="ToolTip" Value="{Binding FolderFilter.Description}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </iconPacks:PackIconMaterial.Style>
+                    </iconPacks:PackIconMaterial>
                 </Button>
+
             </StackPanel>
 
             <TextBox x:Name="pathTextBox" Grid.Column="1" Margin="6,0,6,0" VerticalAlignment="Center" 
@@ -208,12 +223,12 @@
                             Command="{Binding OpenCommand}"/>
             </DataGrid.InputBindings>
             <DataGrid.RowStyle>
-                <Style TargetType="{x:Type DataGridRow}"
-                       BasedOn="{StaticResource MahApps.Styles.DataGridRow}">
+                <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource MahApps.Styles.DataGridRow}">
                     <Setter Property="ContextMenu" Value="{StaticResource entryContextMenu}"/>
                     <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick"/>
                     <EventSetter Event="ContextMenuOpening" Handler="DataGridRow_ContextMenuOpening"/>
                     <EventSetter Event="ContextMenuClosing" Handler="DataGridRow_ContextMenuClosing"/>
+                    <EventSetter Event="GotFocus" Handler="DataGridRow_OnGotFocus"></EventSetter>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsHidden}" Value="True">
                             <Setter Property="Opacity" Value="0.6"/>
@@ -226,8 +241,10 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Grid Height="16" Margin="2,0,0,0" Background="Transparent"
+                                  Focusable="False"
                                   ToolTip="{Binding TagsDescription}">
-                                <ItemsControl ItemsSource="{Binding Tags}">
+                                <ItemsControl ItemsSource="{Binding Tags}"
+                                              Focusable="False">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <VirtualizingStackPanel Orientation="Horizontal"/>
@@ -296,7 +313,7 @@
                     <Run Text="{Binding TotalCount, Mode=OneWay}"/>
                 </TextBlock>
             </StatusBarItem>
-           
+
             <Separator Style="{StaticResource MahApps.Styles.Separator.StatusBar}" />
 
             <StatusBarItem >

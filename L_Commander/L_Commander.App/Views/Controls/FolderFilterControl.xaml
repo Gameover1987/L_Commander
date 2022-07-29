@@ -8,16 +8,24 @@
              xmlns:designMock="clr-namespace:L_Commander.App.Views.DesignMock"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              mc:Ignorable="d" 
-             d:DesignHeight="1000" d:DesignWidth="300"
+             d:DesignHeight="1000" 
+             Width="300"
              d:DataContext="{d:DesignInstance Type={x:Type designMock:DesignMockFolderFilterViewModel}, IsDesignTimeCreatable=True}">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+        <TextBox Grid.Row="0" Margin="6,0,0,0" 
+                 mah:TextBoxHelper.ClearTextButton="True"
+                 mah:TextBoxHelper.UseFloatingWatermark="True"
+                 mah:TextBoxHelper.Watermark="Search files and folders..."
+                 Text="{Binding SearchString, Mode=TwoWay, Delay=300, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                       Background="Transparent"
-                      Margin="6,0,0,0">
+                      Margin="6,6,0,0">
             <ScrollViewer.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Reset filters"
@@ -65,7 +73,7 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <StackPanel Grid.Row="1" Margin="6,6,0,0">
+        <StackPanel Grid.Row="2" Margin="6,6,0,0">
             <Button Content="Clear all filters" Margin="0,0,0,0"
                     Command="{Binding ClearAllFiltersCommand}"/>
             <Button Content="Select all filters" Margin="0,6,0,0"

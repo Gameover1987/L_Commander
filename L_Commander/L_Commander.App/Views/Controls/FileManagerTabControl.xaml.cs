@@ -38,6 +38,11 @@ namespace L_Commander.App.Views.Controls
 
         private void FilterButton_OnClick(object sender, RoutedEventArgs e)
         {
+            ShowFiltersPanel();
+        }
+
+        private void ShowFiltersPanel()
+        {
             var window = (MetroWindow)Window.GetWindow(this);
             var mainViewModel = (IMainViewModel)window.DataContext;
             if (mainViewModel.ActiveFileManager == mainViewModel.LeftFileManager)
@@ -108,6 +113,21 @@ namespace L_Commander.App.Views.Controls
         {
             pathPartItemsControl.Visibility = Visibility.Collapsed;
             pathTextBox.Focus();
+        }
+
+        private void FileManagerTabControl_OnPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F && Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+            {
+                ShowFiltersPanel();
+            }
+        }
+
+        private void DataGridRow_OnGotFocus(object sender, RoutedEventArgs e)
+        {
+            var dataGridRow = (DataGridRow)sender;
+            var firstCell = dataGridRow.FindChild<DataGridCell>();
+            firstCell.Focus();
         }
     }
 }

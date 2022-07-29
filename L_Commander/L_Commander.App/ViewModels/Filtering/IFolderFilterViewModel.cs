@@ -11,7 +11,11 @@ namespace L_Commander.App.ViewModels.Filtering
     {
         ObservableCollection<FilterItemViewModel> Filters { get; }
 
-        bool HasFilters { get; }
+        bool IsLoaded { get; }
+
+        bool IsApplied { get; }
+
+        string Description { get; }
 
         IDelegateCommand SelectAllFiltersCommand { get; }
 

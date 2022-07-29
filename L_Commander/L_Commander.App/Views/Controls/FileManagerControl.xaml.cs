@@ -22,6 +22,28 @@ namespace L_Commander.App.Views.Controls
             DataContextChanged += FileManagerControl_DataContextChanged;
         }
 
+        public void FocusTabControl()
+        {
+            var dataGrid = UIHelper.FindChild<DataGrid>(metroTabControl);
+            if (dataGrid.SelectedItem != null)
+            {
+                var selectedRow = (DataGridRow)dataGrid.ItemContainerGenerator.ContainerFromItem(dataGrid.SelectedItem);
+                if (selectedRow == null)
+                {
+                    dataGrid.Focus();
+                }
+                else
+                {
+                    FocusManager.SetIsFocusScope(selectedRow, true);
+                    FocusManager.SetFocusedElement(selectedRow, selectedRow);
+                }
+            }
+            else
+            {
+                dataGrid.Focus();
+            }
+        }
+
         private void FileManagerControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (e.NewValue is IFileManagerViewModel)
