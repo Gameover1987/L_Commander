@@ -215,6 +215,7 @@
                                  Drop="DataGrid_OnDrop"
                                  PreviewMouseMove="DataGrid_OnPreviewMouseMove"
                                  ItemsSource="{Binding FolderView}"
+
                                  SelectedItem="{Binding SelectedFileSystemEntry}"
                                  IsReadOnly="True"
                                  Style="{StaticResource MahApps.Styles.DataGrid}"
