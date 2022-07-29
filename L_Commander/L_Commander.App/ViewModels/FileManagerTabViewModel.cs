@@ -8,6 +8,7 @@ using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.ViewModels.Factories;
 using L_Commander.App.ViewModels.Filtering;
+using L_Commander.App.Views;
 using L_Commander.App.Views.Controls;
 using L_Commander.Common.Extensions;
 using L_Commander.UI.Commands;
@@ -391,7 +392,16 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     private void ShowPropertiesCommandHandler()
     {
-        _processProvider.ShowPropertiesByPath(SelectedFileSystemEntry.FullPath);
+        if (SelectedEntries.Length == 1)
+        {
+            _processProvider.ShowPropertiesByPath(SelectedFileSystemEntry.FullPath);
+        }
+        else
+        {
+            var multiplePropertiesViewModel = _fileSystemEntryViewModelFactory.CreateMultiplePropertiesViewModel();
+            multiplePropertiesViewModel.Initialize(SelectedEntries);
+            _windowManager.ShowWindow<MultipleFilePropertiesWindow>(multiplePropertiesViewModel);
+        }
     }
 
     private bool CanCalculateFolderSizeCommandHandler()

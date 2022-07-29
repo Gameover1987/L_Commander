@@ -4,6 +4,15 @@ using System.IO;
 
 namespace L_Commander.App.OperatingSystem
 {
+    public class PathInfo
+    {
+        public int FilesCount { get; set; }
+
+        public int FoldersCount { get; set; }
+
+        public long TotalSize { get; set; }
+    }
+
     public interface IFileSystemProvider
     {
         DriveInfo[] GetDrives();
@@ -42,7 +51,7 @@ namespace L_Commander.App.OperatingSystem
 
         string CombinePaths(params string[] paths);
 
-        long CalculateFolderSize(string folderPath);
+        PathInfo GetPathInfoRecursively(string folderPath);
 
         void Initialize();
 

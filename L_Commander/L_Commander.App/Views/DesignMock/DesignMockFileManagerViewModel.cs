@@ -43,7 +43,12 @@ internal sealed class DesignMockWindowManager : IWindowManager
         throw new NotImplementedException();
     }
 
-    public bool ShowDialogWindow<T>(object viewModel) where T : Window
+    public bool ShowDialogWindow<T>(object dataContext) where T : Window
+    {
+        throw new NotImplementedException();
+    }
+
+    public void ShowWindow<T>(object dataContext) where T : Window
     {
         throw new NotImplementedException();
     }

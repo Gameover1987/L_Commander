@@ -23,7 +23,9 @@ namespace L_Commander.App.Infrastructure
 
         Task ShowDialogAsync<T>(object dataContext) where T : BaseMetroDialog, new();
 
-        bool ShowDialogWindow<T>(object viewModel) where T : Window;
+        bool ShowDialogWindow<T>(object dataContext) where T : Window;
+
+        void ShowWindow<T>(object dataContext) where T : Window;
     }
 
     public sealed class WindowManager : IWindowManager
@@ -32,22 +34,22 @@ namespace L_Commander.App.Infrastructure
 
         public Task<string> ShowInputBox(string title, string message, MetroDialogSettings settings = null)
         {
-            return DialogManager.ShowInputAsync(MainWindow, title, message, settings);
+            return MainWindow.ShowInputAsync(title, message, settings);
         }
 
         public Task<MessageDialogResult> ShowMessage(string title, string message, MetroDialogSettings settings = null)
         {
-            return DialogManager.ShowMessageAsync(MainWindow, title, message, MessageDialogStyle.Affirmative, settings);
+            return MainWindow.ShowMessageAsync(title, message, MessageDialogStyle.Affirmative, settings);
         }
 
         public Task<MessageDialogResult> ShowQuestion(string title, string message, MetroDialogSettings settings = null)
         {
-            return DialogManager.ShowMessageAsync(MainWindow, title, message, MessageDialogStyle.AffirmativeAndNegative, settings);
+            return MainWindow.ShowMessageAsync(title, message, MessageDialogStyle.AffirmativeAndNegative, settings);
         }
 
         public Task<ProgressDialogController> ShowProgressDialog(string title, string message)
         {
-            return DialogManager.ShowProgressAsync(MainWindow, title, message, isCancelable: true);
+            return MainWindow.ShowProgressAsync(title, message, isCancelable: true);
         }
 
         public async Task ShowDialogAsync<T>(object dataContext) where T : BaseMetroDialog, new()
@@ -57,13 +59,21 @@ namespace L_Commander.App.Infrastructure
             await dialog.WaitUntilUnloadedAsync();
         }
 
+        public bool ShowDialogWindow<T>(object dataContext) where T : Window
+        {
+            var window = Activator.CreateInstance<T>();
+            window.Owner = MainWindow;
+            window.DataContext = dataContext;
+            return window.ShowDialog() == true;
+        }
 
-        public bool ShowDialogWindow<T>(object viewModel) where T : Window
+        public void ShowWindow<T>(object dataContext) where T : Window
         {
             var dialog = Activator.CreateInstance<T>();
             dialog.Owner = MainWindow;
-            dialog.DataContext = viewModel;
-            return dialog.ShowDialog() == true;
+            dialog.DataContext = dataContext;
+
+            dialog.Show();
         }
     }
 }

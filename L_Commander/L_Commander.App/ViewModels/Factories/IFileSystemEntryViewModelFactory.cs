@@ -10,7 +10,9 @@ namespace L_Commander.App.ViewModels.Factories
 {
     public interface IFileSystemEntryViewModelFactory
     {
-        public IFileSystemEntryViewModel CreateEntryViewModel(string path, IFileManagerTabViewModel tab);
+        IFileSystemEntryViewModel CreateEntryViewModel(string path, IFileManagerTabViewModel tab);
+
+        IMultipleFilePropertiesViewModel CreateMultiplePropertiesViewModel();
     }
 
     public class FileSystemEntryViewModelFactory : IFileSystemEntryViewModelFactory
@@ -29,6 +31,11 @@ namespace L_Commander.App.ViewModels.Factories
         public IFileSystemEntryViewModel CreateEntryViewModel(string path, IFileManagerTabViewModel tab)
         {
             return new FileSystemEntryViewModel(path, _fileSystemProvider, _exceptionHandler, _tagRepository);
+        }
+
+        public IMultipleFilePropertiesViewModel CreateMultiplePropertiesViewModel()
+        {
+            return new MultipleFilePropertiesViewModel(_fileSystemProvider, _exceptionHandler);
         }
     }
 }

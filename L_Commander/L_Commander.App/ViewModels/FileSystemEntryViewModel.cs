@@ -105,7 +105,7 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
             IsBusy = true;
             TotalSize = await Task.Run(() =>
             {
-                return _fileSystemProvider.CalculateFolderSize(FullPath);
+                return _fileSystemProvider.GetPathInfoRecursively(FullPath).TotalSize;
             });
         }
         catch (Exception exception)

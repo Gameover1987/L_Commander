@@ -22,15 +22,6 @@
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type settingsViewModels:TagViewModel}">
                     <Grid HorizontalAlignment="Left">
-                        <Grid.Style>
-                            <Style TargetType="{x:Type Grid}">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}, Path=DataContext.IsEnabled}" Value="False">
-                                        <Setter Property="Opacity" Value="0.6"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Grid.Style>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
@@ -44,8 +35,7 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,6,0,0"
-                    IsEnabled="{Binding IsEnabled}">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,6,0,0">
             <Button Content="Add tag" Width="100"
                     Command="{Binding AddTagCommand}"/>
             <Button Content="Edit tag" Width="100" Margin="6,0,0,0"

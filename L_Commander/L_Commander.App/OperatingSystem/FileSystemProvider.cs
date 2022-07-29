@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
@@ -168,11 +169,18 @@ public sealed class FileSystemProvider : IFileSystemProvider
         return Path.Combine(paths);
     }
 
-    public long CalculateFolderSize(string folderPath)
+    public PathInfo GetPathInfoRecursively(string folderPath)
     {
         var dirInfo = new DirectoryInfo(folderPath);
-        long dirSize = dirInfo.EnumerateFiles("*", SearchOption.AllDirectories).Sum(file => file.Length);
-        return dirSize;
+        var enumeratedFiles = dirInfo.EnumerateFiles("*", SearchOption.AllDirectories).ToArray();
+        var enumeratedDirs = dirInfo.EnumerateDirectories("*", SearchOption.AllDirectories);
+
+        return new PathInfo
+        {
+            FilesCount = enumeratedFiles.Count(),
+            FoldersCount = enumeratedDirs.Count(),
+            TotalSize = enumeratedFiles.Select(x => x.Length).Sum()
+        };
     }
 
     public bool IsFileExists(string filePath)

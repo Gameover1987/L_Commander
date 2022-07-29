@@ -121,6 +121,8 @@
                     Command="{Binding MakeDirCommand}"/>
         <KeyBinding Key="Space"
                     Command="{Binding CalculateFolderSizeCommand}"/>
+        <KeyBinding Key="Enter" Modifiers="Alt"
+                    Command="{Binding ShowPropertiesCommand}"/>
     </UserControl.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
