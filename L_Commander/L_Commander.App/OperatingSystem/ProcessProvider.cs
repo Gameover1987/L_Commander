@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
 
@@ -46,8 +42,11 @@ public sealed class ProcessProvider : IProcessProvider
         Process.Start(new ProcessStartInfo("cmd", $"/K \"cd /d {path}\""));
     }
 
+    [DllImport("shell32.dll", SetLastError = true)]
+    static extern int SHMultiFileProperties(IDataObject pdtobj, int flags);
+
     public void ShowPropertiesByPath(string path)
     {
-     
+        Win32.ShowFileProperties(path);
     }
 }
