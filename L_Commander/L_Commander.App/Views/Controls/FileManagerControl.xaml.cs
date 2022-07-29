@@ -66,6 +66,9 @@ namespace L_Commander.App.Views.Controls
             var sourceTabItem = (MetroTabItem)e.Data.GetData(typeof(MetroTabItem));
             var targetTabItem = UIHelper.FindAncestor<TabItem>((DependencyObject)e.OriginalSource);
 
+            if (sourceTabItem == null || targetTabItem == null)
+                return;
+
             var sourceFileManagerTab = (IFileManagerTabViewModel)sourceTabItem.DataContext;
             var targetFileManagerTab = (IFileManagerTabViewModel)targetTabItem.DataContext;
 

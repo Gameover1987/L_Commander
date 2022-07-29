@@ -211,6 +211,9 @@
         </Grid>
 
         <controls:CustomDataGrid x:Name="dataGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="0,6,0,0"
+                                 AllowDrop="False"
+                                 Drop="DataGrid_OnDrop"
+                                 PreviewMouseMove="DataGrid_OnPreviewMouseMove"
                                  ItemsSource="{Binding FolderView}"
                                  SelectedItem="{Binding SelectedFileSystemEntry}"
                                  IsReadOnly="True"
@@ -222,17 +225,33 @@
                 <KeyBinding Key="Enter"
                             Command="{Binding OpenCommand}"/>
             </DataGrid.InputBindings>
+            <DataGrid.CellStyle>
+                <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource MahApps.Styles.DataGridCell}">
+                    <Setter Property="Foreground" Value="{StaticResource MahApps.Brushes.Text}"></Setter>
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource MahApps.Brushes.Text}"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.CellStyle>
             <DataGrid.RowStyle>
                 <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource MahApps.Styles.DataGridRow}">
                     <Setter Property="ContextMenu" Value="{StaticResource entryContextMenu}"/>
                     <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick"/>
+                    <EventSetter Event="PreviewMouseLeftButtonDown" Handler="DataGridRow_PreviewMouseLeftButtonDown"/>
                     <EventSetter Event="ContextMenuOpening" Handler="DataGridRow_ContextMenuOpening"/>
                     <EventSetter Event="ContextMenuClosing" Handler="DataGridRow_ContextMenuClosing"/>
-                    <EventSetter Event="GotFocus" Handler="DataGridRow_OnGotFocus"></EventSetter>
+                    <EventSetter Event="GotFocus" Handler="DataGridRow_OnGotFocus"/>
+                    <EventSetter Event="PreviewMouseLeftButtonUp" Handler="ButtonUp"></EventSetter>
+                    <Setter Property="Foreground" Value="Black"/>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsHidden}" Value="True">
                             <Setter Property="Opacity" Value="0.6"/>
                         </DataTrigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{StaticResource MahApps.Brushes.Accent4}"/>
+                        </Trigger>
                     </Style.Triggers>
                 </Style>
             </DataGrid.RowStyle>

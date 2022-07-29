@@ -129,5 +129,87 @@ namespace L_Commander.App.Views.Controls
             var firstCell = dataGridRow.FindChild<DataGridCell>();
             firstCell.Focus();
         }
+
+        private void DataGrid_OnPreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            var dataGrid = e.Source as DataGrid;
+            if (dataGrid == null)
+                return;
+
+            if (Mouse.PrimaryDevice.LeftButton == MouseButtonState.Pressed &&
+                _dataContext.SelectedEntries.Any())
+                DragDrop.DoDragDrop(dataGrid, new DragDropData(dataGrid, _dataContext.SelectedEntries), DragDropEffects.Copy);
+        }
+
+        private void DataGrid_OnDrop(object sender, DragEventArgs e)
+        {
+            var data = (DragDropData)e.Data.GetData(typeof(DragDropData));
+            if (data.DataGrid == dataGrid)
+                return;
+
+            var window = Window.GetWindow(this);
+            var mainViewModel = window.DataContext as IMainViewModel;
+            mainViewModel.CopyCommand.TryExecute();
+        }
+
+        private void DataGridRow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            e.Handled = true;
+            //var dataGridRow = sender as DataGridRow;
+            //if (e.ClickCount == 2)
+            //    return;
+
+            //if (dataGridRow.IsSelected && _dataContext.SelectedEntries.Length > 1)
+            //    e.Handled = true;
+        }
+
+        private class DragDropData
+        {
+            public DragDropData(DataGrid dataGrid, IFileSystemEntryViewModel[] selectedItems)
+            {
+                DataGrid = dataGrid;
+                SelectedItems = selectedItems;
+            }
+
+            public DataGrid DataGrid { get; }
+
+            public IFileSystemEntryViewModel[] SelectedItems { get; }
+        }
+
+        private void ButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var dataGridRow = sender as DataGridRow;
+            if (dataGridRow == null)
+                return;
+
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+            {
+                Debug.WriteLine("Keyboard CTRL");
+                if (dataGridRow.IsSelected)
+                {
+                    dataGrid.SelectedItems.Remove(dataGridRow.DataContext);
+                }
+                else
+                {
+                    dataGrid.SelectedItems.Add(dataGridRow.DataContext);
+                }
+            }
+            else if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+            {
+                Debug.WriteLine("Keyboard SHIFT");
+                var lastSelectedItem = dataGrid.SelectedItems[dataGrid.SelectedItems.Count - 1];
+                foreach (var dataGridItem in dataGrid.Items)
+                {
+                    Debug.WriteLine(((IFileSystemEntryViewModel)dataGridItem).Name);
+                }
+                var currentSelectedItem = dataGridRow.DataContext;
+            }
+            else
+            {
+                Debug.WriteLine("Single click");
+                dataGrid.SelectedItems.Clear();
+                dataGridRow.IsSelected = !dataGridRow.IsSelected;
+            }
+        }
     }
 }

@@ -15,5 +15,9 @@ public interface IMainViewModel : ISettingsFiller
 
     IDelegateCommand DeleteCommand { get; }
 
+    IDelegateCommand CopyCommand { get; }
+
+    IDelegateCommand MoveCommand { get; }
+
     void Initialize();
 }
