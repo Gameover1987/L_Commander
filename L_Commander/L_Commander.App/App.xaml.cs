@@ -3,14 +3,17 @@ using System.IO;
 using System.Windows;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.Infrastructure.Db;
+using L_Commander.App.Infrastructure.History;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.OperatingSystem.Operations;
 using L_Commander.App.OperatingSystem.Registry;
 using L_Commander.App.ViewModels;
 using L_Commander.App.ViewModels.Factories;
 using L_Commander.App.ViewModels.Filtering;
+using L_Commander.App.ViewModels.History;
 using L_Commander.App.ViewModels.Settings;
 using L_Commander.App.Views;
+using L_Commander.App.Views.DesignMock;
 using L_Commander.UI.Commands;
 using L_Commander.UI.Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -90,6 +93,7 @@ namespace L_Commander.App
                 .AddSingleton<ISettingsManager, SettingsManager>()
                 .AddSingleton<ITagRepository, TagRepository>()
                 .AddSingleton<IClipBoardProvider, ClipBoardProvider>()
+                .AddSingleton<IHistoryManager, DesignMockHistoryManager>()
                 .AddLogging(x =>
                 {
                     x.SetMinimumLevel(LogLevel.Information);
@@ -122,6 +126,7 @@ namespace L_Commander.App
                 .AddSingleton<ISettingsViewModel, SettingsViewModel>()
                 .AddSingleton<IContextMenuItemProvider, ContextMenuItemProvider>()
                 .AddSingleton<IOpenWithViewModel, OpenWithViewModel>()
+                .AddSingleton<IHistoryViewModel, HistoryViewModel>()
                 .AddTransient<IFileManagerViewModel, FileManagerViewModel>();
 
 

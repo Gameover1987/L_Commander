@@ -3,8 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using ControlzEx.Standard;
 using L_Commander.App.Infrastructure;
+using L_Commander.App.Infrastructure.Settings;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.OperatingSystem.Operations;
+using L_Commander.App.ViewModels.History;
 using L_Commander.App.ViewModels.Settings;
 using L_Commander.App.Views;
 using L_Commander.UI.Commands;
@@ -23,6 +25,7 @@ namespace L_Commander.App.ViewModels
         private readonly IMoveOperation _moveOperation;
         private readonly IDeleteOperation _deleteOperation;
         private readonly IWindowManager _windowManager;
+        private readonly IHistoryViewModel _historyViewModel;
         private readonly IExceptionHandler _exceptionHandler;
         private readonly ISettingsViewModel _settingsViewModel;
         private readonly IFileSystemProvider _fileSystemProvider;
@@ -35,6 +38,7 @@ namespace L_Commander.App.ViewModels
             IMoveOperation moveOperation,
             IDeleteOperation deleteOperation,
             IWindowManager windowManager,
+            IHistoryViewModel historyViewModel,
             IExceptionHandler exceptionHandler,
             ISettingsViewModel settingsViewModel,
             IFileSystemProvider fileSystemProvider)
@@ -49,6 +53,7 @@ namespace L_Commander.App.ViewModels
             _moveOperation.Progress += FileSystemOperationOnProgress;
             _copyOperation.Progress += FileSystemOperationOnProgress;
             _windowManager = windowManager;
+            _historyViewModel = historyViewModel;
             _exceptionHandler = exceptionHandler;
             _settingsViewModel = settingsViewModel;
             _fileSystemProvider = fileSystemProvider;
@@ -62,6 +67,7 @@ namespace L_Commander.App.ViewModels
             MakeDirCommand = new DelegateCommand(MakeDirCommandHandler, CanMakeDirCommandHandler);
             DeleteCommand = new DelegateCommand(DeleteCommandHandler, CanDeleteCommandHandler);
             ShowSettingsCommand = new DelegateCommand(ShowSettingsCommandHandler);
+            ShowHistoryCommand = new DelegateCommand(ShowHistoryCommandHandler);
         }
 
         public IFileManagerViewModel LeftFileManager => _leftFileManager;
@@ -108,6 +114,8 @@ namespace L_Commander.App.ViewModels
         public IDelegateCommand MakeDirCommand { get; set; }
 
         public IDelegateCommand ShowSettingsCommand { get; }
+
+        public IDelegateCommand ShowHistoryCommand { get; }
 
         public void Initialize()
         {
@@ -351,6 +359,12 @@ namespace L_Commander.App.ViewModels
             }
 
             _settingsManager.Save();
+        }
+
+        private void ShowHistoryCommandHandler()
+        {
+            _historyViewModel.Initialize();
+            _windowManager.ShowDialogWindow<HistoryWindow>(_historyViewModel);
         }
 
         private void ProgressDialogControllerOnCanceled(object sender, EventArgs e)

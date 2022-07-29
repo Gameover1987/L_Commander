@@ -36,6 +36,7 @@
 
             <converters1:TotalSizeToStringConverter x:Key="TotalSizeToStringConverter"/>
             <converters1:TotalSizeToStringWithUnitsConverter x:Key="TotalSizeToStringWithUnitsConverter"/>
+            <converters1:DateToStringConverter x:Key="DateToStringConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

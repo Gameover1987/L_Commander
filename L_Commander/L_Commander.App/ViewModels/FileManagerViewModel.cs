@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using L_Commander.App.Infrastructure;
+using L_Commander.App.Infrastructure.Settings;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.ViewModels.Factories;
 using L_Commander.Common.Extensions;

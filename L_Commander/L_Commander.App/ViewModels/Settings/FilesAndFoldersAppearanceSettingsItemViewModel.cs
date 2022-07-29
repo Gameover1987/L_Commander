@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using L_Commander.App.Infrastructure;
+using L_Commander.App.Infrastructure.Settings;
 using L_Commander.Common.Extensions;
 using L_Commander.UI.ViewModels;
 using Newtonsoft.Json;

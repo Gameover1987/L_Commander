@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
 using L_Commander.App.Infrastructure;
+using L_Commander.App.Infrastructure.Settings;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.ViewModels.Factories;
 using L_Commander.App.ViewModels.Filtering;

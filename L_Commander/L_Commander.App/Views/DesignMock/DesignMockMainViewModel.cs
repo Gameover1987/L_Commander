@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using L_Commander.App.Infrastructure;
+using L_Commander.App.Infrastructure.Settings;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.ViewModels;
 
@@ -37,6 +38,7 @@ namespace L_Commander.App.Views.DesignMock
                   new DesignMockMoveOperation(),
                   new DesignMockDeleteOperation(),
                   new DesignMockWindowManager(),
+                  new DesignMockHistoryViewModel(),
                   new DesignMockExceptionHandler(),
                   new DesignMockSettingsViewModel(),
                   new FileSystemProvider(new IconCache()))

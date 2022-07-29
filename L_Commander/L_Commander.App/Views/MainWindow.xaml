@@ -75,7 +75,8 @@
             <MenuItem Header="Options">
                 <MenuItem Header="Settings"
                           Command="{Binding ShowSettingsCommand}"/>
-                <MenuItem Header="History"/>
+                <MenuItem Header="History"
+                          Command="{Binding ShowHistoryCommand}"/>
             </MenuItem>
         </Menu>
         

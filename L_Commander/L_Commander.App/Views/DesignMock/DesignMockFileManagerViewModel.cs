@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using L_Commander.App.Infrastructure;
+using L_Commander.App.Infrastructure.Settings;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.ViewModels;
 using L_Commander.App.ViewModels.Factories;

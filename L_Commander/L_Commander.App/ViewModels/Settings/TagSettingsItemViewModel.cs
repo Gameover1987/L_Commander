@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using L_Commander.App.Views;
 using Newtonsoft.Json;
+using L_Commander.App.Infrastructure.Settings;
 
 namespace L_Commander.App.ViewModels.Settings
 {

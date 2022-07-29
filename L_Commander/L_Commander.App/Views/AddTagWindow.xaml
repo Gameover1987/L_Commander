@@ -13,7 +13,7 @@
                  ResizeMode="NoResize"
                  ShowIconOnTitleBar="True"
                  ShowInTaskbar="False"
-                 WindowStartupLocation="CenterScreen"
+                 WindowStartupLocation="CenterOwner"
                  d:DataContext="{d:DesignInstance Type=designMock:DesignMockAddTagViewModel, IsDesignTimeCreatable=True}">
     <Grid Margin="12">
         <Grid.ColumnDefinitions>
