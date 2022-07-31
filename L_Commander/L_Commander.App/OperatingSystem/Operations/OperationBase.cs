@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using L_Commander.App.Infrastructure.History;
 
 namespace L_Commander.App.OperatingSystem.Operations;
 

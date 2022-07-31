@@ -12,6 +12,8 @@ namespace L_Commander.App.Infrastructure
     {
         MetroWindow MainWindow { get; }
 
+        MetroWindow ActiveWindow { get; }
+
         Task<string> ShowInputBox(string title, string message, MetroDialogSettings settings = null);
 
         Task<MessageDialogResult> ShowMessage(string title, string message, MetroDialogSettings settings = null);

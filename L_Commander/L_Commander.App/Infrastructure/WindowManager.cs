@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using MahApps.Metro.Controls;
@@ -10,24 +11,32 @@ public sealed class WindowManager : IWindowManager
 {
     public MetroWindow MainWindow => (MetroWindow)Application.Current.MainWindow;
 
+    public MetroWindow ActiveWindow
+    {
+        get
+        {
+           return (MetroWindow)Application.Current.Windows.Cast<object>().Where(x => x is MetroWindow).FirstOrDefault(x => ((MetroWindow)x).IsActive);
+        }
+    }
+
     public Task<string> ShowInputBox(string title, string message, MetroDialogSettings settings = null)
     {
-        return MainWindow.ShowInputAsync(title, message, settings);
+        return ActiveWindow.ShowInputAsync(title, message, settings);
     }
 
     public Task<MessageDialogResult> ShowMessage(string title, string message, MetroDialogSettings settings = null)
     {
-        return MainWindow.ShowMessageAsync(title, message, MessageDialogStyle.Affirmative, settings);
+        return ActiveWindow.ShowMessageAsync(title, message, MessageDialogStyle.Affirmative, settings);
     }
 
     public Task<MessageDialogResult> ShowQuestion(string title, string message, MetroDialogSettings settings = null)
     {
-        return MainWindow.ShowMessageAsync(title, message, MessageDialogStyle.AffirmativeAndNegative, settings);
+        return ActiveWindow.ShowMessageAsync(title, message, MessageDialogStyle.AffirmativeAndNegative, settings);
     }
 
     public Task<ProgressDialogController> ShowProgressDialog(string title, string message)
     {
-        return MainWindow.ShowProgressAsync(title, message, isCancelable: true);
+        return ActiveWindow.ShowProgressAsync(title, message, isCancelable: true);
     }
 
     public async Task ShowDialogAsync<T>(object dataContext) where T : BaseMetroDialog, new()

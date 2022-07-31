@@ -7,8 +7,10 @@ namespace L_Commander.App.Infrastructure.History
 {
     public interface IHistoryManager
     {
-        public void Add(HistoryItem historyItem);
+        public void Add(string name, string description);
 
         public HistoryItem[] GetHistory();
+
+        void DeleteFromHistory(int id);
     }
 }

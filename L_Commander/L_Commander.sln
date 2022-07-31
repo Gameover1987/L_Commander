@@ -5,9 +5,11 @@ VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "L_Commander.App", "L_Commander.App\L_Commander.App.csproj", "{21CABEC9-5E57-43F6-A14C-871C79AEC8C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "L_Commander.UI", "L_Commander.UI\L_Commander.UI.csproj", "{C30FC416-523C-4717-8469-2231577176E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "L_Commander.UI", "L_Commander.UI\L_Commander.UI.csproj", "{C30FC416-523C-4717-8469-2231577176E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "L_Commander.Common", "L_Commander.Common\L_Commander.Common.csproj", "{55FC7708-3D49-40C7-8CC8-B11E1E99BF70}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "L_Commander.Common", "L_Commander.Common\L_Commander.Common.csproj", "{55FC7708-3D49-40C7-8CC8-B11E1E99BF70}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "L_Commander.Database", "L_Commander.Database\L_Commander.Database.csproj", "{45B20912-5106-44A1-95A4-EF82451BFD37}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{55FC7708-3D49-40C7-8CC8-B11E1E99BF70}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55FC7708-3D49-40C7-8CC8-B11E1E99BF70}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55FC7708-3D49-40C7-8CC8-B11E1E99BF70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45B20912-5106-44A1-95A4-EF82451BFD37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45B20912-5106-44A1-95A4-EF82451BFD37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45B20912-5106-44A1-95A4-EF82451BFD37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45B20912-5106-44A1-95A4-EF82451BFD37}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

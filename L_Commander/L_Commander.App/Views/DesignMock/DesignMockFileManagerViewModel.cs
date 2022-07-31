@@ -19,6 +19,8 @@ namespace L_Commander.App.Views.DesignMock;
 internal sealed class DesignMockWindowManager : IWindowManager
 {
     public MetroWindow MainWindow { get; }
+    public MetroWindow ActiveWindow { get; }
+
     public Task<string> ShowInputBox(string title, string message, MetroDialogSettings settings = null)
     {
         throw new NotImplementedException();
@@ -69,7 +71,8 @@ internal sealed class DesignMockFileManagerTabViewModel : FileManagerTabViewMode
             new DesignMockTagRepository(),
             new DesignMockOpenWithViewModel(),
             new TabStatusBarViewModel(),
-            new DesignMockSettingsManager())
+            new DesignMockSettingsManager(),
+            new DesignMockHistoryManager())
     {
         ThreadTaskExtensions.IsSyncRun = true;
         Initialize("E:\\Download");
@@ -106,7 +109,8 @@ internal sealed class DesignMockFileManagerTabViewModelFactory : FileManagerTabV
             new FileSystemEntryViewModelFactory(new FileSystemProvider(new IconCache()), new DesignMockExceptionHandler(), new DesignMockTagRepository()), 
             new DesignMockTagRepository(),
             new DesignMockOpenWithViewModel(),
-            new DesignMockSettingsManager())
+            new DesignMockSettingsManager(),
+            new DesignMockHistoryManager())
     {
 
     }

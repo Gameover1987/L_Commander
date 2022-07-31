@@ -1,19 +1,23 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
+using L_Commander.App.Infrastructure.History;
 
 namespace L_Commander.App.OperatingSystem.Operations
 {
     public sealed class DeleteOperation : OperationBase<DeleteUnitOfWork>, IDeleteOperation
     {
         private readonly IFileSystemProvider _fileSystemProvider;
+        private readonly IHistoryManager _historyManager;
 
         private int _initialCount;
 
         private FileSystemEntryDescriptor[] _entries;
 
-        public DeleteOperation(IFileSystemProvider fileSystemProvider)
+        public DeleteOperation(IFileSystemProvider fileSystemProvider, IHistoryManager historyManager)
         {
             _fileSystemProvider = fileSystemProvider;
+            _historyManager = historyManager;
         }
 
         public void Initialize(FileSystemEntryDescriptor[] entries)
@@ -34,6 +38,8 @@ namespace L_Commander.App.OperatingSystem.Operations
 
         protected override void Setup()
         {
+            _historyManager.Add("Delete operation started", string.Join("", _entries.Select(x => x.Path + Environment.NewLine)));
+
             foreach (var work in _entries.Select(x => new DeleteUnitOfWork(x.FileOrFolder, x.Path)))
             {
                 _worksQueue.Enqueue(work);
@@ -48,6 +54,8 @@ namespace L_Commander.App.OperatingSystem.Operations
             {
                 _fileSystemProvider.Delete(descriptor.FileOrFolder, descriptor.Path);
             }
+
+            _historyManager.Add("Delete operation finished succesfully", string.Join("", _entries.Select(x => x.Path + Environment.NewLine)));
         }
 
         protected override void ThreadMethod(DeleteUnitOfWork unitOfWork)

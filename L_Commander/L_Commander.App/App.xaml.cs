@@ -2,7 +2,6 @@
 using System.IO;
 using System.Windows;
 using L_Commander.App.Infrastructure;
-using L_Commander.App.Infrastructure.Db;
 using L_Commander.App.Infrastructure.History;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.OperatingSystem.Operations;
@@ -14,9 +13,9 @@ using L_Commander.App.ViewModels.History;
 using L_Commander.App.ViewModels.Settings;
 using L_Commander.App.Views;
 using L_Commander.App.Views.DesignMock;
+using L_Commander.Database;
 using L_Commander.UI.Commands;
 using L_Commander.UI.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -93,7 +92,7 @@ namespace L_Commander.App
                 .AddSingleton<ISettingsManager, SettingsManager>()
                 .AddSingleton<ITagRepository, TagRepository>()
                 .AddSingleton<IClipBoardProvider, ClipBoardProvider>()
-                .AddSingleton<IHistoryManager, DesignMockHistoryManager>()
+                .AddSingleton<IHistoryManager, HistoryManager>()
                 .AddLogging(x =>
                 {
                     x.SetMinimumLevel(LogLevel.Information);

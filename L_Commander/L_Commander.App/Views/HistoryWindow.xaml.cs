@@ -23,5 +23,10 @@ namespace L_Commander.App.Views
         {
             InitializeComponent();
         }
+
+        private void ButtonClose_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
     }
 }

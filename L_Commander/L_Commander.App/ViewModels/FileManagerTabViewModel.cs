@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
 using L_Commander.App.Infrastructure;
+using L_Commander.App.Infrastructure.History;
 using L_Commander.App.Infrastructure.Settings;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.ViewModels.Factories;
@@ -36,6 +37,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private readonly IOpenWithViewModel _openWithViewModel;
     private readonly ITabStatusBarViewModel _statusBarViewModel;
     private readonly ISettingsManager _settingsManager;
+    private readonly IHistoryManager _historyManager;
     private string _fullPath;
 
     private IFileSystemEntryViewModel _selectedFileSystemEntry;
@@ -61,7 +63,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         ITagRepository tagRepository,
         IOpenWithViewModel openWithViewModel,
         ITabStatusBarViewModel statusBarViewModel,
-        ISettingsManager settingsManager)
+        ISettingsManager settingsManager,
+        IHistoryManager historyManager)
     {
         _folderFilter = folderFilter;
         _folderFilter.Changed += FolderFilterOnChanged;
@@ -77,6 +80,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _openWithViewModel = openWithViewModel;
         _statusBarViewModel = statusBarViewModel;
         _settingsManager = settingsManager;
+        _historyManager = historyManager;
         _settingsManager.SettingsChanged += SettingsManagerOnSettingsChanged;
         _timer.Initialize(TimeSpan.FromMilliseconds(TimerInterval));
         _timer.Tick += TimerOnTick;
@@ -319,8 +323,9 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
             var newName = await _windowManager.ShowInputBox("Rename", SelectedFileSystemEntry.FullPath, settings);
             if (newName.IsNullOrWhiteSpace())
                 return;
-
+            
             _fileSystemProvider.Rename(SelectedFileSystemEntry.FileOrFolder, SelectedFileSystemEntry.FullPath, newName);
+            _historyManager.Add("Rename operation", $"Old name is'{SelectedFileSystemEntry.FullPath}'\r\nNew name is '{newName}'");
         }
         catch (Exception exception)
         {
@@ -383,6 +388,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
             var newDirectoryFullPath = _fileSystemProvider.CombinePaths(FullPath, newName);
             _fileSystemProvider.CreateDirectory(newDirectoryFullPath);
+            _historyManager.Add("Make directory", $"New directory name '{newName}'");
 
         }
         catch (Exception exception)

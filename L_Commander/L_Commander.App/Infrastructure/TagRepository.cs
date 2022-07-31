@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using L_Commander.App.Infrastructure.Db;
 using L_Commander.App.OperatingSystem;
+using L_Commander.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace L_Commander.App.Infrastructure;
@@ -58,6 +58,9 @@ public sealed class TagRepository : ITagRepository
     {
         lock (_dbContext)
         {
+            if (_dbContext.IsDisposing)
+                return Array.Empty<Tag>();
+
             return _dbContext.Tags.Select(x => new Tag
             {
                 Guid = x.TagGuid,

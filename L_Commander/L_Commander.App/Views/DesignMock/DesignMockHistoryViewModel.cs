@@ -14,10 +14,11 @@ namespace L_Commander.App.Views.DesignMock
     {
         private const string LoremIpsum =
             "Lorem ipsum — классический текст-«рыба» (условный, зачастую бессмысленный текст-заполнитель, вставляемый в макет страницы). Является искажённым отрывком из философского трактата Марка Туллия Цицерона «О пределах добра и зла[en]», написанного в 45 году до н. э. на латинском языке, обнаружение сходства приписывается Ричарду МакКлинтоку[1]. Распространился в 1970-х годах из-за трафаретов компании Letraset, a затем — из-за того, что служил примером текста в программе PageMaker. Испорченный текст, вероятно, происходит от его издания в Loeb Classical Library 1914 года, в котором слово dolorem разбито переносом так, что страница 36 начинается с lorem ipsum… (do- осталось на предыдущей)[2].";
+        
 
-        public void Add(HistoryItem historyItem)
+        public void Add(string name, string description)
         {
-
+            throw new NotImplementedException();
         }
 
         public HistoryItem[] GetHistory()
@@ -94,12 +95,17 @@ namespace L_Commander.App.Views.DesignMock
                 },
             };
         }
+
+        public void DeleteFromHistory(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class DesignMockHistoryViewModel : HistoryViewModel
     {
         public DesignMockHistoryViewModel()
-            : base(new DesignMockHistoryManager(), new DesignMockExceptionHandler())
+            : base(new DesignMockHistoryManager(), new DesignMockExceptionHandler(), new DesignMockWindowManager())
         {
             ThreadTaskExtensions.IsSyncRun = true;
             Initialize();

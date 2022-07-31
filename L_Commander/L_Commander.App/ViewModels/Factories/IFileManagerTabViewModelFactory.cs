@@ -1,4 +1,5 @@
 ﻿using L_Commander.App.Infrastructure;
+using L_Commander.App.Infrastructure.History;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.ViewModels.Filtering;
 using L_Commander.App.Views.DesignMock;
@@ -21,6 +22,7 @@ namespace L_Commander.App.ViewModels.Factories
         private readonly ITagRepository _tagRepository;
         private readonly IOpenWithViewModel _openWithViewModel;
         private readonly ISettingsManager _settingsManager;
+        private readonly IHistoryManager _historyManager;
 
         public FileManagerTabViewModelFactory(IFileSystemProvider fileSystemProvider,
             IWindowManager windowManager,
@@ -29,7 +31,8 @@ namespace L_Commander.App.ViewModels.Factories
             IFileSystemEntryViewModelFactory fileSystemEntryViewModelFactory,
             ITagRepository tagRepository,
             IOpenWithViewModel openWithViewModel,
-            ISettingsManager settingsManager)
+            ISettingsManager settingsManager,
+            IHistoryManager historyManager)
         {
             _fileSystemProvider = fileSystemProvider;
             _windowManager = windowManager;
@@ -39,6 +42,7 @@ namespace L_Commander.App.ViewModels.Factories
             _tagRepository = tagRepository;
             _openWithViewModel = openWithViewModel;
             _settingsManager = settingsManager;
+            _historyManager = historyManager;
         }
 
         public IFileManagerTabViewModel CreateFileManagerTab()
@@ -54,7 +58,8 @@ namespace L_Commander.App.ViewModels.Factories
                 _tagRepository,
                 _openWithViewModel,
                 new TabStatusBarViewModel(),
-                _settingsManager);
+                _settingsManager,
+                _historyManager);
             return tab;
         }
     }

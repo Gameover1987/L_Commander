@@ -1,54 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace L_Commander.App.Infrastructure.Db
+namespace L_Commander.Database
 {
-    public class FileEntity
-    {
-        [Key]
-        public string Path { get; set; }
-
-        public List<FileTagEntity> Tags { get; set; }
-    }
-
-    public class FileTagEntity
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-
-        [Required]
-        public FileEntity FileEntity { get; set; }
-
-        [Required]
-        public TagEntity TagEntity { get; set; }
-    }
-
-    public class TagEntity
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid TagGuid { get; set; }
-
-        [Required]
-        public string Text { get; set; }
-
-        [Required]
-        public int Color { get; set; }
-    }
-
     public sealed class LCommanderDbContext : DbContext
     {
         private bool _isDisposing;
+
+        public DbSet<HistoryItemEntity> History { get; set; }
 
         public DbSet<FileEntity> Files { get; set; }
 
         public DbSet<FileTagEntity> FileTags { get; set; }
 
         public DbSet<TagEntity> Tags { get; set; }
+
+        public LCommanderDbContext()
+        {
+            
+        }
 
         public LCommanderDbContext(DbContextOptions options)
             : base(options)
@@ -67,7 +36,7 @@ namespace L_Commander.App.Infrastructure.Db
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite(@"Data Source=FileSystemTags.db");
+            optionsBuilder.UseSqlite(@"Data Source=L_CommanderStorage.db");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -78,7 +47,6 @@ namespace L_Commander.App.Infrastructure.Db
                 .HasOne(x => x.FileEntity);
             modelBuilder.Entity<FileTagEntity>()
                 .HasOne(x => x.TagEntity);
-
 
         }
     }

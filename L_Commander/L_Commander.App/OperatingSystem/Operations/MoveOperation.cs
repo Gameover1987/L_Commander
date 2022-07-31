@@ -3,21 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using L_Commander.App.Infrastructure.History;
 
 namespace L_Commander.App.OperatingSystem.Operations
 {
     public sealed class MoveOperation : OperationBase<CopyUnitOfWork>, IMoveOperation
     {
         private readonly IFileSystemProvider _fileSystemProvider;
+        private readonly IHistoryManager _historyManager;
 
         private int _initialCount;        
 
         private FileSystemEntryDescriptor[] _entries;
         private string _destDirectory;
 
-        public MoveOperation(IFileSystemProvider fileSystemProvider)
+        public MoveOperation(IFileSystemProvider fileSystemProvider, IHistoryManager historyManager)
         {
             _fileSystemProvider = fileSystemProvider;
+            _historyManager = historyManager;
         }
 
         public void Initialize(FileSystemEntryDescriptor[] entries, string destDirectory)
@@ -29,6 +32,7 @@ namespace L_Commander.App.OperatingSystem.Operations
 
         protected override void Setup()
         {
+            _historyManager.Add("Move operation started", string.Join("", _entries.Select(x => x.Path + Environment.NewLine)));
             var works = GetUnitOfWorks(_entries, _destDirectory);
             var folders = works.Select(x => _fileSystemProvider.GetTopLevelPath(x.DestinationPath)).Distinct().ToArray();
             foreach (var folder in folders)
@@ -58,6 +62,8 @@ namespace L_Commander.App.OperatingSystem.Operations
             {
                 _fileSystemProvider.Delete(descriptor.FileOrFolder, descriptor.Path);
             }
+
+            _historyManager.Add("Move operation finished succesfully", string.Join("", _entries.Select(x => x.Path + Environment.NewLine)));
         }
 
         protected override OperationProgressEventArgs GetProgressEventArgs(CopyUnitOfWork unitOfWork)
