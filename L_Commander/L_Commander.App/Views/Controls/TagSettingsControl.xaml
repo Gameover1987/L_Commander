@@ -21,7 +21,7 @@
                  SelectedItem="{Binding SelectedTag}"                 >
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type settingsViewModels:TagViewModel}">
-                    <Grid HorizontalAlignment="Left">
+                    <Grid HorizontalAlignment="Left" Margin="3">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
