@@ -64,10 +64,10 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <mah:MetroAnimatedTabControl x:Name="metroTabControl" Grid.Row="1" Margin="0,0,0,0"                                      
-                                     mah:TabControlHelper.Underlined="SelectedTabItem"
-                                     ItemsSource="{Binding Tabs}"
-                                     SelectedItem="{Binding SelectedTab}">
+        <mah:MetroTabControl x:Name="metroTabControl" Grid.Row="1" Margin="0,0,0,0"       
+                             mah:TabControlHelper.Underlined="SelectedTabItem"
+                             ItemsSource="{Binding Tabs}"
+                             SelectedItem="{Binding SelectedTab}">
             <TabControl.ItemContainerStyle>
                 <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource {x:Type TabItem}}">
                     <Setter Property="ToolTip" Value="{Binding FullPath}"/>
@@ -126,6 +126,6 @@
                     </Grid>
                 </DataTemplate>
             </TabControl.ItemTemplate>
-        </mah:MetroAnimatedTabControl>
+        </mah:MetroTabControl>
     </Grid>
 </UserControl>
