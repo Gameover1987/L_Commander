@@ -1,4 +1,5 @@
-﻿using L_Commander.App.ViewModels;
+﻿using System;
+using L_Commander.App.ViewModels;
 using L_Commander.UI.Helpers;
 using MahApps.Metro.Controls;
 using System.Diagnostics;
@@ -14,6 +15,8 @@ namespace L_Commander.App.Views.Controls
     public partial class FileManagerControl : UserControl
     {
         private IFileManagerViewModel _fileManager;
+
+        private Point _startPoint;
 
         public FileManagerControl()
         {
@@ -50,6 +53,11 @@ namespace L_Commander.App.Views.Controls
                 _fileManager = (IFileManagerViewModel)e.NewValue;
         }
 
+        private void TabItem_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _startPoint = e.GetPosition(null);
+        }
+
         private void TabItem_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             var tabItem = e.Source as TabItem;
@@ -57,7 +65,12 @@ namespace L_Commander.App.Views.Controls
             if (tabItem == null)
                 return;
 
-            if (Mouse.PrimaryDevice.LeftButton == MouseButtonState.Pressed)
+            var mousePos = e.GetPosition(null);
+            var diff = _startPoint - mousePos;
+
+            if (Mouse.PrimaryDevice.LeftButton == MouseButtonState.Pressed &&
+                (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance ||
+                 Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance))
                 DragDrop.DoDragDrop(tabItem, tabItem, DragDropEffects.Move);
         }
 

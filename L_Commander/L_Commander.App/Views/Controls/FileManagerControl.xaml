@@ -72,6 +72,7 @@
                 <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource {x:Type TabItem}}">
                     <Setter Property="ToolTip" Value="{Binding FullPath}"/>
                     <Setter Property="AllowDrop" Value="True"/>
+                    <EventSetter Event="PreviewMouseLeftButtonDown" Handler="TabItem_MouseLeftButtonDown"/>
                     <EventSetter Event="PreviewMouseMove" Handler="TabItem_PreviewMouseMove"/>
                     <EventSetter Event="Drop" Handler="TabItem_Drop"/>
                     <Setter Property="ContextMenu">
