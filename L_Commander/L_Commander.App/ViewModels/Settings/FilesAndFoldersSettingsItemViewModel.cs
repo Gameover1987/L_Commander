@@ -10,22 +10,22 @@ using Newtonsoft.Json;
 
 namespace L_Commander.App.ViewModels.Settings
 {
-    public class FilesAndFoldersAppearanceSettingsItemViewModel : ViewModelBase, ISettingsItemViewModel
+    public class FilesAndFoldersSettingsItemViewModel : ViewModelBase, ISettingsItemViewModel
     {
-        private readonly FilesAndFoldersAppearanceSettings _settings;
+        private readonly FilesAndFoldersSettings _settings;
 
         private bool _showSystemFiles;
         private bool _showHiddenFiles;
 
 
-        public FilesAndFoldersAppearanceSettingsItemViewModel(FilesAndFoldersAppearanceSettings settings)
+        public FilesAndFoldersSettingsItemViewModel(FilesAndFoldersSettings settings)
         {
             _settings = settings;
             _showSystemFiles = _settings.ShowSystemFilesAndFolders;
             _showHiddenFiles = _settings.ShowHiddenFilesAndFolders;
         }
 
-        public string DisplayName => "Files and folders appearance";
+        public string DisplayName => "Files and folders";
 
         public bool IsChanged
         {
@@ -64,12 +64,12 @@ namespace L_Commander.App.ViewModels.Settings
 
         public void Save(ClientSettings settings)
         {
-            settings.FilesAndFoldersAppearanceSettings = GetSettings();
+            settings.FilesAndFoldersSettings = GetSettings();
         }
 
-        private FilesAndFoldersAppearanceSettings GetSettings()
+        private FilesAndFoldersSettings GetSettings()
         {
-            return new FilesAndFoldersAppearanceSettings
+            return new FilesAndFoldersSettings
             {
                 ShowHiddenFilesAndFolders = ShowHiddenFiles,
                 ShowSystemFilesAndFolders = ShowSystemFiles

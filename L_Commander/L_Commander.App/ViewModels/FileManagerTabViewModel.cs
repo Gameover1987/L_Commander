@@ -50,7 +50,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     private bool _isBusy;
     private bool _isLocked;
-    private FilesAndFoldersAppearanceSettings _settings;
+    private FilesAndFoldersSettings _settings;
 
     public FileManagerTabViewModel(IFolderFilterViewModel folderFilter,
         IFileSystemProvider fileSystemProvider,
@@ -218,7 +218,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _navigationIndex = 0;
         _navigationHistory.Add(NavigationHistoryItem.Create(rootPath));
 
-        _settings = _settingsManager.Get().FilesAndFoldersAppearanceSettings;
+        _settings = _settingsManager.Get().FilesAndFoldersSettings;
 
         SetPath(rootPath);
     }
@@ -575,7 +575,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
     private void SettingsManagerOnSettingsChanged(object sender, SettingsChangedEventArgs e)
     {
-        _settings = e.Settings.FilesAndFoldersAppearanceSettings;
+        _settings = e.Settings.FilesAndFoldersSettings;
         if (IsBusy)
             return;
 

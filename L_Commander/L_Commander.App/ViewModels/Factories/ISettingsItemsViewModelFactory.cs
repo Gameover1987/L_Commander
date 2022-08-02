@@ -25,7 +25,7 @@ public class SettingsItemsViewModelFactory : ISettingsItemsViewModelFactory
     public ISettingsItemViewModel[] CreateSettingsItems(ClientSettings clientSettings)
     {
         var tagSettingsItem = new TagSettingsItemViewModel(_tagRepository, _addTagViewModel, _windowManager);
-        var fileSystemViewItem = new FilesAndFoldersAppearanceSettingsItemViewModel(clientSettings.FilesAndFoldersAppearanceSettings);
+        var fileSystemViewItem = new FilesAndFoldersSettingsItemViewModel(clientSettings.FilesAndFoldersSettings);
 
         return new ISettingsItemViewModel[] { tagSettingsItem, fileSystemViewItem };
     }

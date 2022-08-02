@@ -14,9 +14,9 @@ namespace L_Commander.App.Views.DesignMock
         }
     }
 
-    internal sealed class DesignMockFilesAndFoldersAppearanceSettingsItemViewModel : FilesAndFoldersAppearanceSettingsItemViewModel
+    internal sealed class DesignMockFilesAndFoldersSettingsItemViewModel : FilesAndFoldersSettingsItemViewModel
     {
-        public DesignMockFilesAndFoldersAppearanceSettingsItemViewModel() : base(new FilesAndFoldersAppearanceSettings
+        public DesignMockFilesAndFoldersSettingsItemViewModel() : base(new FilesAndFoldersSettings
         {
             ShowHiddenFilesAndFolders = true,
             ShowSystemFilesAndFolders = true

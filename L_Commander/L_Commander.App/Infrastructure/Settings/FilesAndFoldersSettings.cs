@@ -3,7 +3,7 @@
 /// <summary>
 /// FileSystem view settings
 /// </summary>
-public class FilesAndFoldersAppearanceSettings
+public class FilesAndFoldersSettings
 {
     public bool ShowSystemFilesAndFolders { get; set; }
 

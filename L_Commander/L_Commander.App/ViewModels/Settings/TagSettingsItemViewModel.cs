@@ -37,7 +37,7 @@ namespace L_Commander.App.ViewModels.Settings
             DeleteCommand = new DelegateCommand(DeleteCommandHandler, CanDeleteCommandHandler);
         }
 
-        public string DisplayName => "Tag settings";
+        public string DisplayName => "Tags";
 
         public bool IsChanged
         {

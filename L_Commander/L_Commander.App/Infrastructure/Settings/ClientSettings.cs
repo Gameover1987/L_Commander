@@ -7,7 +7,7 @@ public class ClientSettings
 {
     public ClientSettings()
     {
-        FilesAndFoldersAppearanceSettings = new FilesAndFoldersAppearanceSettings();
+        FilesAndFoldersSettings = new FilesAndFoldersSettings();
     }
 
     public MainWindowSettings MainWindowSettings { get; set; }
@@ -16,5 +16,5 @@ public class ClientSettings
 
     public FileManagerSettings RightFileManagerSettings { get; set; }
 
-    public FilesAndFoldersAppearanceSettings FilesAndFoldersAppearanceSettings { get; set; }
+    public FilesAndFoldersSettings FilesAndFoldersSettings { get; set; }
 }

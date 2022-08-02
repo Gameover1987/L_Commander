@@ -35,7 +35,7 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,6,0,0">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left" Margin="6,6,0,0">
             <Button Content="Add tag" Width="100"
                     Command="{Binding AddTagCommand}"/>
             <Button Content="Edit tag" Width="100" Margin="6,0,0,0"

@@ -24,43 +24,34 @@
     <mah:MetroWindow.Resources>
         <ResourceDictionary>
             <DataTemplate DataType="{x:Type settingsViewModels:TagSettingsItemViewModel}">
-                <controls:TagsSettingControl/>
+                <controls:TagsSettingControl Margin="0,0,0,6"/>
             </DataTemplate>
 
-            <DataTemplate DataType="{x:Type settingsViewModels:FilesAndFoldersAppearanceSettingsItemViewModel}">
+            <DataTemplate DataType="{x:Type settingsViewModels:FilesAndFoldersSettingsItemViewModel}">
                 <controls:FilesAndFoldersAppearanceSettingsControl/>
             </DataTemplate>
         </ResourceDictionary>
     </mah:MetroWindow.Resources>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <ListBox Grid.Row="0" Grid.Column="0" Width="200" Margin="0,6,0,0"
-                 BorderThickness="0,0,1,0"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 ItemsSource="{Binding Items}"
-                 SelectedItem="{Binding SelectedItem}">
-            <ListBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type settingsViewModels:ISettingsItemViewModel}">
+        <mah:MetroAnimatedTabControl Grid.Row="0" Grid.Column="0"
+                                     ItemsSource="{Binding Items}"
+                                     SelectedItem="{Binding SelectedItem}">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
                     <TextBlock Text="{Binding DisplayName}"/>
                 </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+            </TabControl.ItemTemplate>
+        </mah:MetroAnimatedTabControl>
 
-        <ContentControl Grid.Row="0" Grid.Column="1" Margin="6,6,0,0"
-                        Content="{Binding SelectedItem}"/>
+        <Separator Grid.Row="1" Grid.Column="0" />
 
-        <Separator Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="0" />
-
-        <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="12">
+        <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="12">
             <Button Content="OK" Width="100"
                     Command="{Binding OkCommand}"
                     IsDefault="True" Click="ButtonOK_Click"/>
