@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using L_Commander.App.ViewModels;
 
 namespace L_Commander.App.Views
 {
@@ -19,13 +20,24 @@ namespace L_Commander.App.Views
     /// </summary>
     public partial class MultipleFilePropertiesWindow
     {
+        private IMultipleFilePropertiesViewModel _multipleFilePropertiesViewModel;
+
         public MultipleFilePropertiesWindow()
         {
             InitializeComponent();
+
+            DataContextChanged += OnDataContextChanged;
+        }
+
+        private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            _multipleFilePropertiesViewModel = (IMultipleFilePropertiesViewModel)DataContext;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            _multipleFilePropertiesViewModel.Cancel();
+
             Close();
         }
     }

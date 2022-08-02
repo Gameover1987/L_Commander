@@ -16,15 +16,15 @@ namespace L_Commander.Common.Extensions
 
             if (totalSize < 1024 * 1024)
             {
-                return $"{totalSize / 1024} Kb";
+                return $"{Math.Round(totalSize / 1024.0, 2)} Kb";
             }
 
             if (totalSize < 1024 * 1024 * 1024)
             {
-                return $"{totalSize / 1024 / 1024} Mb";
+                return $"{Math.Round(totalSize / 1024.0 / 1024, 2)} Mb";
             }
 
-            return $"{totalSize / 1024 / 1024 / 1024} Gb";
+            return $"{Math.Round(totalSize / 1024.0 / 1024 / 1024, 2)} Gb";
         }
 
         public static string ToStringSplitedBySpaces(this long totalSize)

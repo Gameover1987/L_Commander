@@ -12,6 +12,8 @@ namespace L_Commander.App.ViewModels
     public interface IMultipleFilePropertiesViewModel
     {
         void Initialize(IFileSystemEntryViewModel[] entries);
+
+        void Cancel();
     }
 
     public class MultipleFilePropertiesViewModel : ViewModelBase, IMultipleFilePropertiesViewModel
@@ -23,89 +25,18 @@ namespace L_Commander.App.ViewModels
 
         private IFileSystemEntryViewModel[] _entries;
 
-        private CancellationTokenSource _audioEffectsCancellationTokenSource;
+        private CancellationTokenSource _cancellationTokenSource;
         private string _title;
         private long _filesCount;
         private long _foldersCount;
         private string _sizeDescription;
         private string _errorDescription;
+        private bool _isBusy;
 
         public MultipleFilePropertiesViewModel(IFileSystemProvider fileSystemProvider, IExceptionHandler exceptionHandler)
         {
             _fileSystemProvider = fileSystemProvider;
             _exceptionHandler = exceptionHandler;
-        }
-
-        public void Initialize(IFileSystemEntryViewModel[] entries)
-        {
-            _entries = entries;
-
-            if (_audioEffectsCancellationTokenSource != null)
-            {
-                _audioEffectsCancellationTokenSource.Cancel();
-                _audioEffectsCancellationTokenSource.Dispose();
-                _audioEffectsCancellationTokenSource = null;
-            }
-
-            _audioEffectsCancellationTokenSource = new CancellationTokenSource();
-            var token = _audioEffectsCancellationTokenSource.Token;
-
-            Title = $"Properties: {SelectedEntriesToString(_entries)}";
-            FilesCount = entries.Count(x => x.IsFile);
-            FoldersCount = entries.Length - FilesCount;
-            SizeDescription = string.Empty;
-
-            try
-            {
-                ThreadTaskExtensions.Run(() =>
-                {
-                    long totalSize = 0;
-                    var errorsStringBuilder = new StringBuilder();
-                    foreach (var entry in _entries)
-                    {
-                        try
-                        {
-                            if (token.IsCancellationRequested)
-                                return;
-
-                            if (entry.IsFile)
-                            {
-                                totalSize += entry.TotalSize;
-                            }
-                            else
-                            {
-                                var pathInfo = _fileSystemProvider.GetPathInfoRecursively(entry.FullPath);
-                                totalSize += pathInfo.TotalSize;
-
-                                FilesCount += pathInfo.FilesCount;
-                                FoldersCount += pathInfo.FoldersCount;
-                            }
-
-                            SizeDescription = $"{totalSize.SizeAsString()} ({totalSize.ToStringSplitedBySpaces()})";
-                        }
-                        catch (Exception exception)
-                        {
-                            errorsStringBuilder.AppendLine(exception.Message);
-                            ErrorDescription = errorsStringBuilder.ToString();
-                        }
-                    }
-                }, token);
-            }
-            catch (Exception exception)
-            {
-                if (token.IsCancellationRequested)
-                    return;
-
-                _exceptionHandler.HandleExceptionWithMessageBox(exception);
-            }
-            finally
-            {
-                if (!token.IsCancellationRequested)
-                {
-                    _audioEffectsCancellationTokenSource.Dispose();
-                    _audioEffectsCancellationTokenSource = null;
-                }
-            }
         }
 
         public string Title
@@ -170,6 +101,96 @@ namespace L_Commander.App.ViewModels
         }
 
         public bool HasErrors => !_errorDescription.IsNullOrWhiteSpace();
+
+        public bool IsBusy
+        {
+            get { return _isBusy; }
+            set
+            {
+                if (_isBusy == value)
+                    return;
+                _isBusy = value;
+                OnPropertyChanged(() => IsBusy);
+            }
+        }
+
+        public async void Initialize(IFileSystemEntryViewModel[] entries)
+        {
+            _entries = entries;
+
+            _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource?.Dispose();
+            _cancellationTokenSource = null;
+
+            _cancellationTokenSource = new CancellationTokenSource();
+            var token = _cancellationTokenSource.Token;
+
+            Title = $"Properties: {SelectedEntriesToString(_entries)}";
+            FilesCount = entries.Count(x => x.IsFile);
+            FoldersCount = entries.Length - FilesCount;
+            SizeDescription = string.Empty;
+
+            try
+            {
+                IsBusy = true;
+                await ThreadTaskExtensions.Run(() =>
+                {
+                    long totalSize = 0;
+                    var errorsStringBuilder = new StringBuilder();
+                    foreach (var entry in _entries)
+                    {
+                        try
+                        {
+                            if (token.IsCancellationRequested)
+                                return;
+
+                            if (entry.IsFile)
+                            {
+                                totalSize += entry.TotalSize;
+                            }
+                            else
+                            {
+                                var pathInfo = _fileSystemProvider.GetPathInfoRecursively(entry.FullPath);
+                                totalSize += pathInfo.TotalSize;
+
+                                FilesCount += pathInfo.FilesCount;
+                                FoldersCount += pathInfo.FoldersCount;
+                            }
+
+                            SizeDescription = $"{totalSize.SizeAsString()} ({totalSize.ToStringSplitedBySpaces()})";
+                        }
+                        catch (Exception exception)
+                        {
+                            errorsStringBuilder.AppendLine(exception.Message);
+                            ErrorDescription = errorsStringBuilder.ToString();
+                        }
+                    }
+                }, token);
+            }
+            catch (Exception exception)
+            {
+                if (token.IsCancellationRequested)
+                    return;
+
+                _exceptionHandler.HandleExceptionWithMessageBox(exception);
+            }
+            finally
+            {
+                IsBusy = false;
+                if (!token.IsCancellationRequested)
+                {
+                    _cancellationTokenSource.Dispose();
+                    _cancellationTokenSource = null;
+                }
+            }
+        }
+
+        public void Cancel()
+        {
+            _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource?.Dispose();
+            _cancellationTokenSource = null;
+        }
 
         private string SelectedEntriesToString(IFileSystemEntryViewModel[] entries)
         {
