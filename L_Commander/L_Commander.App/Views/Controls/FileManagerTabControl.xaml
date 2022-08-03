@@ -211,7 +211,11 @@
         </Grid>
 
         <controls:CustomDataGrid x:Name="dataGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="0,6,0,0"
-                                 AllowDrop="False"
+                                 AllowDrop="True"
+                                 Drop="DataGrid_OnDrop"
+                                 DragEnter="DataGrid_OnDragEnter"
+                                 DragLeave="DataGrid_OnDragLeave"
+                                 QueryContinueDrag="DataGrid_OnQueryContinueDrag"
                                  ItemsSource="{Binding FolderView}"
                                  SelectedItem="{Binding SelectedFileSystemEntry}"
                                  IsReadOnly="True"

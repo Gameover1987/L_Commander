@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Threading.Tasks;
 using L_Commander.App.Infrastructure;
+using L_Commander.App.OperatingSystem;
 using L_Commander.App.Views;
 using L_Commander.UI.Commands;
 
@@ -20,4 +22,8 @@ public interface IMainViewModel : ISettingsFiller
     IDelegateCommand MoveCommand { get; }
 
     void Initialize();
+
+    Task Copy(FileSystemEntryDescriptor[] descriptors, string destPath);
+
+    Task Move(FileSystemEntryDescriptor[] sourceEntries, string destPath);
 }

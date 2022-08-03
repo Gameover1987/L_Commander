@@ -31,7 +31,8 @@ public sealed class WindowManager : IWindowManager
 
     public Task<MessageDialogResult> ShowQuestion(string title, string message, MetroDialogSettings settings = null)
     {
-        return ActiveWindow.ShowMessageAsync(title, message, MessageDialogStyle.AffirmativeAndNegative, settings);
+        var window = ActiveWindow ?? MainWindow;
+        return window.ShowMessageAsync(title, message, MessageDialogStyle.AffirmativeAndNegative, settings);
     }
 
     public Task<ProgressDialogController> ShowProgressDialog(string title, string message)

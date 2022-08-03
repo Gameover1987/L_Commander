@@ -177,25 +177,35 @@ namespace L_Commander.App.ViewModels
 
         private async void CopyCommandHandler()
         {
+            var descriptors = ActiveFileManager?.SelectedTab.SelectedEntries
+                .Select(x => x.GetDescriptor())
+                .ToArray();
+
+            await Copy(descriptors, AnotherFileManager.SelectedTab.FullPath);
+        }
+
+        public async Task Copy(FileSystemEntryDescriptor[] descriptors, string destPath)
+        {
             try
             {
-                var sourceEntries = ActiveFileManager?.SelectedTab.SelectedEntries
-                    .Select(x => x.GetDescriptor())
-                    .ToArray();
-                if (await CheckSourceAndDestPath("Copy operation", sourceEntries, AnotherFileManager.SelectedTab.FullPath) == false)
+                if (await CheckSourceAndDestPath("Copy operation", descriptors, destPath) == false)
                 {
                     return;
                 }
 
+                var message = GetFilesListMessage(descriptors);
+
                 var questionSettings = new MetroDialogSettings { DefaultButtonFocus = MessageDialogResult.Affirmative };
-                var result = await _windowManager.ShowQuestion("Copy operation", $"Do you want copy selected item(s) to '{AnotherFileManager.SelectedTab.FullPath}'?", questionSettings);
+                var result = await _windowManager.ShowQuestion($"Copy ({descriptors.Length}) items to '{destPath}'", message, questionSettings);
                 if (result != MessageDialogResult.Affirmative)
                     return;
 
-                _progressDialogController = await _windowManager.ShowProgressDialog($"Copying files to \r\n'{AnotherFileManager.SelectedTab.FullPath}'", "Wait for copy...");
+                _progressDialogController = await _windowManager.ShowProgressDialog(
+                    $"Copying files to \r\n'{destPath}'",
+                    "Wait for copy...");
                 _progressDialogController.Canceled += ProgressDialogControllerOnCanceled;
 
-                _copyOperation.Initialize(sourceEntries, AnotherFileManager.SelectedTab.FullPath);
+                _copyOperation.Initialize(descriptors, destPath);
                 await _copyOperation.Execute();
             }
             catch (Exception exception)
@@ -211,6 +221,21 @@ namespace L_Commander.App.ViewModels
                     _progressDialogController.Canceled -= ProgressDialogControllerOnCanceled;
                 }
             }
+        }
+
+        private string GetFilesListMessage(FileSystemEntryDescriptor[] descriptors)
+        {
+            var message = string.Join(Environment.NewLine, descriptors.Select(x => x.Path).Take(100).OrderBy(x => x));
+            if (descriptors.Length > 50)
+            {
+                var stringList = descriptors.Select(x => x.Path).Take(50).OrderBy(x => x).ToList();
+                stringList.Add("...");
+                stringList.Add("And other file system entries?");
+
+                message = string.Join(Environment.NewLine, stringList);
+            }
+
+            return message;
         }
 
         private async Task<bool> CheckSourceAndDestPath(string operationName, FileSystemEntryDescriptor[] sourceEntries, string destPath)
@@ -252,29 +277,33 @@ namespace L_Commander.App.ViewModels
 
         private async void MoveCommandHandler()
         {
+            var sourceEntries = ActiveFileManager?.SelectedTab.SelectedEntries
+               .Select(x => x.GetDescriptor())
+               .ToArray();
+
+            await Move(sourceEntries, AnotherFileManager.SelectedTab.FullPath);
+            ActiveFileManager.SelectedTab.ReLoad();
+        }
+
+        public async Task Move(FileSystemEntryDescriptor[] descriptors, string destPath)
+        {
             try
             {
-                var sourceEntries = ActiveFileManager?.SelectedTab.SelectedEntries
-                   .Select(x => x.GetDescriptor())
-                   .ToArray();
-
-                if (await CheckSourceAndDestPath("Move operation", sourceEntries, AnotherFileManager.SelectedTab.FullPath) == false)
+                if (await CheckSourceAndDestPath("Move operation", descriptors, destPath) == false)
                 {
                     return;
                 }
 
                 var questionSettings = new MetroDialogSettings { DefaultButtonFocus = MessageDialogResult.Affirmative };
-                var result = await _windowManager.ShowQuestion("Move operation", $"Do you want move selected item(s) to '{AnotherFileManager.SelectedTab.FullPath}'?", questionSettings);
+                var result = await _windowManager.ShowQuestion($"Move ({descriptors.Length}) items to '{destPath}'", GetFilesListMessage(descriptors), questionSettings);
                 if (result != MessageDialogResult.Affirmative)
                     return;
 
-                _progressDialogController = await _windowManager.ShowProgressDialog($"Moving files to \r\n'{AnotherFileManager.SelectedTab.FullPath}'", "Wait for move...");
+                _progressDialogController = await _windowManager.ShowProgressDialog($"Moving files to \r\n'{destPath}'", "Wait for move...");
                 _progressDialogController.Canceled += ProgressDialogControllerOnCanceled;
 
-                _moveOperation.Initialize(sourceEntries, AnotherFileManager.SelectedTab.FullPath);
+                _moveOperation.Initialize(descriptors, destPath);
                 await _moveOperation.Execute();
-
-                ActiveFileManager?.SelectedTab.ReLoad();
             }
             catch (Exception exception)
             {
