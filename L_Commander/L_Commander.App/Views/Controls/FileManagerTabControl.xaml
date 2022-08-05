@@ -211,6 +211,7 @@
         </Grid>
 
         <controls:CustomDataGrid x:Name="dataGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="0,6,0,0"
+                                 HorizontalScrollBarVisibility="Disabled"
                                  AllowDrop="True"
                                  Drop="DataGrid_OnDrop"
                                  DragEnter="DataGrid_OnDragEnter"
