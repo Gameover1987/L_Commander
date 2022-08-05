@@ -22,8 +22,8 @@ namespace L_Commander.App.Views.Controls
     {
         private IFileManagerTabViewModel _fileManagerTab;
 
-        private Thickness _oldThickness;
-        private Brush _oldBorderBrush;
+        private readonly Thickness _oldThickness;
+        private readonly Brush _oldBorderBrush;
 
         public FileManagerTabControl()
         {
@@ -145,7 +145,6 @@ namespace L_Commander.App.Views.Controls
             {
                 dataGrid.BorderThickness = new Thickness(1);
                 dataGrid.BorderBrush = Brushes.Black;
-                
             }
         }
 
@@ -159,19 +158,27 @@ namespace L_Commander.App.Views.Controls
         {
             try
             {
-                if (!e.Data.GetDataPresent(DataFormats.FileDrop))
-                    return;
-
                 var move = e.KeyStates == DragDropKeyStates.ShiftKey;
 
-                var files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                if (files == null)
-                    return;
+                var descriptors = Array.Empty<FileSystemEntryDescriptor>();
 
-                var fileSystemProvider = App.ServiceProvider.GetService<IFileSystemProvider>();
-                if (fileSystemProvider == null)
-                    throw new ArgumentException($"{nameof(IFileSystemProvider)} is not registered in DI");
-                var descriptors = files.Select(x => fileSystemProvider.GetFileSystemDescriptor(x)).ToArray();
+                var draggedObjects = (object[])e.Data.GetData(typeof(object[]));
+                if (draggedObjects != null)
+                {
+                    descriptors = draggedObjects
+                        .Cast<IFileSystemEntryViewModel>()
+                        .Select(x => x.GetDescriptor())
+                        .ToArray();
+                }
+                else if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                    if (files == null)
+                        return;
+                    var fileSystemProvider = App.ServiceProvider.GetService<IFileSystemProvider>();
+
+                    descriptors = files.Select(x => fileSystemProvider.GetFileSystemDescriptor(x)).ToArray();
+                }
 
                 var mainViewModel = App.ServiceProvider.GetService<IMainViewModel>();
                 if (mainViewModel == null)
