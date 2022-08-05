@@ -42,7 +42,10 @@ public class CustomDataGrid : DataGrid
 
         _downItem = null; // always clear selecteditem 
 
-        if (SelectionMode == DataGridSelectionMode.Extended && row != null && SelectedItems.Contains(row.Item) && Keyboard.Modifiers == ModifierKeys.None)  //if the pointed item is already selected do not reselect it, so the previous multi-selection will remain
+        if (SelectionMode == DataGridSelectionMode.Extended && 
+            row != null && SelectedItems.Contains(row.Item) && 
+            Keyboard.Modifiers == ModifierKeys.None &&
+            e.ClickCount != 2)  //if the pointed item is already selected do not reselect it, so the previous multi-selection will remain
         {
             e.Handled = true;  // this prevents the multiselection from disappearing, BUT datagridcell still gets the event and sets DataGrid's private member _selectionAnchor
             _downItem = row.Item; // store our item to select on MouseLeftButtonUp

@@ -200,6 +200,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     public IDelegateCommand OpenWithCommand { get; }
 
     public IDelegateCommand MakeDirCommand { get; }
+
     public IDelegateCommand ShowPropertiesCommand { get; }
 
     public IDelegateCommand CalculateFolderSizeCommand { get; }
