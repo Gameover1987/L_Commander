@@ -254,41 +254,36 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
             _folderFilter.Clear();
 
-            var fileSystemEntries = new List<IFileSystemEntryViewModel>();
+            var filesWithTags = _tagRepository.GetAllFilesWithTags();
+
+            var items = _fileSystemProvider
+                .GetFileSystemEntries(rootPath);
+            var firstItems = items.Take(FileSystemEntriesPageSize);
+            foreach (var firstItem in firstItems)
+            {
+                var fileSystemEntryViewModel = _fileSystemEntryViewModelFactory.CreateEntryViewModel(firstItem);
+                var tagsByFile = filesWithTags.FirstOrDefault(x => x.FilePath == fileSystemEntryViewModel.FullPath);
+                fileSystemEntryViewModel.Initialize(tagsByFile?.Tags);
+                FileSystemEntries.Add(fileSystemEntryViewModel);
+            }
+            
             await ThreadTaskExtensions.Run(() =>
             {
                 var items = _fileSystemProvider
                     .GetFileSystemEntries(rootPath)
-                    .Select(x => _fileSystemEntryViewModelFactory.CreateEntryViewModel(x, this));
-                var filesWithTags = _tagRepository.GetAllFilesWithTags();
+                    .Skip(FileSystemEntriesPageSize)
+                    .Select(x => _fileSystemEntryViewModelFactory.CreateEntryViewModel(x));
+              
                 foreach (var fileSystemEntryViewModel in items)
                 {
-                    var fileWithTags = filesWithTags.FirstOrDefault(x => x.FilePath == fileSystemEntryViewModel.FullPath);
-                    fileSystemEntryViewModel.Initialize(fileWithTags?.Tags);
-                    fileSystemEntries.Add(fileSystemEntryViewModel);
-
-                    if (fileSystemEntries.Count > FileSystemEntriesPageSize)
-                    {
-                        foreach (var fileSystemEntry in fileSystemEntries)
-                        {
-                            FileSystemEntries.Add(fileSystemEntry);
-                        }
-
-                        fileSystemEntries.Clear();
-                    }
+                    var tagsByFile = filesWithTags.FirstOrDefault(x => x.FilePath == fileSystemEntryViewModel.FullPath);
+                    fileSystemEntryViewModel.Initialize(tagsByFile?.Tags);
+                    FileSystemEntries.Add(fileSystemEntryViewModel);
                 }
-
-                if (fileSystemEntries.Any())
-                {
-                    foreach (var fileSystemEntry in fileSystemEntries)
-                    {
-                        FileSystemEntries.Add(fileSystemEntry);
-                    }
-                }
-
-                if (!_isManualyChangedSelection)
-                    SelectedFileSystemEntry = FileSystemEntries.FirstOrDefault(FileSystemEntryFilter);
             });
+
+            if (!_isManualyChangedSelection)
+                SelectedFileSystemEntry = FileSystemEntries.FirstOrDefault(FileSystemEntryFilter);
 
             _folderFilter.Refresh(FileSystemEntries);
         }
@@ -521,7 +516,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
                 switch (e.Change)
                 {
                     case FileChangeType.Create:
-                        var newEntry = _fileSystemEntryViewModelFactory.CreateEntryViewModel(e.CurrentPath, this);
+                        var newEntry = _fileSystemEntryViewModelFactory.CreateEntryViewModel(e.CurrentPath);
                         newEntry.Initialize();
                         FileSystemEntries.Add(newEntry);
                         break;
