@@ -180,6 +180,9 @@ namespace L_Commander.App.Views.Controls
                     descriptors = files.Select(x => fileSystemProvider.GetFileSystemDescriptor(x)).ToArray();
                 }
 
+                if (descriptors.Length == 0) 
+                    return;
+
                 var mainViewModel = App.ServiceProvider.GetService<IMainViewModel>();
                 if (mainViewModel == null)
                     throw new ArgumentException($"{nameof(IMainViewModel)} is not registered in DI");

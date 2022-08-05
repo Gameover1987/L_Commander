@@ -12,9 +12,9 @@ namespace L_Commander.App.Views.Controls;
 /// </summary>
 public class CustomDataGrid : DataGrid
 {
-    object downItem;
-    int downIdx;
-    bool leftRow;
+    private object _downItem;
+    private int _downIdx;
+    private bool _leftRow;
 
     static CustomDataGrid()
     {
@@ -23,10 +23,10 @@ public class CustomDataGrid : DataGrid
 
     public CustomDataGrid()
     {
-        this.PreviewMouseDown += DataGrid_PreviewMouseDown;
-        this.PreviewMouseMove += DataGrid_PreviewMouseMove;
-        this.PreviewMouseUp += DataGrid_PreviewMouseUp;
-        this.MouseLeave += DataGrid_MouseLeave;
+        PreviewMouseDown += DataGrid_PreviewMouseDown;
+        PreviewMouseMove += DataGrid_PreviewMouseMove;
+        PreviewMouseUp += DataGrid_PreviewMouseUp;
+        MouseLeave += DataGrid_MouseLeave;
     }
 
     /// <summary>
@@ -35,42 +35,17 @@ public class CustomDataGrid : DataGrid
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    void DataGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+    private void DataGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
-        DataGrid grid = sender as DataGrid;//reference to self for extensions
-        DataGridRow row = grid.FindOverRow(e);
-        leftRow = false;
-        downItem = null; // always clear selecteditem 
-        downIdx = this.GetIndexAt(e);
-        
-        if (row != null && overCheckbox && SelectionMode == DataGridSelectionMode.Extended)
-        {
-            DataGridCell cell = grid.GetAtPoint<DataGridCell>(e);
-            DataGridColumn col = cell == null ? null : cell.Column;
-            object overdata = row.Item;
-            CheckBox checkbox = col == null ? null : col.GetCellContent(overdata) as CheckBox;
-            if (checkbox != null)
-            {
-                bool oldstate = checkbox.IsChecked.Value;
-                bool newstate = !oldstate;
-                // loop thru all the selected columns and update the ischecked state
-                foreach (object selecteditem in grid.SelectedItems)
-                {
-                    row = grid.ItemContainerGenerator.ContainerFromItem(selecteditem) as DataGridRow;
-                    if (row != null)
-                    {
-                        checkbox = col.GetCellContent(row) as CheckBox;
-                        if (checkbox != null)
-                            checkbox.IsChecked = newstate;
-                    }
-                }
-                e.Handled = true;
-            }
-        }
-        else if (SelectionMode == DataGridSelectionMode.Extended && row != null && SelectedItems.Contains(row.Item) && Keyboard.Modifiers == ModifierKeys.None)  //if the pointed item is already selected do not reselect it, so the previous multi-selection will remain
+        var grid = sender as DataGrid; //reference to self for extensions
+        var row = grid.FindOverRow(e);
+
+        _downItem = null; // always clear selecteditem 
+
+        if (SelectionMode == DataGridSelectionMode.Extended && row != null && SelectedItems.Contains(row.Item) && Keyboard.Modifiers == ModifierKeys.None)  //if the pointed item is already selected do not reselect it, so the previous multi-selection will remain
         {
             e.Handled = true;  // this prevents the multiselection from disappearing, BUT datagridcell still gets the event and sets DataGrid's private member _selectionAnchor
-            downItem = row.Item; // store our item to select on MouseLeftButtonUp
+            _downItem = row.Item; // store our item to select on MouseLeftButtonUp
         }
     }
     /// <summary>
@@ -78,38 +53,31 @@ public class CustomDataGrid : DataGrid
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    void DataGrid_PreviewMouseMove(object sender, MouseEventArgs e)
+    private void DataGrid_PreviewMouseMove(object sender, MouseEventArgs e)
     {
-        try
-        {
-            if (Mouse.LeftButton == MouseButtonState.Pressed)
-            {
-                if (Mouse.Captured == this)
-                {
-                    if (!this.IsMouseInBounds(e))
-                        DataGrid_MouseLeave(sender, e);
-                }
+        if (Mouse.LeftButton != MouseButtonState.Pressed)
+            return;
 
-                // enable selection repositioning within grid
-                DataGridRow row = this.FindOverRow(e);
-                this.GetAtPoint<DataGridRow>(e);
-                int idx = row == null ? -1 : row.GetIndex();
-                object o = this.InputHitTest(e.GetPosition(this));
-                if (row != null && !row.IsEditing)
-                {
-                    int idxover = this.GetIndexAt(e);
-                    if (idxover >= 0 && downIdx >= 0 && idxover != downIdx)
-                    {
-                        leftRow = true;
-                        this.ShiftSelections(idxover > downIdx);
-                        downIdx = idxover;
-                    }
-                }
-            }
-        }
-        catch (Exception x)
+        if (Mouse.Captured == this)
         {
-            //Globals.Instance.Log(x);
+            if (!this.IsMouseInBounds(e))
+                DataGrid_MouseLeave(sender, e);
+        }
+
+        // enable selection repositioning within grid
+        var row = this.FindOverRow(e);
+        this.GetAtPoint<DataGridRow>(e);
+        int idx = row == null ? -1 : row.GetIndex();
+        object o = InputHitTest(e.GetPosition(this));
+        if (row != null && !row.IsEditing)
+        {
+            int idxover = this.GetIndexAt(e);
+            if (idxover >= 0 && _downIdx >= 0 && idxover != _downIdx)
+            {
+                _leftRow = true;
+                this.ShiftSelections(idxover > _downIdx);
+                _downIdx = idxover;
+            }
         }
 
     }
@@ -118,17 +86,17 @@ public class CustomDataGrid : DataGrid
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    void DataGrid_MouseLeave(object sender, MouseEventArgs e)
+    private void DataGrid_MouseLeave(object sender, MouseEventArgs e)
     {
         if (Mouse.LeftButton == MouseButtonState.Pressed)
         {
-            leftRow = true;
+            _leftRow = true;
             if (SelectedItems.Count > 0 && SelectionMode == DataGridSelectionMode.Extended)
             {
                 DataObject data = new DataObject();
                 object todrag = SelectedItems.Cast<object>().ToArray();
                 data.SetData(todrag.GetType(), todrag);
-                System.Windows.DragDrop.DoDragDrop(this, data, DragDropEffects.Move | DragDropEffects.Copy);
+                DragDrop.DoDragDrop(this, data, DragDropEffects.Move | DragDropEffects.Copy);
             }
         }
     }
@@ -137,16 +105,16 @@ public class CustomDataGrid : DataGrid
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    void DataGrid_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+    private void DataGrid_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
         DataGridRow row = this.FindOverRow(e);
-        if (SelectionMode == DataGridSelectionMode.Extended && row != null && row.Item == downItem)  // check if it's set and concerning the same row
+        if (SelectionMode == DataGridSelectionMode.Extended && row != null && row.Item == _downItem)  // check if it's set and concerning the same row
         {
-            if (SelectedItem == downItem)
+            if (SelectedItem == _downItem)
                 SelectedItem = null;  // if the item is already selected whe need to trigger a change 
-            SelectedItem = downItem;  // this will clear the multi selection, and only select the item we pressed down on
+            SelectedItem = _downItem;  // this will clear the multi selection, and only select the item we pressed down on
             typeof(DataGrid).GetField("_selectionAnchor", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(this, new DataGridCellInfo(row.Item, ColumnFromDisplayIndex(0)));  // we need to set this anchor for when we select by pressing shift key
-            downItem = null;  // handled
+            _downItem = null;  // handled
         }
     }
 }
