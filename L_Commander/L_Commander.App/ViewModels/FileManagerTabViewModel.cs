@@ -22,7 +22,7 @@ namespace L_Commander.App.ViewModels;
 
 public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 {
-    private const int FileSystemEntriesPageSize = 20;
+    private const int FileSystemEntriesPageSize = 40;
     private const int TimerInterval = 1000;
 
     private readonly IFolderFilterViewModel _folderFilter;
@@ -516,7 +516,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
                 switch (e.Change)
                 {
                     case FileChangeType.Create:
-                        var newEntry = _fileSystemEntryViewModelFactory.CreateEntryViewModel(e.CurrentPath);
+                        var newEntry = _fileSystemEntryViewModelFactory.CreateEntryViewModel(_fileSystemProvider.GetFileSystemDescriptor(e.CurrentPath));
                         newEntry.Initialize();
                         FileSystemEntries.Add(newEntry);
                         break;

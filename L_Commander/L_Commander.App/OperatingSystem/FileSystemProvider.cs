@@ -27,10 +27,33 @@ public sealed class FileSystemProvider : IFileSystemProvider
         return DriveInfo.GetDrives();
     }
 
-    public IEnumerable<string> GetFileSystemEntries(string path)
+    public IEnumerable<FileSystemEntryDescriptor> GetFileSystemEntries(string path)
     {
-        var entries = Directory.EnumerateFileSystemEntries(path, "*.*", SearchOption.TopDirectoryOnly);
-        return entries;
+        var directory = new DirectoryInfo(path);
+        var directories = directory
+            .EnumerateDirectories("*.*", SearchOption.TopDirectoryOnly)
+            .Select(x => new FileSystemEntryDescriptor
+            {
+                Path = x.FullName,
+                Created = x.CreationTime,
+                FileOrFolder = FileOrFolder.Folder,
+                Name = x.Name
+            });
+
+        var files = directory
+            .EnumerateFiles("*.*", SearchOption.TopDirectoryOnly)
+            .Select(x => new FileSystemEntryDescriptor
+            {
+                Path = x.FullName,
+                Created = x.CreationTime,
+                Extension = x.Extension,
+                FileOrFolder = FileOrFolder.File,
+                Icon = _iconCache.GetByPath(x.FullName),
+                Name = x.Name,
+                TotalSize = x.Length,
+            });
+
+        return directories.Concat(files);
     }
 
     public IEnumerable<string> GetFilesRecursively(string path)

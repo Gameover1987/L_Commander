@@ -15,9 +15,13 @@ namespace L_Commander.Tests
             var aaa = fileSystemProvider.GetFileSystemEntries("C:\\Lot_Of_Files").ToArray();
 
 
-            var bbb = fileSystemProvider.GetFileSystemEntries("C:\\Lot_Of_Files")
-                .Select(x => fileSystemProvider.GetFileSystemDescriptor(x))
-                .ToArray();
+            var directory = new DirectoryInfo("E:\\Download");
+            var files = directory.EnumerateFileSystemInfos("*.*", SearchOption.AllDirectories).ToArray();
+            var directoris = directory.EnumerateDirectories("*.*", SearchOption.AllDirectories).ToArray();
+
+            //var bbb = fileSystemProvider.GetFileSystemEntries("E:\\Download")
+            //    .Select(x => fileSystemProvider.GetFileSystemDescriptor(x))
+            //    .ToArray();
         }
     }
 }

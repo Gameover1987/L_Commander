@@ -17,10 +17,12 @@ namespace L_Commander.App.Views.DesignMock
         {
             ThreadTaskExtensions.IsSyncRun = true;
             
+            var fileSystemProvider  = new FileSystemProvider(new IconCache());
+
             Initialize(new []
             {
-                new FileSystemEntryViewModel("E:\\Download", new FileSystemProvider(new IconCache()), new DesignMockExceptionHandler(), new DesignMockTagRepository()),
-                new FileSystemEntryViewModel("E:\\Stacy", new FileSystemProvider(new IconCache()), new DesignMockExceptionHandler(), new DesignMockTagRepository())
+                new FileSystemEntryViewModel( fileSystemProvider.GetFileSystemDescriptor("E:\\Download"), new FileSystemProvider(new IconCache()), new DesignMockExceptionHandler(), new DesignMockTagRepository()),
+                new FileSystemEntryViewModel(fileSystemProvider.GetFileSystemDescriptor("E:\\Stacy"), new FileSystemProvider(new IconCache()), new DesignMockExceptionHandler(), new DesignMockTagRepository())
             });
         }
     }

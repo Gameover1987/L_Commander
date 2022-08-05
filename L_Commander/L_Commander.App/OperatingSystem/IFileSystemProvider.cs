@@ -17,7 +17,7 @@ namespace L_Commander.App.OperatingSystem
     {
         DriveInfo[] GetDrives();
 
-        IEnumerable<string> GetFileSystemEntries(string path);
+        IEnumerable<FileSystemEntryDescriptor> GetFileSystemEntries(string path);
 
         IEnumerable<string> GetFilesRecursively(string path);
 

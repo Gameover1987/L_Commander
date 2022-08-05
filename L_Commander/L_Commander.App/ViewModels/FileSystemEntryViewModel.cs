@@ -16,18 +16,17 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
     private readonly IFileSystemProvider _fileSystemProvider;
     private readonly IExceptionHandler _exceptionHandler;
     private readonly ITagRepository _tagRepository;
-
-    private string _fullPath;
+    
     private FileSystemEntryDescriptor _descriptor;
     private bool _isBusy;
     private long _totalSize;
 
-    public FileSystemEntryViewModel(string fullPath,
+    public FileSystemEntryViewModel(FileSystemEntryDescriptor descriptor,
         IFileSystemProvider fileSystemProvider,
         IExceptionHandler exceptionHandler,
         ITagRepository tagRepository)
     {
-        _fullPath = fullPath;
+        _descriptor = descriptor;
         _fileSystemProvider = fileSystemProvider;
         _exceptionHandler = exceptionHandler;
         _tagRepository = tagRepository;
@@ -35,7 +34,7 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
 
     public ImageSource Icon { get; private set; }
 
-    public string FullPath => _fullPath;
+    public string FullPath => _descriptor.Path;
 
     public string Name { get; private set; }
 
@@ -138,15 +137,13 @@ public class FileSystemEntryViewModel : ViewModelBase, IFileSystemEntryViewModel
 
     public void Rename(string newPath)
     {
-        _fullPath = newPath;
+        _descriptor = _fileSystemProvider.GetFileSystemDescriptor(newPath);
 
         InitializeImpl();
     }
 
     protected virtual void InitializeImpl(Tag[] tags = null)
     {
-        _descriptor = _fileSystemProvider.GetFileSystemDescriptor(_fullPath);
-
         FileOrFolder = _descriptor.FileOrFolder;
         IsHidden = _descriptor.IsHidden;
         IsSystem = _descriptor.IsSystem;
