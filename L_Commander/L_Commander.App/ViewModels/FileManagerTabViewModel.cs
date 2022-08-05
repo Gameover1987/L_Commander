@@ -40,6 +40,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private readonly IHistoryManager _historyManager;
     private string _fullPath;
 
+    private bool _isManualyChangedSelection;
     private IFileSystemEntryViewModel _selectedFileSystemEntry;
     private IFileSystemEntryViewModel[] _selectedFileSystemEntries = Array.Empty<IFileSystemEntryViewModel>();
     private readonly List<NavigationHistoryItem> _navigationHistory = new List<NavigationHistoryItem>();
@@ -168,6 +169,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         {
             if (_selectedFileSystemEntry == value)
                 return;
+            _isManualyChangedSelection = true;
             _selectedFileSystemEntry = value;
             OnPropertyChanged();
         }
@@ -283,7 +285,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
                     }
                 }
 
-                SelectedFileSystemEntry = FileSystemEntries.FirstOrDefault(FileSystemEntryFilter);
+                if (!_isManualyChangedSelection)
+                    SelectedFileSystemEntry = FileSystemEntries.FirstOrDefault(FileSystemEntryFilter);
             });
 
             _folderFilter.Refresh(FileSystemEntries);
@@ -323,7 +326,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
             var newName = await _windowManager.ShowInputBox("Rename", SelectedFileSystemEntry.FullPath, settings);
             if (newName.IsNullOrWhiteSpace())
                 return;
-            
+
             _fileSystemProvider.Rename(SelectedFileSystemEntry.FileOrFolder, SelectedFileSystemEntry.FullPath, newName);
             _historyManager.Add("Rename operation", $"Old name is'{SelectedFileSystemEntry.FullPath}'\r\nNew name is '{newName}'");
         }
