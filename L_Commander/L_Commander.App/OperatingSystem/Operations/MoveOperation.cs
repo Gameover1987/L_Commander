@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using L_Commander.App.Infrastructure.History;
 
 namespace L_Commander.App.OperatingSystem.Operations
@@ -23,12 +21,14 @@ namespace L_Commander.App.OperatingSystem.Operations
             _historyManager = historyManager;
         }
 
+        public event EventHandler<CopyProgressEventArgs> ActiveItemsProgress;
+
         public void Initialize(FileSystemEntryDescriptor[] entries, string destDirectory)
         {
             _entries = entries;
             _destDirectory = destDirectory;
             _isInitialized = true;
-        }        
+        }
 
         protected override void Setup()
         {
@@ -51,18 +51,8 @@ namespace L_Commander.App.OperatingSystem.Operations
             _initialCount = _worksQueue.Count + _entries.Length;
         }
 
-        protected override void ThreadMethod(CopyUnitOfWork unitOfWork)
-        {
-            _fileSystemProvider.Move(unitOfWork.SourcePath, unitOfWork.DestinationPath);
-        }
-
         protected override void Cleanup()
         {
-            foreach (var descriptor in _entries)
-            {
-                _fileSystemProvider.Delete(descriptor.FileOrFolder, descriptor.Path);
-            }
-
             _historyManager.Add("Move operation finished succesfully", string.Join("", _entries.Select(x => x.Path + Environment.NewLine)));
         }
 
@@ -74,7 +64,20 @@ namespace L_Commander.App.OperatingSystem.Operations
                 Total = _initialCount,
                 CurrentItemName = unitOfWork.SourcePath
             };
-        }             
+        }
+
+        protected override void NotifyActiveItemProgress()
+        {
+            ActiveItemsProgress?.Invoke(this, new CopyProgressEventArgs(GetActiveWorks()));
+        }
+
+        private CopyUnitOfWork[] GetActiveWorks()
+        {
+            return _activeWorks
+                .Where(x => x.Copied > 0 && x.Copied != x.TotalSize)
+                .OrderBy(x => x.DestinationPath)
+                .ToArray();
+        }
 
         private CopyUnitOfWork[] GetUnitOfWorks(FileSystemEntryDescriptor[] entries, string destDirectory)
         {
@@ -83,13 +86,16 @@ namespace L_Commander.App.OperatingSystem.Operations
             {
                 if (descriptor.IsFile)
                 {
-                    units.Add(new CopyUnitOfWork(_fileSystemProvider.GetTopLevelPath(descriptor.Path), descriptor.Path, destDirectory));
+                    units.Add(new CopyUnitOfWork(_fileSystemProvider.GetTopLevelPath(descriptor.Path), descriptor.Path, descriptor.TotalSize, destDirectory));
                 }
                 else
                 {
-                    var files = _fileSystemProvider.GetFilesRecursively(descriptor.Path);
-                    units.AddRange(files.Select(x =>
-                        new CopyUnitOfWork(_fileSystemProvider.GetTopLevelPath(descriptor.Path), x, destDirectory)));
+                    var descriptors = _fileSystemProvider
+                        .GetFilesRecursively(descriptor.Path)
+                        .Select(x => _fileSystemProvider.GetFileSystemDescriptor(x))
+                        .ToArray();
+                    units.AddRange(descriptors.Select(x =>
+                        new CopyUnitOfWork(_fileSystemProvider.GetTopLevelPath(descriptor.Path), x.Path, x.TotalSize, destDirectory)));
                 }
             }
 

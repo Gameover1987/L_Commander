@@ -7,38 +7,19 @@ namespace L_Commander.App.Views.DesignMock;
 
 internal sealed class DesignMockCopyOperation : ICopyOperation
 {
-    public bool IsStarted => throw new NotImplementedException();
+    public bool IsStarted { get; }
+    public bool HasErrors { get; }
+    public Exception[] Errors { get; }
 
-    public event EventHandler<OperationProgressEventArgs> Progress;
-
-    public void Cancel()
-    {
-        throw new NotImplementedException();
-    }
+    public event EventHandler<OperationProgressEventArgs> TotalProgress;
+    public event EventHandler<CopyProgressEventArgs> ActiveItemsProgress;
 
     public Task Execute()
     {
         throw new NotImplementedException();
     }
 
-    public void Initialize(FileSystemEntryDescriptor[] entries, string destDirectory)
-    {
-        throw new NotImplementedException();
-    }
-}
-
-internal sealed class DesignMockMoveOperation : IMoveOperation
-{
-    public bool IsStarted => throw new NotImplementedException();
-
-    public event EventHandler<OperationProgressEventArgs> Progress;
-
     public void Cancel()
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task Execute()
     {
         throw new NotImplementedException();
     }
@@ -52,8 +33,10 @@ internal sealed class DesignMockMoveOperation : IMoveOperation
 internal sealed class DesignMockDeleteOperation : IDeleteOperation
 {
     public bool IsStarted => throw new NotImplementedException();
+    public bool HasErrors { get; }
+    public Exception[] Errors { get; }
 
-    public event EventHandler<OperationProgressEventArgs> Progress;
+    public event EventHandler<OperationProgressEventArgs> TotalProgress;
 
     public void Cancel()
     {

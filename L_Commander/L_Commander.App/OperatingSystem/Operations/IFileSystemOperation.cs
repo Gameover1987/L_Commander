@@ -3,11 +3,15 @@ using System.Threading.Tasks;
 
 namespace L_Commander.App.OperatingSystem.Operations;
 
-public interface IFileSystemOperation<TArgs>
+public interface IFileSystemOperation
 {
     bool IsStarted { get; }
 
-    public event EventHandler<TArgs> Progress;
+    bool HasErrors { get; }
+
+    Exception[] Errors { get; }
+
+    public event EventHandler<OperationProgressEventArgs> TotalProgress;
 
     Task Execute();
 

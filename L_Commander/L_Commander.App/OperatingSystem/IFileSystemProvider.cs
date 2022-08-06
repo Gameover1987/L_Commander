@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 
 namespace L_Commander.App.OperatingSystem
 {
@@ -39,9 +40,9 @@ namespace L_Commander.App.OperatingSystem
 
         void Delete(FileOrFolder fileOrFolder, string path);
 
-        void Copy(string sourcePath, string destinationPath);
+        void Copy(string sourcePath, string destinationPath, CancellationToken cancellationToken);
 
-        void Move(string sourcePath, string destinationPath);
+        void Move(string sourcePath, string destinationPath, CancellationToken cancellationToken);
 
         void CreateDirectory(string path);        
 

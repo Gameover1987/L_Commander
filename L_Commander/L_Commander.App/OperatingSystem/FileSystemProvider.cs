@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.AccessControl;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
-using ControlzEx.Standard;
+using L_Commander.App.OperatingSystem.Operations;
 
 namespace L_Commander.App.OperatingSystem;
 
@@ -167,14 +165,76 @@ public sealed class FileSystemProvider : IFileSystemProvider
         }
     }
 
-    public void Copy(string sourcePath, string destinationPath)
+    public void Copy(string sourcePath, string destinationPath, CancellationToken cancellationToken)
     {
-        File.Copy(sourcePath, destinationPath, true);
+        CopyImpl(sourcePath, destinationPath, cancellationToken);
     }
 
-    public void Move(string sourcePath, string destinationPath)
+    private void CopyImpl(string sourcePath, string destinationPath, CancellationToken cancellationToken)
     {
-        File.Move(sourcePath, destinationPath, true);
+        var fromFile = new FileStream(sourcePath, FileMode.Open, FileAccess.Read);
+        var toFile = new FileStream(destinationPath, FileMode.Append, FileAccess.Write);
+
+        var bufferSize = 1024 * 1024 * 5;
+
+        if (bufferSize < fromFile.Length)
+        {
+            var buffer = new byte[bufferSize];
+            long copied = 0;
+            while (copied <= fromFile.Length - bufferSize)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    fromFile.Close();
+                    toFile.Close();
+                    File.Delete(destinationPath);
+                    return;
+                }
+
+                var toCopyLength = fromFile.Read(buffer, 0, bufferSize);
+                fromFile.Flush();
+                toFile.Write(buffer, 0, bufferSize);
+                toFile.Flush();
+
+                toFile.Position = fromFile.Position;
+                copied += toCopyLength;
+            }
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                fromFile.Close();
+                toFile.Close();
+                File.Delete(destinationPath);
+                return;
+            }
+
+            var left = (int)(fromFile.Length - copied);
+            fromFile.Read(buffer, 0, left);
+            fromFile.Flush();
+            toFile.Write(buffer, 0, left);
+            toFile.Flush();
+        }
+        else
+        {
+            var buffer = new byte[fromFile.Length];
+            fromFile.Read(buffer, 0, buffer.Length);
+            fromFile.Flush();
+            toFile.Write(buffer, 0, buffer.Length);
+            toFile.Flush();
+
+        }
+        fromFile.Close();
+        toFile.Close();
+    }
+
+    public void Move(string sourcePath, string destinationPath, CancellationToken cancellationToken)
+    {
+       CopyImpl(sourcePath, destinationPath, cancellationToken);
+
+       if (cancellationToken.IsCancellationRequested)
+           return;
+
+       File.Delete(sourcePath);
     }
 
     public bool IsDirectoryExists(string path)

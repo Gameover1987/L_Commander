@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using ControlzEx.Standard;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.Infrastructure.Settings;
 using L_Commander.App.OperatingSystem;
@@ -49,9 +49,11 @@ namespace L_Commander.App.ViewModels
             _copyOperation = copyOperation;
             _moveOperation = moveOperation;
             _deleteOperation = deleteOperation;
-            _deleteOperation.Progress += FileSystemOperationOnProgress;
-            _moveOperation.Progress += FileSystemOperationOnProgress;
-            _copyOperation.Progress += FileSystemOperationOnProgress;
+            _deleteOperation.TotalProgress += FileSystemOperationOnProgress;
+            _moveOperation.TotalProgress += FileSystemOperationOnProgress;
+            _moveOperation.ActiveItemsProgress += CopyOperationOnActiveItemsProgress;
+            _copyOperation.TotalProgress += FileSystemOperationOnProgress;
+            _copyOperation.ActiveItemsProgress += CopyOperationOnActiveItemsProgress;
             _windowManager = windowManager;
             _historyViewModel = historyViewModel;
             _exceptionHandler = exceptionHandler;
@@ -139,11 +141,6 @@ namespace L_Commander.App.ViewModels
             settings.RightFileManagerSettings = RightFileManager.CollectSettings();
         }
 
-        public MainWindowSettings GetMainWindowSettings()
-        {
-            return _settingsManager.Get()?.MainWindowSettings;
-        }
-
         private bool CanRenameCommandHandler()
         {
             return ActiveFileManager?.SelectedTab?.RenameCommand.CanExecute() == true;
@@ -207,6 +204,12 @@ namespace L_Commander.App.ViewModels
 
                 _copyOperation.Initialize(descriptors, destPath);
                 await _copyOperation.Execute();
+
+                if (_copyOperation.HasErrors)
+                {
+                    var aggregateException = new AggregateException(_deleteOperation.Errors);
+                    _exceptionHandler.HandleExceptionWithMessageBox(aggregateException);
+                }
             }
             catch (Exception exception)
             {
@@ -304,6 +307,12 @@ namespace L_Commander.App.ViewModels
 
                 _moveOperation.Initialize(descriptors, destPath);
                 await _moveOperation.Execute();
+
+                if (_moveOperation.HasErrors)
+                {
+                    var aggregateException = new AggregateException(_moveOperation.Errors);
+                    _exceptionHandler.HandleExceptionWithMessageBox(aggregateException);
+                }
             }
             catch (Exception exception)
             {
@@ -351,6 +360,12 @@ namespace L_Commander.App.ViewModels
 
                 _deleteOperation.Initialize(selectedEntries.Select(x => x.GetDescriptor()).ToArray());
                 await _deleteOperation.Execute();
+
+                if (_deleteOperation.HasErrors)
+                {
+                    var aggregateException = new AggregateException(_deleteOperation.Errors);
+                    _exceptionHandler.HandleExceptionWithMessageBox(aggregateException);
+                }
 
                 ActiveFileManager?.SelectedTab.ReLoad();
             }
@@ -416,9 +431,40 @@ namespace L_Commander.App.ViewModels
                     return;
 
                 _progressDialogController.Maximum = e.Total;
-                _progressDialogController.SetMessage(e.CurrentItemName);
+
+                if (_deleteOperation.IsStarted)
+                {
+                    _progressDialogController.SetMessage(e.CurrentItemName);
+                }
+
                 _progressDialogController.SetProgress(e.Processed);
             });
+        }
+
+
+        private void CopyOperationOnActiveItemsProgress(object sender, CopyProgressEventArgs e)
+        {
+            ExecuteInUIThread(() =>
+            {
+                if (_progressDialogController == null)
+                    return;
+
+                var isMoving = sender is IMoveOperation;
+
+                var progressMessage = GetProgressMessage(e.ActiveWorks, isMoving);
+                _progressDialogController.SetMessage(progressMessage);
+            });
+        }
+
+        private string GetProgressMessage(CopyUnitOfWork[] works, bool isMoving)
+        {
+            var builder = new StringBuilder();
+            foreach (var work in works)
+            {
+                builder.AppendLine($"Copying {work.Percent}% - {work.DestinationPath}");
+            }
+
+            return builder.ToString();
         }
     }
 }

@@ -1,28 +1,42 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using L_Commander.App.Infrastructure.History;
 
 namespace L_Commander.App.OperatingSystem.Operations;
 
-public abstract class OperationBase<TUnit> : IFileSystemOperation<OperationProgressEventArgs>
-    where TUnit : class, IUnitOfWork     
+public abstract class OperationBase<TUnit> : IFileSystemOperation
+    where TUnit : class, IUnitOfWork
 {
     protected readonly ConcurrentQueue<TUnit> _worksQueue = new ConcurrentQueue<TUnit>();
-    protected readonly ConcurrentBag<Exception> _errors = new ConcurrentBag<Exception>();
+    private readonly ConcurrentBag<Exception> _errors = new ConcurrentBag<Exception>();
+    protected readonly ConcurrentBag<TUnit> _activeWorks = new ConcurrentBag<TUnit>();
 
-    private CancellationTokenSource _canellationTokenSource;    
+    private CancellationTokenSource _canellationTokenSource;
     protected bool _isInitialized;
 
     public bool IsStarted { get; protected set; }
 
-    public event EventHandler<OperationProgressEventArgs> Progress;
+    public bool HasErrors
+    {
+        get { return _errors.Any(); }
+    }
+
+    public Exception[] Errors
+    {
+        get { return _errors.ToArray(); }
+    }
+
+    public event EventHandler<OperationProgressEventArgs> TotalProgress;
 
     public Task Execute()
     {
+        _activeWorks.Clear();
+        _worksQueue.Clear();
+        _errors.Clear();
+
         if (!_isInitialized)
             throw new ArgumentException($"{GetType().Name} instance is not initialized!");
 
@@ -31,12 +45,11 @@ public abstract class OperationBase<TUnit> : IFileSystemOperation<OperationProgr
             _canellationTokenSource.Cancel();
             _canellationTokenSource.Dispose();
             _canellationTokenSource = null;
-        }      
+        }
 
         _canellationTokenSource = new CancellationTokenSource();
         var cancellationToken = _canellationTokenSource.Token;
 
-        var tasks = new List<Task>();
         return Task.Run(() =>
         {
             IsStarted = true;
@@ -45,14 +58,18 @@ public abstract class OperationBase<TUnit> : IFileSystemOperation<OperationProgr
                 Setup();
 
                 var tasks = new List<Task>();
-                for (int i = 0; i < Environment.ProcessorCount / 2; i++)
+                for (var i = 0; i < Environment.ProcessorCount / 2; i++)
                 {
-                    tasks.Add(Task.Run(() => ExecuteThreadMethodWithLogging(cancellationToken), cancellationToken));
+                    tasks.Add(Task.Run(() => ProcessQueue(cancellationToken), cancellationToken));
                 }
 
                 Task.WaitAll(tasks.ToArray());
 
                 Cleanup();
+            }
+            catch (Exception exception)
+            {
+                _errors.Add(exception);
             }
             finally
             {
@@ -72,8 +89,6 @@ public abstract class OperationBase<TUnit> : IFileSystemOperation<OperationProgr
 
     protected abstract void Setup();
 
-    protected abstract void ThreadMethod(TUnit unitOfWork);
-
     protected virtual void Cleanup()
     {
 
@@ -83,30 +98,52 @@ public abstract class OperationBase<TUnit> : IFileSystemOperation<OperationProgr
 
     protected void NotifyProgress(TUnit unitOfWork)
     {
-        Progress?.Invoke(this, GetProgressEventArgs(unitOfWork));
+        TotalProgress?.Invoke(this, GetProgressEventArgs(unitOfWork));
     }
-    private void ExecuteThreadMethodWithLogging(CancellationToken cancellationToken)
+
+    protected virtual void NotifyActiveItemProgress()
     {
-        try
+
+    }
+
+    private void ProcessQueue(CancellationToken cancellationToken)
+    {
+        while (!_worksQueue.IsEmpty)
         {
-            while (!_worksQueue.IsEmpty)
+            _worksQueue.TryDequeue(out var work);
+
+            if (work == null)
+                return;
+
+            if (cancellationToken.IsCancellationRequested)
+                return;
+
+            try
             {
-                _worksQueue.TryDequeue(out var work);
-
-                if (work == null)
-                    return;
-
-                if (cancellationToken.IsCancellationRequested)
-                    return;
+                work.Progress += WorkOnProgress;
+                work.Do(cancellationToken);
 
                 NotifyProgress(work);
-
-                ThreadMethod(work);
+            }
+            catch (Exception exception)
+            {
+                _errors.Add(exception);
+            }
+            finally
+            {
+                work.Progress -= WorkOnProgress;
             }
         }
-        catch (Exception exception)
+    }
+
+    private void WorkOnProgress(object sender, EventArgs e)
+    {
+        var work = (TUnit)sender;
+        if (!_activeWorks.Contains(work))
         {
-            _errors.Add(exception);
+            _activeWorks.Add(work);
         }
+
+        NotifyActiveItemProgress();
     }
 }

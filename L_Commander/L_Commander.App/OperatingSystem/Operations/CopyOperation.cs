@@ -21,6 +21,8 @@ public sealed class CopyOperation : OperationBase<CopyUnitOfWork>, ICopyOperatio
         _historyManager = historyManager;
     }
 
+    public event EventHandler<CopyProgressEventArgs> ActiveItemsProgress;
+
     public void Initialize(FileSystemEntryDescriptor[] entries, string destDirectory)
     {
         _entries = entries;
@@ -49,11 +51,6 @@ public sealed class CopyOperation : OperationBase<CopyUnitOfWork>, ICopyOperatio
         _initialCount = _worksQueue.Count;
     }
 
-    protected override void ThreadMethod(CopyUnitOfWork unitOfWork)
-    {
-        _fileSystemProvider.Copy(unitOfWork.SourcePath, unitOfWork.DestinationPath);
-    }
-
     protected override void Cleanup()
     {
         _historyManager.Add("Copy operation finished succesfully", string.Join("", _entries.Select(x => x.Path + Environment.NewLine)));
@@ -69,6 +66,19 @@ public sealed class CopyOperation : OperationBase<CopyUnitOfWork>, ICopyOperatio
         };
     }
 
+    protected override void NotifyActiveItemProgress()
+    {
+        ActiveItemsProgress?.Invoke(this, new CopyProgressEventArgs(GetActiveWorks()));
+    }
+
+    private CopyUnitOfWork[] GetActiveWorks()
+    {
+        return _activeWorks
+            .Where(x => x.Copied > 0 && x.Copied != x.TotalSize)
+            .OrderBy(x => x.DestinationPath)
+            .ToArray();
+    }
+
     private CopyUnitOfWork[] GetUnitOfWorks(FileSystemEntryDescriptor[] entries, string destDirectory)
     {
         var units = new List<CopyUnitOfWork>();
@@ -76,13 +86,16 @@ public sealed class CopyOperation : OperationBase<CopyUnitOfWork>, ICopyOperatio
         {
             if (descriptor.IsFile)
             {
-                units.Add(new CopyUnitOfWork(_fileSystemProvider.GetTopLevelPath(descriptor.Path), descriptor.Path, destDirectory));
+                units.Add(new CopyUnitOfWork(_fileSystemProvider.GetTopLevelPath(descriptor.Path), descriptor.Path, descriptor.TotalSize, destDirectory));
             }
             else
             {
-                var files = _fileSystemProvider.GetFilesRecursively(descriptor.Path);
-                units.AddRange(files.Select(x =>
-                    new CopyUnitOfWork(_fileSystemProvider.GetTopLevelPath(descriptor.Path), x, destDirectory)));
+                var descriptors = _fileSystemProvider
+                    .GetFilesRecursively(descriptor.Path)
+                    .Select(x => _fileSystemProvider.GetFileSystemDescriptor(x))
+                    .ToArray();
+                units.AddRange(descriptors.Select(x =>
+                    new CopyUnitOfWork(_fileSystemProvider.GetTopLevelPath(descriptor.Path), x.Path, x.TotalSize, destDirectory)));
             }
         }
 
