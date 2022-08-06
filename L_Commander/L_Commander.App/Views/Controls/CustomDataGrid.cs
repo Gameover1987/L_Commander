@@ -41,9 +41,11 @@ public class CustomDataGrid : DataGrid
         var row = grid.FindOverRow(e);
 
         _downItem = null; // always clear selecteditem 
-
+        
         if (SelectionMode == DataGridSelectionMode.Extended && 
-            row != null && SelectedItems.Contains(row.Item) && 
+            e.ChangedButton == MouseButton.Left &&
+            row != null && 
+            SelectedItems.Contains(row.Item) && 
             Keyboard.Modifiers == ModifierKeys.None &&
             e.ClickCount != 2)  //if the pointed item is already selected do not reselect it, so the previous multi-selection will remain
         {
