@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Windows.Data;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.Infrastructure.History;
@@ -12,11 +13,6 @@ using MahApps.Metro.Controls.Dialogs;
 
 namespace L_Commander.App.ViewModels.History
 {
-    public interface IHistoryViewModel
-    {
-        void Initialize();
-    }
-
     public class HistoryViewModel : ViewModelBase, IHistoryViewModel
     {
         private readonly IHistoryManager _historyManager;
@@ -91,8 +87,10 @@ namespace L_Commander.App.ViewModels.History
             try
             {
                 History.Clear();
+                
                 var items = await ThreadTaskExtensions.Run(() =>
                 {
+                    Thread.Sleep(2000);
                     return _historyManager.GetHistory();
                 });
 
@@ -114,6 +112,8 @@ namespace L_Commander.App.ViewModels.History
             }
         }
 
+        public HistoryItem[] SelectedHistoryItems { get; set; }
+
         private bool CanDeleteFromHistoryCommandHandler()
         {
             return SelectedHistoryItem != null;
@@ -123,13 +123,16 @@ namespace L_Commander.App.ViewModels.History
         {
             var questionSettings = new MetroDialogSettings { DefaultButtonFocus = MessageDialogResult.Affirmative };
             var result = await _windowManager.ShowQuestion("Delete from history",
-                $"Do you want delete history data about '{SelectedHistoryItem.Name}' at {SelectedHistoryItem.DateTime.ToString("F")}", 
+                $"Do you want delete selected history data?", 
                 questionSettings);
             if (result != MessageDialogResult.Affirmative)
                 return;
 
-            _historyManager.DeleteFromHistory(SelectedHistoryItem.Id);
-            History.Remove(SelectedHistoryItem);
+            foreach (var selectedHistoryItem in SelectedHistoryItems)
+            {
+                _historyManager.DeleteFromHistory(selectedHistoryItem.Id);
+                History.Remove(selectedHistoryItem);
+            }
         }
 
         private bool Filter(object obj)

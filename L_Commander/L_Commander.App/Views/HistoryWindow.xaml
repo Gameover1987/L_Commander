@@ -13,83 +13,113 @@
                  MinHeight="350"
                  Height="600" 
                  MinWidth="600"
-                 Width="800"
+                 Width="900"
                  GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
                  ResizeMode="CanResizeWithGrip"
                  ShowIconOnTitleBar="True"
                  WindowStartupLocation="CenterOwner"
-                 d:DataContext="{d:DesignInstance Type=designMock:DesignMockHistoryViewModel, IsDesignTimeCreatable=True}">
+                 d:DataContext="{d:DesignInstance Type=designMock:DesignMockHistoryViewModel, IsDesignTimeCreatable=True}"
+                 DataContextChanged="HistoryWindow_OnDataContextChanged">
     <Grid Margin="12">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0.30*"/>
-            <ColumnDefinition Width="0.70*"/>
+            <ColumnDefinition MinWidth="300" Width="350"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TextBox Grid.Column="0" Grid.Row="0" Margin="0,0,0,0" 
-                 mah:TextBoxHelper.ClearTextButton="True"
-                 mah:TextBoxHelper.UseFloatingWatermark="True"
-                 mah:TextBoxHelper.Watermark="Search in history..."
-                 Text="{Binding SearchString, Mode=TwoWay, Delay=300, UpdateSourceTrigger=PropertyChanged}"/>
+        <Grid Grid.Row="0"
+              Visibility="{Binding IsBusy, Converter={StaticResource BoolToInvisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <ListBox Grid.Column="0" Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="0,6,0,0"
-                 ItemsSource="{Binding History}"
-                 SelectedItem="{Binding SelectedHistoryItem}">
-            <ListBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type history:HistoryItem}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Grid.Row="0" Margin="0,0,0,0" 
+                     mah:TextBoxHelper.ClearTextButton="True"
+                     mah:TextBoxHelper.UseFloatingWatermark="True"
+                     mah:TextBoxHelper.Watermark="Search in history..."
+                     Text="{Binding SearchString, Mode=TwoWay, Delay=300, UpdateSourceTrigger=PropertyChanged}"/>
 
-                        <TextBlock Grid.Column="0" Grid.Row="0" Text="{Binding Name}" FontWeight="SemiBold" 
+            <ListBox x:Name="historyListBox" Grid.Column="0" Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="0,6,0,0"
+                     SelectionMode="Extended"
+                     ItemsSource="{Binding History}"
+                     SelectedItem="{Binding SelectedHistoryItem}"
+                     SelectionChanged="HistoryListBox_OnSelectionChanged">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type history:HistoryItem}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Grid.Row="0" Text="{Binding Name}" FontWeight="SemiBold" 
                                    TextTrimming="CharacterEllipsis" helpers:TextBlockToolTipHelper.ShowTooltipWhenTrimming="True"/>
-                        <TextBlock Grid.Column="1" Grid.Row="0" Margin="0,0,3,0" FontSize="10" VerticalAlignment="Top" Opacity="0.6"
+                            <TextBlock Grid.Column="1" Grid.Row="0" Margin="0,0,3,0" FontSize="10" VerticalAlignment="Top" Opacity="0.6"
                                    Text="{Binding DateTime, StringFormat='HH:mm:ss'}" />
-                    </Grid>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-            <ItemsControl.GroupStyle>
-                <GroupStyle>
-                    <GroupStyle.ContainerStyle>
-                        <Style TargetType="{x:Type GroupItem}">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate>
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="*"/>
-                                            </Grid.RowDefinitions>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <ItemsControl.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.ContainerStyle>
+                            <Style TargetType="{x:Type GroupItem}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate>
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="*"/>
+                                                </Grid.RowDefinitions>
 
-                                            <TextBlock Grid.Row="0" Text="{Binding Name, Converter={StaticResource DateToStringConverter}}"
-                                                       FontSize="18" Opacity="0.6"/>
+                                                <TextBlock Grid.Row="0" Text="{Binding Name, Converter={StaticResource DateToStringConverter}}"
+                                                           FontSize="18" Opacity="0.6"/>
 
-                                            <ItemsPresenter Grid.Row="1" Margin="0,0,0,6"/>
-                                        </Grid>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </GroupStyle.ContainerStyle>
-                </GroupStyle>
-            </ItemsControl.GroupStyle>
-        </ListBox>
+                                                <ItemsPresenter Grid.Row="1" Margin="0,0,0,6"/>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </GroupStyle.ContainerStyle>
+                    </GroupStyle>
+                </ItemsControl.GroupStyle>
+            </ListBox>
+        </Grid>
 
-        <TextBox Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Margin="6,0,0,0"
-                 IsReadOnly="True" IsReadOnlyCaretVisible="True"
-                 ScrollViewer.VerticalScrollBarVisibility="Auto"
-                 TextWrapping="Wrap"
-                 Text="{Binding SelectedHistoryItem.Description}"/>
+        <Grid Grid.Row="0" Grid.Column="1"
+              Visibility="{Binding IsBusy, Converter={StaticResource BoolToInvisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <Button Grid.Column="0" Grid.Row="2" Content="Delete from history" Margin="0,12,0,0"
+            <TextBlock Grid.Row="0" Margin="6,0,0,3" FontSize="18" Opacity="0.6">
+                <Run Text="{Binding SelectedHistoryItem.Name, Mode=OneWay}"/>
+                <Run Text="-"/>
+                <Run Text="{Binding SelectedHistoryItem.DateTime, Converter={StaticResource DateToStringConverter}, Mode=OneWay}"/>
+            </TextBlock>
+
+            <TextBox Grid.Row="1" Margin="6,0,0,0"
+                     IsReadOnly="True" IsReadOnlyCaretVisible="True"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     TextWrapping="Wrap"
+                     Text="{Binding SelectedHistoryItem.Description}"/>
+        </Grid>
+
+        <Button Grid.Column="0" Grid.Row="1" Content="Delete from history" Margin="0,12,0,0"
+                Visibility="{Binding IsBusy, Converter={StaticResource BoolToInvisibilityConverter}}"
                 Command="{Binding DeleteFromHistoryCommand}"/>
 
-        <Button Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" Content="Close" Width="100" HorizontalAlignment="Right" Margin="0,12,0,0"
+        <Button Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Content="Close" Width="100" HorizontalAlignment="Right" Margin="0,12,0,0"
+                Visibility="{Binding IsBusy, Converter={StaticResource BoolToInvisibilityConverter}}"
                 Click="ButtonClose_Click" IsCancel="True" />
+
+        <mah:MetroProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" 
+                              IsIndeterminate="{Binding IsBusy}"
+                              Margin="0"/>
     </Grid>
 </mah:MetroWindow>
