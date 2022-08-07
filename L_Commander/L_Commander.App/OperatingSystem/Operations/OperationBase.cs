@@ -14,7 +14,7 @@ public abstract class OperationBase<TUnit> : IFileSystemOperation
     private readonly ConcurrentBag<Exception> _errors = new ConcurrentBag<Exception>();
     protected readonly ConcurrentBag<TUnit> _activeWorks = new ConcurrentBag<TUnit>();
 
-    private CancellationTokenSource _canellationTokenSource;
+    private CancellationTokenSource _cancellationTokenSource;
     protected bool _isInitialized;
 
     public bool IsStarted { get; protected set; }
@@ -40,15 +40,15 @@ public abstract class OperationBase<TUnit> : IFileSystemOperation
         if (!_isInitialized)
             throw new ArgumentException($"{GetType().Name} instance is not initialized!");
 
-        if (_canellationTokenSource != null)
+        if (_cancellationTokenSource != null)
         {
-            _canellationTokenSource.Cancel();
-            _canellationTokenSource.Dispose();
-            _canellationTokenSource = null;
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
+            _cancellationTokenSource = null;
         }
 
-        _canellationTokenSource = new CancellationTokenSource();
-        var cancellationToken = _canellationTokenSource.Token;
+        _cancellationTokenSource = new CancellationTokenSource();
+        var cancellationToken = _cancellationTokenSource.Token;
 
         return Task.Run(() =>
         {
@@ -82,7 +82,7 @@ public abstract class OperationBase<TUnit> : IFileSystemOperation
 
     public void Cancel()
     {
-        _canellationTokenSource?.Cancel();
+        _cancellationTokenSource?.Cancel();
 
         _worksQueue.Clear();
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Controls;
 using System.Windows.Data;
 using L_Commander.App.Infrastructure;
 using L_Commander.App.Infrastructure.History;
@@ -52,6 +53,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
     private bool _isBusy;
     private bool _isLocked;
     private FilesAndFoldersSettings _settings;
+    private IFileManagerTabControl _control;
 
     public FileManagerTabViewModel(IFolderFilterViewModel folderFilter,
         IFileSystemProvider fileSystemProvider,
@@ -237,6 +239,11 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         SetPath(FullPath);
     }
 
+    public void Attach(IFileManagerTabControl fileManagerTabControl)
+    {
+        _control = fileManagerTabControl;
+    }
+
     private async void SetPath(string rootPath)
     {
         try
@@ -251,8 +258,8 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
 
             IsBusy = true;
             FileSystemEntries.Clear();
-
             _folderFilter.Clear();
+            _isManualyChangedSelection = false;
 
             var filesWithTags = _tagRepository.GetAllFilesWithTags();
 
@@ -269,12 +276,11 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
             
             await ThreadTaskExtensions.Run(() =>
             {
-                var items = _fileSystemProvider
-                    .GetFileSystemEntries(rootPath)
+                var itemsInTask = items
                     .Skip(FileSystemEntriesPageSize)
                     .Select(x => _fileSystemEntryViewModelFactory.CreateEntryViewModel(x));
               
-                foreach (var fileSystemEntryViewModel in items)
+                foreach (var fileSystemEntryViewModel in itemsInTask)
                 {
                     var tagsByFile = filesWithTags.FirstOrDefault(x => x.FilePath == fileSystemEntryViewModel.FullPath);
                     fileSystemEntryViewModel.Initialize(tagsByFile?.Tags);
@@ -283,7 +289,11 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
             });
 
             if (!_isManualyChangedSelection)
+            {
                 SelectedFileSystemEntry = FileSystemEntries.FirstOrDefault(FileSystemEntryFilter);
+            }
+
+            _control?.FocusToSelection();
 
             _folderFilter.Refresh(FileSystemEntries);
         }

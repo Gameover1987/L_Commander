@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -10,15 +11,21 @@ using L_Commander.App.Infrastructure;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.OperatingSystem.Operations;
 using L_Commander.App.ViewModels;
+using L_Commander.Common.Extensions;
 using MahApps.Metro.Controls;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace L_Commander.App.Views.Controls
 {
+    public interface IFileManagerTabControl
+    {
+        void FocusToSelection();
+    }
+
     /// <summary>
     /// Interaction logic for FileManagerTabControl.xaml
     /// </summary>
-    public partial class FileManagerTabControl : UserControl
+    public partial class FileManagerTabControl : UserControl, IFileManagerTabControl
     {
         private IFileManagerTabViewModel _fileManagerTab;
 
@@ -38,6 +45,7 @@ namespace L_Commander.App.Views.Controls
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             _fileManagerTab = (IFileManagerTabViewModel)e.NewValue;
+            _fileManagerTab.Attach(this);
         }
 
         private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -212,6 +220,26 @@ namespace L_Commander.App.Views.Controls
         {
             if (e.EscapePressed)
                 e.Action = DragAction.Cancel;
+        }
+
+        public void FocusToSelection()
+        {
+            ThreadTaskExtensions.Run(() =>
+            {
+                this.Dispatcher.BeginInvoke(() =>
+                {
+                    var selectedRow = dataGrid.ItemContainerGenerator.ContainerFromItem(dataGrid.SelectedItem);
+                    if (selectedRow == null)
+                    {
+                        var aaa = dataGrid.ItemContainerGenerator.Status;
+                        return;
+                    }
+
+                    var firstCell = selectedRow.FindChild<DataGridCell>();
+                    firstCell.Focus();
+                });
+            });
+
         }
     }
 }
