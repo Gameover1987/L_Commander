@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using L_Commander.App.Infrastructure.Settings;
+using L_Commander.App.OperatingSystem;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
@@ -9,12 +11,14 @@ namespace L_Commander.App.Infrastructure;
 public sealed class SettingsManager : ISettingsManager
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly IFileSystemProvider _fileSystemProvider;
 
     private const string ClientSettingsFileName = "ClientSettings.json";
 
-    public SettingsManager(IServiceProvider serviceProvider)
+    public SettingsManager(IServiceProvider serviceProvider, IFileSystemProvider fileSystemProvider)
     {
         _serviceProvider = serviceProvider;
+        _fileSystemProvider = fileSystemProvider;
     }
 
     public void Save()
@@ -35,7 +39,7 @@ public sealed class SettingsManager : ISettingsManager
 
     public ClientSettings Get()
     {
-        if (!File.Exists(ClientSettingsFileName))
+        if (!_fileSystemProvider.IsFileExists(ClientSettingsFileName))
             return GetDefaultSettings();
 
         return JsonConvert.DeserializeObject<ClientSettings>(File.ReadAllText(ClientSettingsFileName));
@@ -43,7 +47,7 @@ public sealed class SettingsManager : ISettingsManager
 
     public event EventHandler<SettingsChangedEventArgs> SettingsChanged;
 
-    private static ClientSettings GetDefaultSettings()
+    private ClientSettings GetDefaultSettings()
     {
         return new ClientSettings()
         {

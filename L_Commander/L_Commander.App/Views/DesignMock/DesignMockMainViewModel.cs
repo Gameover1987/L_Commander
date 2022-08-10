@@ -7,6 +7,7 @@ using L_Commander.App.Infrastructure;
 using L_Commander.App.Infrastructure.Settings;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.ViewModels;
+using L_Commander.App.ViewModels.Factories;
 
 namespace L_Commander.App.Views.DesignMock
 {
@@ -41,7 +42,8 @@ namespace L_Commander.App.Views.DesignMock
                   new DesignMockHistoryViewModel(),
                   new DesignMockExceptionHandler(),
                   new DesignMockSettingsViewModel(),
-                  new FileSystemProvider(new IconCache()))
+                  new FileSystemProvider(new IconCache()),
+                  new FileSystemEntryViewModelFactory(new FileSystemProvider(new IconCache()), new DesignMockExceptionHandler(), new DesignMockTagRepository()))
         {
         }
     }

@@ -17,4 +17,6 @@ public class ClientSettings
     public FileManagerSettings RightFileManagerSettings { get; set; }
 
     public FilesAndFoldersSettings FilesAndFoldersSettings { get; set; }
+
+    public FavoritesSettings FavoritesSettings { get; set; }
 }

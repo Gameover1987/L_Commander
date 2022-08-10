@@ -10,6 +10,8 @@
                  xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
                  xmlns:views="clr-namespace:L_Commander.App.Views"
                  xmlns:filtering="clr-namespace:L_Commander.App.ViewModels.Filtering"
+                 xmlns:viewModels="clr-namespace:L_Commander.App.ViewModels"
+                 xmlns:helpers="clr-namespace:L_Commander.UI.Helpers;assembly=L_Commander.UI"
                  mc:Ignorable="d"
                  Title="{x:Static app:Resources.MainWindowTitle}" 
                  MinHeight="600"
@@ -21,6 +23,12 @@
                  ShowIconOnTitleBar="True"
                  WindowStartupLocation="CenterScreen"
                  d:DataContext="{d:DesignInstance Type=designMock:DesignMockMainViewModel, IsDesignTimeCreatable=True}">
+    <mah:MetroWindow.Resources>
+        <ResourceDictionary>
+            <helpers:BindingProxy x:Key="BindingProxy"
+                                  Data="{Binding}"/>
+        </ResourceDictionary>
+    </mah:MetroWindow.Resources>
     <mah:MetroWindow.InputBindings>
         <KeyBinding Key="F2"
                     Command="{Binding RenameCommand}"/>
@@ -58,27 +66,59 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Menu Grid.Row="0">
-            <MenuItem Header="Files">
-                <MenuItem Header="Open"
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <Menu Grid.Column="0">
+                <MenuItem Header="Files">
+                    <MenuItem Header="Open"
                           Command="{Binding ActiveFileManager.SelectedTab.OpenCommand}"
                           InputGestureText="Enter"/>
-                <MenuItem Header="Open with" 
+                    <MenuItem Header="Open with" 
                           Command="{Binding ActiveFileManager.SelectedTab.OpenWithCommand}"/>
-                <Separator/>
-                <MenuItem Header="Archive" IsEnabled="False"/>
-                <MenuItem Header="UnArchive" IsEnabled="False"/>
-                <Separator/>
-                <MenuItem Header="Exit"
+                    <Separator/>
+                    <MenuItem Header="Archive" IsEnabled="False"/>
+                    <MenuItem Header="UnArchive" IsEnabled="False"/>
+                    <Separator/>
+                    <MenuItem Header="Exit"
                           InputGestureText="Alt+F4"/>
-            </MenuItem>
-            <MenuItem Header="Options">
-                <MenuItem Header="Settings"
+                </MenuItem>
+                <MenuItem Header="Options">
+                    <MenuItem Header="Settings"
                           Command="{Binding ShowSettingsCommand}"/>
-                <MenuItem Header="History"
+                    <MenuItem Header="History"
                           Command="{Binding ShowHistoryCommand}"/>
-            </MenuItem>
-        </Menu>
+                </MenuItem>
+            </Menu>
+
+            <ScrollViewer Grid.Column="1" 
+                          HorizontalAlignment="Center"
+                          VerticalScrollBarVisibility="Disabled" 
+                          HorizontalScrollBarVisibility="Auto" Margin="24,6,0,0">
+                <ItemsControl ItemsSource="{Binding Favorites}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Orientation="Horizontal" IsItemsHost="True"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type viewModels:FavoriteFileSystemEntryViewModel}">
+                            <Grid Background="Transparent">                                
+                                <Button Content="{Binding DisplayName}" Margin="0,0,3,0" MinWidth="100"
+                                        ToolTip="{Binding FullPath}"
+                                        Command="{Binding Source={StaticResource BindingProxy}, Path=Data.NavigateToFavoriteCommand}"
+                                        CommandParameter="{Binding}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+       
         
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>

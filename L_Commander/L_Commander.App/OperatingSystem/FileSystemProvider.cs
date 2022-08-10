@@ -229,12 +229,12 @@ public sealed class FileSystemProvider : IFileSystemProvider
 
     public void Move(string sourcePath, string destinationPath, CancellationToken cancellationToken)
     {
-       CopyImpl(sourcePath, destinationPath, cancellationToken);
+        CopyImpl(sourcePath, destinationPath, cancellationToken);
 
-       if (cancellationToken.IsCancellationRequested)
-           return;
+        if (cancellationToken.IsCancellationRequested)
+            return;
 
-       File.Delete(sourcePath);
+        File.Delete(sourcePath);
     }
 
     public bool IsDirectoryExists(string path)
@@ -289,5 +289,17 @@ public sealed class FileSystemProvider : IFileSystemProvider
 
         DrivesChanged?.Invoke(this, EventArgs.Empty);
         return IntPtr.Zero;
+    }
+
+    public string GetSpecialFolderPath(Environment.SpecialFolder specialFolder)
+    {
+        try
+        {
+            return Environment.GetFolderPath(specialFolder);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 }

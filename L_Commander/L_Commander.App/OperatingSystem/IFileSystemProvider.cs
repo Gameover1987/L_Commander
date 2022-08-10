@@ -2,17 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using static System.Environment;
 
 namespace L_Commander.App.OperatingSystem
 {
-    public class PathInfo
-    {
-        public int FilesCount { get; set; }
-
-        public int FoldersCount { get; set; }
-
-        public long TotalSize { get; set; }
-    }
 
     public interface IFileSystemProvider
     {
@@ -53,6 +46,8 @@ namespace L_Commander.App.OperatingSystem
         string CombinePaths(params string[] paths);
 
         PathInfo GetPathInfoRecursively(string folderPath);
+
+        string GetSpecialFolderPath(SpecialFolder specialFolder);
 
         void Initialize();
 

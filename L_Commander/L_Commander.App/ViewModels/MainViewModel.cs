@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using L_Commander.App.Infrastructure;
 using L_Commander.App.Infrastructure.Settings;
 using L_Commander.App.OperatingSystem;
 using L_Commander.App.OperatingSystem.Operations;
+using L_Commander.App.ViewModels.Factories;
 using L_Commander.App.ViewModels.History;
 using L_Commander.App.ViewModels.Settings;
 using L_Commander.App.Views;
@@ -15,6 +17,7 @@ using MahApps.Metro.Controls.Dialogs;
 
 namespace L_Commander.App.ViewModels
 {
+
     public class MainViewModel : ViewModelBase, IMainViewModel
     {
         private readonly ISettingsManager _settingsManager;
@@ -29,6 +32,8 @@ namespace L_Commander.App.ViewModels
         private readonly IExceptionHandler _exceptionHandler;
         private readonly ISettingsViewModel _settingsViewModel;
         private readonly IFileSystemProvider _fileSystemProvider;
+        private readonly IFileSystemEntryViewModelFactory _factory;
+
         private ProgressDialogController _progressDialogController;
 
         public MainViewModel(ISettingsManager settingsManager,
@@ -41,7 +46,8 @@ namespace L_Commander.App.ViewModels
             IHistoryViewModel historyViewModel,
             IExceptionHandler exceptionHandler,
             ISettingsViewModel settingsViewModel,
-            IFileSystemProvider fileSystemProvider)
+            IFileSystemProvider fileSystemProvider,
+            IFileSystemEntryViewModelFactory factory)
         {
             _settingsManager = settingsManager;
             _leftFileManager = leftFileManager;
@@ -59,6 +65,7 @@ namespace L_Commander.App.ViewModels
             _exceptionHandler = exceptionHandler;
             _settingsViewModel = settingsViewModel;
             _fileSystemProvider = fileSystemProvider;
+            _factory = factory;
 
             ActiveFileManager = LeftFileManager;
 
@@ -70,6 +77,7 @@ namespace L_Commander.App.ViewModels
             DeleteCommand = new DelegateCommand(DeleteCommandHandler, CanDeleteCommandHandler);
             ShowSettingsCommand = new DelegateCommand(ShowSettingsCommandHandler);
             ShowHistoryCommand = new DelegateCommand(ShowHistoryCommandHandler);
+            NavigateToFavoriteCommand = new DelegateCommand(NavigateToFavoriteCommandHandler);
         }
 
         public IFileManagerViewModel LeftFileManager => _leftFileManager;
@@ -103,6 +111,8 @@ namespace L_Commander.App.ViewModels
             }
         }
 
+        public ObservableCollection<IFavoriteFileSystemEntryViewModel> Favorites { get; } = new ObservableCollection<IFavoriteFileSystemEntryViewModel>();
+
         public IDelegateCommand RenameCommand { get; }
 
         public IDelegateCommand OpenCommand { get; }
@@ -119,6 +129,8 @@ namespace L_Commander.App.ViewModels
 
         public IDelegateCommand ShowHistoryCommand { get; }
 
+        public IDelegateCommand NavigateToFavoriteCommand { get; }
+
         public void Initialize()
         {
             var settings = _settingsManager.Get();
@@ -126,6 +138,19 @@ namespace L_Commander.App.ViewModels
             _rightFileManager.Initialize(settings?.RightFileManagerSettings);
 
             _fileSystemProvider.Initialize();
+
+            Favorites.Clear();
+            if (settings.FavoritesSettings != null)
+            {
+
+            }
+            else
+            {
+                foreach (var specialFolderPath in GetDefaultFavorites())
+                {
+                    Favorites.Add(_factory.CreateFavorite(specialFolderPath));
+                }
+            }
         }
 
         public void FillSettings(ClientSettings settings)
@@ -167,7 +192,6 @@ namespace L_Commander.App.ViewModels
                 return false;
             if (AnotherFileManager?.SelectedTab == null)
                 return false;
-
 
             return !_copyOperation.IsStarted;
         }
@@ -411,6 +435,15 @@ namespace L_Commander.App.ViewModels
             _windowManager.ShowDialogWindow<HistoryWindow>(_historyViewModel);
         }
 
+        private void NavigateToFavoriteCommandHandler(object obj)
+        {
+            if (ActiveFileManager.SelectedTab == null)
+                return;
+
+            var favorite = (IFavoriteFileSystemEntryViewModel)obj;
+            ActiveFileManager.SelectedTab.FullPath = favorite.FullPath;
+        }
+
         private void ProgressDialogControllerOnCanceled(object sender, EventArgs e)
         {
             if (_copyOperation.IsStarted)
@@ -465,6 +498,20 @@ namespace L_Commander.App.ViewModels
             }
 
             return builder.ToString();
+        }
+
+        private string[] GetDefaultFavorites()
+        {
+            return new string[]
+            {
+                _fileSystemProvider.GetSpecialFolderPath(Environment.SpecialFolder.Desktop),
+                _fileSystemProvider.GetSpecialFolderPath(Environment.SpecialFolder.MyDocuments),
+                _fileSystemProvider.GetSpecialFolderPath(Environment.SpecialFolder.MyMusic),
+                _fileSystemProvider.GetSpecialFolderPath(Environment.SpecialFolder.MyVideos),
+                _fileSystemProvider.GetSpecialFolderPath(Environment.SpecialFolder.MyPictures),
+            }
+            .Where(x => x != null)
+            .ToArray();
         }
     }
 }
