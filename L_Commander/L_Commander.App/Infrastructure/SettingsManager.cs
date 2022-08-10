@@ -9,7 +9,7 @@ namespace L_Commander.App.Infrastructure;
 public sealed class SettingsManager : ISettingsManager
 {
     private readonly IServiceProvider _serviceProvider;
-        
+
     private const string ClientSettingsFileName = "ClientSettings.json";
 
     public SettingsManager(IServiceProvider serviceProvider)
@@ -36,10 +36,22 @@ public sealed class SettingsManager : ISettingsManager
     public ClientSettings Get()
     {
         if (!File.Exists(ClientSettingsFileName))
-            return null;
+            return GetDefaultSettings();
 
         return JsonConvert.DeserializeObject<ClientSettings>(File.ReadAllText(ClientSettingsFileName));
     }
 
     public event EventHandler<SettingsChangedEventArgs> SettingsChanged;
+
+    private static ClientSettings GetDefaultSettings()
+    {
+        return new ClientSettings()
+        {
+            FilesAndFoldersSettings = new FilesAndFoldersSettings
+            {
+                ShowHiddenFilesAndFolders = true,
+                ShowSystemFilesAndFolders = true
+            }
+        };
+    }
 }

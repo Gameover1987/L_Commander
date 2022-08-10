@@ -223,7 +223,7 @@ public class FileManagerTabViewModel : ViewModelBase, IFileManagerTabViewModel
         _navigationIndex = 0;
         _navigationHistory.Add(NavigationHistoryItem.Create(rootPath));
 
-        _settings = _settingsManager.Get().FilesAndFoldersSettings;
+        _settings = _settingsManager.Get()?.FilesAndFoldersSettings;
 
         SetPath(rootPath);
     }
