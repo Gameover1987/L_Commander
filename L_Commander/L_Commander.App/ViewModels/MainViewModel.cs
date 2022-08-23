@@ -78,6 +78,7 @@ namespace L_Commander.App.ViewModels
             ShowSettingsCommand = new DelegateCommand(ShowSettingsCommandHandler);
             ShowHistoryCommand = new DelegateCommand(ShowHistoryCommandHandler);
             NavigateToFavoriteCommand = new DelegateCommand(NavigateToFavoriteCommandHandler);
+            AddToFavoritesCommand = new DelegateCommand(AddToFavoritesCommandHandler);
         }
 
         public IFileManagerViewModel LeftFileManager => _leftFileManager;
@@ -131,6 +132,8 @@ namespace L_Commander.App.ViewModels
 
         public IDelegateCommand NavigateToFavoriteCommand { get; }
 
+        public IDelegateCommand AddToFavoritesCommand { get; }
+
         public void Initialize()
         {
             var settings = _settingsManager.Get();
@@ -139,18 +142,7 @@ namespace L_Commander.App.ViewModels
 
             _fileSystemProvider.Initialize();
 
-            Favorites.Clear();
-            if (settings.FavoritesSettings != null)
-            {
-
-            }
-            else
-            {
-                foreach (var specialFolderPath in GetDefaultFavorites())
-                {
-                    Favorites.Add(_factory.CreateFavorite(specialFolderPath));
-                }
-            }
+            InitializeFavorites(settings);
         }
 
         public void FillSettings(ClientSettings settings)
@@ -164,6 +156,36 @@ namespace L_Commander.App.ViewModels
             };
             settings.LeftFileManagerSettings = LeftFileManager.CollectSettings();
             settings.RightFileManagerSettings = RightFileManager.CollectSettings();
+
+            settings.FavoritesSettings = new FavoritesSettings
+            {
+                Favorites = Favorites.Select(x => x.FullPath).ToArray()
+            };
+        }
+
+        private void InitializeFavorites(ClientSettings settings)
+        {
+            Favorites.Clear();
+            if (settings.FavoritesSettings != null)
+            {
+                foreach (var folderPath in settings.FavoritesSettings.Favorites)
+                {
+                    if (!_fileSystemProvider.IsDirectoryExists(folderPath))
+                        continue;
+
+                    Favorites.Add(_factory.CreateFavorite(folderPath));
+                }
+            }
+            else
+            {
+                foreach (var specialFolderPath in GetDefaultFavorites())
+                {
+                    if (!_fileSystemProvider.IsDirectoryExists(specialFolderPath))
+                        continue;
+
+                    Favorites.Add(_factory.CreateFavorite(specialFolderPath));
+                }
+            }
         }
 
         private bool CanRenameCommandHandler()
@@ -442,6 +464,15 @@ namespace L_Commander.App.ViewModels
 
             var favorite = (IFavoriteFileSystemEntryViewModel)obj;
             ActiveFileManager.SelectedTab.FullPath = favorite.FullPath;
+        }
+
+        private void AddToFavoritesCommandHandler(object obj)
+        {
+            if (ActiveFileManager.SelectedTab == null)
+                return;
+
+            var clickedTab = (IFileManagerTabViewModel)obj;
+            Favorites.Add(_factory.CreateFavorite(clickedTab.FullPath));
         }
 
         private void ProgressDialogControllerOnCanceled(object sender, EventArgs e)

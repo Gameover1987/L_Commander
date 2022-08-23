@@ -11,7 +11,7 @@
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance Type=designMock:DesignMockFileManagerViewModel, IsDesignTimeCreatable=True}">
+             d:DataContext="{d:DesignInstance Type=designMock:DesignMockFileManagerViewModel, IsDesignTimeCreatable=True}">  
     <UserControl.InputBindings>
         <KeyBinding Gesture="Ctrl+T"
                     Command="{Binding NewTabCommand}"/>
@@ -27,6 +27,9 @@
     </UserControl.InputBindings>
     <UserControl.Resources>
         <ResourceDictionary>
+            <helpers:BindingProxy x:Key="MainWindowBindingProxy"
+                              Data="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext}"/>
+
             <DataTemplate DataType="{x:Type viewModels:FileManagerTabViewModel}">
                 <local:FileManagerTabControl Margin="0,3,0,0"/>
             </DataTemplate>
@@ -105,7 +108,9 @@
                                           IsChecked="{Binding IsLocked}"
                                           Command="{Binding Source={StaticResource BindingProxy}, Path=Data.LockTabCommand}"
                                           CommandParameter="{Binding}"/>
-                                <MenuItem Header="Add to favorites"/>
+                                <MenuItem Header="Add to favorites"
+                                          Command="{Binding Source={StaticResource MainWindowBindingProxy}, Path=Data.AddToFavoritesCommand}"
+                                          CommandParameter="{Binding}"/>
                             </ContextMenu>
                         </Setter.Value>
                     </Setter>
