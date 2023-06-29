@@ -1,0 +1,16 @@
+L_Commander/L_Commander.App/obj/
+L_Commander/.vs/L_Commander/v16/
+L_Commander/L_Commander.App/bin/
+L_Commander/L_Commander.App/L_Commander.App.csproj.user
+L_Commander/.vs/
+L_Commander/L_Commander.Common/bin/
+L_Commander/L_Commander.Common/obj/
+L_Commander/L_Commander.UI/bin/
+*.user
+L_Commander/L_Commander.UI/obj/
+/.vs
+L_Commander/L_Commander.Database/obj/
+L_Commander/L_Commander.Database/bin/Debug/net6.0/L_Commander.Database.dll
+L_Commander/L_Commander.Tests/bin/Debug/
+L_Commander/L_Commander.Tests/obj/
+L_Commander/L_Commander.Database/bin/
